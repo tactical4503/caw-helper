@@ -1,25 +1,22 @@
-# CAW Helper
+# CAW Helper — Finished Visual Foundation
 
-CAW Helper is a fan-made wrestling CAW creation, research, design, and learning platform.
+CAW Helper is an unofficial fan-made wrestling CAW creation, study and design platform.
 
-## Current build
+## Current experience
+- Cinematic game-world home screen.
+- Original generated mask study collection.
+- Mask Wall with search, filters, selection, favorites and inspection.
+- Drag-to-rotate / wheel-to-zoom inspection treatment.
+- Mask Builder with construction, material, palette, pattern, finish, depth and scale controls.
+- Local project/version persistence and JSON export.
+- Create, Body, Attire, Accessories, Explore, Learn and Library worlds.
+- Responsive layouts and reduced-motion support.
 
-The repository contains the working CAW Helper interface, its source, and local visual assets. The main runnable entry is `index.html` for the current standalone build. The React/Three source is retained under `src/` for continued development.
+## Originality
+The visual direction is original. Generated mask artwork was created specifically for this project rather than copied from real-world mask artwork.
 
-## Asset rule
+## Architecture
+The current production artifact is deliberately portable HTML/CSS/JS. The experience is structured so the data and visual systems can later move into React/TypeScript/Three.js without discarding the design.
 
-Visual assets belong in `public/assets/` and should be referenced locally by the application. Do not ship UI that depends on missing placeholder images.
-
-## Development direction
-
-- cinematic game-style CAW workflow
-- Mask Maker as a major world, not a basic page
-- data-driven mask archive
-- future 3D/UV/texture tooling
-- local project persistence and export
-- responsive desktop/mobile experience
-- maintainable AI-assisted codebase
-
-## Important
-
-This is an unofficial fan-made project and is not affiliated with or endorsed by WWE or any rights holder.
+## Deployment
+The repository is ready for GitHub Pages once Pages is enabled for the repository.
