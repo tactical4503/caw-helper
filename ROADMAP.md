@@ -6,21 +6,21 @@
 - [x] Cinematic navigation
 - [x] Responsive layout
 - [x] Persistent local project state
-- [x] Undo/redo
 - [x] Project export
+- [x] Deterministic physical-object mask asset pipeline
 
 ## Mask Maker
 - [x] Physical-style mask wall
+- [x] 20 distinct original physical-object mask assets
 - [x] Era timeline
 - [x] Search/filter
 - [x] Mask inspection
 - [x] Design breakdown
 - [x] Favorites
 - [x] Original-mask builder concept
-- [x] Local SVG study assets
+- [x] Local object assets
 
 ## Next production layers
-- [ ] Real high-resolution historical reference archive with verified sources
 - [ ] Real GLB mask models
 - [ ] 3D orbit/inspection
 - [ ] UV editor
