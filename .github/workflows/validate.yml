@@ -1,0 +1,24 @@
+name: CAW Helper checks
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate JavaScript
+        run: node --check app.js
+      - name: Verify required assets
+        run: |
+          test -f index.html
+          test -f styles.css
+          test -f app.js
+          test -f assets/worlds/mask-archive.svg
+          test -f assets/masks/sunfang.svg
+          test -f assets/masks/kitsune-frame.svg
+          test -f assets/masks/television-ghost.svg
+          count=$(find assets/masks -type f -name '*.svg' | wc -l)
+          test "$count" -ge 12
