@@ -19,6 +19,9 @@ jobs:
           test -f assets/worlds/mask-archive.svg
           test -f assets/worlds/anatomy-lab.svg
           test -f assets/worlds/boot-workshop.svg
+      - name: Reject broken generated asset references
+        run: |
+          ! grep -R "assets/generated/" -n . --exclude-dir=.git
       - name: Verify all physical mask assets
         run: |
           for f in             ember-dragon frost-phoenix jungle-spirit sol-invictus void-walker             crimson-skull ocean-king shadow-fox iron-serpent celestial-guardian             night-blossom blood-moon paper-tiger glass-wraith sun-eater             velvet-jester storm-ram moon-viper cinder-owl white-noise
