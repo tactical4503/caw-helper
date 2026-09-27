@@ -11,14 +11,18 @@ jobs:
       - uses: actions/checkout@v4
       - name: Validate JavaScript
         run: node --check app.js
-      - name: Verify required assets
+      - name: Verify required app files
         run: |
           test -f index.html
           test -f styles.css
           test -f app.js
           test -f assets/worlds/mask-archive.svg
-          test -f assets/masks/sunfang.svg
-          test -f assets/masks/kitsune-frame.svg
-          test -f assets/masks/television-ghost.svg
-          count=$(find assets/masks -type f -name '*.svg' | wc -l)
-          test "$count" -ge 12
+          test -f assets/worlds/anatomy-lab.svg
+          test -f assets/worlds/boot-workshop.svg
+      - name: Verify all physical mask assets
+        run: |
+          for f in             ember-dragon frost-phoenix jungle-spirit sol-invictus void-walker             crimson-skull ocean-king shadow-fox iron-serpent celestial-guardian             night-blossom blood-moon paper-tiger glass-wraith sun-eater             velvet-jester storm-ram moon-viper cinder-owl white-noise
+          do
+            test -f "assets/objects/masks/$f.svg"
+          done
+          test "$(find assets/objects/masks -type f -name '*.svg' | wc -l)" -ge 20
