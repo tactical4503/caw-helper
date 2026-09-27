@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 520">
+<defs>
+ <radialGradient id="g" cx="45%" cy="28%"><stop offset="0" stop-color="#e9e1c8"/><stop offset="1" stop-color="#d4a72c"/></radialGradient>
+ <filter id="s"><feDropShadow dx="0" dy="18" stdDeviation="16" flood-opacity=".35"/></filter>
+</defs>
+<rect width="400" height="520" fill="#111"/>
+<rect x="18" y="18" width="364" height="484" rx="4" fill="#1a1a18" stroke="#777" stroke-width="2"/>
+<path d="M55 145 L92 70 L150 112 L200 48 L250 112 L308 70 L345 145 L325 390 Q200 475 75 390Z" fill="url(#g)" stroke="#174ea6" stroke-width="12" filter="url(#s)"/>
+<path d="M82 180 Q120 145 160 174 L200 205 L240 174 Q280 145 318 180 L300 285 Q200 330 100 285Z" fill="#174ea6" opacity=".9"/>
+<path d="M105 210 Q130 192 156 211 L142 244 Q120 252 102 235Z" fill="#090909" stroke="#e9e1c8" stroke-width="6"/>
+<path d="M295 210 Q270 192 244 211 L258 244 Q280 252 298 235Z" fill="#090909" stroke="#e9e1c8" stroke-width="6"/>
+<path d="M155 304 Q200 335 245 304" fill="none" stroke="#d4a72c" stroke-width="13"/>
+<path d="M200 118 L200 390" stroke="#e9e1c8" stroke-width="5" opacity=".7"/>
+<text x="35" y="475" fill="#eee" font-family="Arial" font-size="18" letter-spacing="4">BLUE-COMET</text>
+<text x="35" y="496" fill="#aaa" font-family="Arial" font-size="10" letter-spacing="2">CAW HELPER / ORIGINAL STUDY ASSET</text>
+</svg>
