@@ -1,0 +1,115 @@
+{
+  "version": 1,
+  "source": "CAW Helper original study collection",
+  "note": "Original study illustrations. Historical claims should be added only after verification.",
+  "masks": [
+    {
+      "id": "sunfang",
+      "name": "Sunfang",
+      "era": "EARLY",
+      "region": "Lucha",
+      "year": 1948,
+      "asset": "assets/masks/sunfang.svg",
+      "lesson": "Silhouette first: the outline should read before decoration."
+    },
+    {
+      "id": "kitsune-frame",
+      "name": "Kitsune Frame",
+      "era": "CLASSIC",
+      "region": "Japan",
+      "year": 1976,
+      "asset": "assets/masks/kitsune-frame.svg",
+      "lesson": "Implied shapes can be stronger than literal illustrations."
+    },
+    {
+      "id": "television-ghost",
+      "name": "Television Ghost",
+      "era": "HORROR",
+      "region": "US",
+      "year": 1983,
+      "asset": "assets/masks/television-ghost.svg",
+      "lesson": "Small asymmetries can create unease without gore."
+    },
+    {
+      "id": "blue-comet",
+      "name": "Blue Comet",
+      "era": "CLASSIC",
+      "region": "Mexico",
+      "year": 1988,
+      "asset": "assets/masks/blue-comet.svg",
+      "lesson": "A limited palette can still be instantly memorable."
+    },
+    {
+      "id": "paper-moon",
+      "name": "Paper Moon",
+      "era": "EXPERIMENTAL",
+      "region": "Global",
+      "year": 1994,
+      "asset": "assets/masks/paper-moon.svg",
+      "lesson": "A strange material choice can become the gimmick."
+    },
+    {
+      "id": "night-engine",
+      "name": "Night Engine",
+      "era": "MODERN",
+      "region": "Japan",
+      "year": 2007,
+      "asset": "assets/masks/night-engine.svg",
+      "lesson": "Modernity can come from construction, not neon."
+    },
+    {
+      "id": "carnival-saint",
+      "name": "Carnival Saint",
+      "era": "CLASSIC",
+      "region": "Lucha",
+      "year": 1965,
+      "asset": "assets/masks/carnival-saint.svg",
+      "lesson": "Texture layering creates richness without clutter."
+    },
+    {
+      "id": "mirror-dog",
+      "name": "Mirror Dog",
+      "era": "MODERN",
+      "region": "US",
+      "year": 2012,
+      "asset": "assets/masks/mirror-dog.svg",
+      "lesson": "Comedy can come from commitment to a specific idea."
+    },
+    {
+      "id": "red-room",
+      "name": "Red Room",
+      "era": "HORROR",
+      "region": "Japan",
+      "year": 2018,
+      "asset": "assets/masks/red-room.svg",
+      "lesson": "Removing facial information can be more unsettling than adding it."
+    },
+    {
+      "id": "silver-static",
+      "name": "Silver Static",
+      "era": "EXPERIMENTAL",
+      "region": "Global",
+      "year": 2022,
+      "asset": "assets/masks/silver-static.svg",
+      "lesson": "A missing feature can become the focal point."
+    },
+    {
+      "id": "jagged-sun",
+      "name": "Jagged Sun",
+      "era": "MODERN",
+      "region": "Mexico",
+      "year": 2015,
+      "asset": "assets/masks/jagged-sun.svg",
+      "lesson": "Directional shapes can make static gear look fast."
+    },
+    {
+      "id": "last-clown",
+      "name": "The Last Clown",
+      "era": "HORROR",
+      "region": "US",
+      "year": 1991,
+      "asset": "assets/masks/last-clown.svg",
+      "lesson": "Context can change how the same shape is perceived."
+    }
+  ]
+}
