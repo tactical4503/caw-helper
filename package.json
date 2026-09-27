@@ -1,0 +1,7 @@
+{
+  "name":"caw-helper",
+  "version":"0.2.0",
+  "private":true,
+  "scripts":{"check":"node --check app.js"},
+  "description":"CAW Helper — cinematic wrestling CAW creation and study platform"
+}
