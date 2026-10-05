@@ -73,7 +73,7 @@ Lighting:
 Studio product lighting: large soft key from upper left, gentle fill from the right, crisp rim light from behind to separate the silhouette, soft self-shadowing in the eye sockets and under the brow.
 
 Color:
-${m.palette}. Keep the palette controlled; no extra accent colours.
+${m.palette.replace(/\.$/, "")}. Keep the palette controlled; no extra accent colours.
 
 Background:
 Fully transparent background (PNG with alpha). No floor, no pedestal, no cast shadow on a surface.

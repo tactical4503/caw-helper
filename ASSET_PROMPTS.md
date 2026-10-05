@@ -668,7 +668,7 @@ Lighting:
 Studio product lighting: large soft key from upper left, gentle fill from the right, crisp rim light from behind to separate the silhouette, soft self-shadowing in the eye sockets and under the brow.
 
 Color:
-Deep crimson, burnished gold, black.. Keep the palette controlled; no extra accent colours.
+Deep crimson, burnished gold, black. Keep the palette controlled; no extra accent colours.
 
 Background:
 Fully transparent background (PNG with alpha). No floor, no pedestal, no cast shadow on a surface.
@@ -795,7 +795,7 @@ Lighting:
 Studio product lighting: large soft key from upper left, gentle fill from the right, crisp rim light from behind to separate the silhouette, soft self-shadowing in the eye sockets and under the brow.
 
 Color:
-White, ice blue, silver.. Keep the palette controlled; no extra accent colours.
+White, ice blue, silver. Keep the palette controlled; no extra accent colours.
 
 Background:
 Fully transparent background (PNG with alpha). No floor, no pedestal, no cast shadow on a surface.
@@ -922,7 +922,7 @@ Lighting:
 Studio product lighting: large soft key from upper left, gentle fill from the right, crisp rim light from behind to separate the silhouette, soft self-shadowing in the eye sockets and under the brow.
 
 Color:
-Forest green, black, antique gold.. Keep the palette controlled; no extra accent colours.
+Forest green, black, antique gold. Keep the palette controlled; no extra accent colours.
 
 Background:
 Fully transparent background (PNG with alpha). No floor, no pedestal, no cast shadow on a surface.
@@ -1049,7 +1049,7 @@ Lighting:
 Studio product lighting: large soft key from upper left, gentle fill from the right, crisp rim light from behind to separate the silhouette, soft self-shadowing in the eye sockets and under the brow.
 
 Color:
-Gold, ivory, deep red.. Keep the palette controlled; no extra accent colours.
+Gold, ivory, deep red. Keep the palette controlled; no extra accent colours.
 
 Background:
 Fully transparent background (PNG with alpha). No floor, no pedestal, no cast shadow on a surface.
@@ -1176,7 +1176,7 @@ Lighting:
 Studio product lighting: large soft key from upper left, gentle fill from the right, crisp rim light from behind to separate the silhouette, soft self-shadowing in the eye sockets and under the brow.
 
 Color:
-Black, deep violet, silver.. Keep the palette controlled; no extra accent colours.
+Black, deep violet, silver. Keep the palette controlled; no extra accent colours.
 
 Background:
 Fully transparent background (PNG with alpha). No floor, no pedestal, no cast shadow on a surface.
@@ -1303,7 +1303,7 @@ Lighting:
 Studio product lighting: large soft key from upper left, gentle fill from the right, crisp rim light from behind to separate the silhouette, soft self-shadowing in the eye sockets and under the brow.
 
 Color:
-Blood red, bone, black.. Keep the palette controlled; no extra accent colours.
+Blood red, bone, black. Keep the palette controlled; no extra accent colours.
 
 Background:
 Fully transparent background (PNG with alpha). No floor, no pedestal, no cast shadow on a surface.
@@ -1430,7 +1430,7 @@ Lighting:
 Studio product lighting: large soft key from upper left, gentle fill from the right, crisp rim light from behind to separate the silhouette, soft self-shadowing in the eye sockets and under the brow.
 
 Color:
-Royal blue, white, gold.. Keep the palette controlled; no extra accent colours.
+Royal blue, white, gold. Keep the palette controlled; no extra accent colours.
 
 Background:
 Fully transparent background (PNG with alpha). No floor, no pedestal, no cast shadow on a surface.
@@ -1557,7 +1557,7 @@ Lighting:
 Studio product lighting: large soft key from upper left, gentle fill from the right, crisp rim light from behind to separate the silhouette, soft self-shadowing in the eye sockets and under the brow.
 
 Color:
-White, black, red.. Keep the palette controlled; no extra accent colours.
+White, black, red. Keep the palette controlled; no extra accent colours.
 
 Background:
 Fully transparent background (PNG with alpha). No floor, no pedestal, no cast shadow on a surface.
@@ -1684,7 +1684,7 @@ Lighting:
 Studio product lighting: large soft key from upper left, gentle fill from the right, crisp rim light from behind to separate the silhouette, soft self-shadowing in the eye sockets and under the brow.
 
 Color:
-Gunmetal, dark green, black.. Keep the palette controlled; no extra accent colours.
+Gunmetal, dark green, black. Keep the palette controlled; no extra accent colours.
 
 Background:
 Fully transparent background (PNG with alpha). No floor, no pedestal, no cast shadow on a surface.
@@ -1811,7 +1811,7 @@ Lighting:
 Studio product lighting: large soft key from upper left, gentle fill from the right, crisp rim light from behind to separate the silhouette, soft self-shadowing in the eye sockets and under the brow.
 
 Color:
-Gold, white, azure.. Keep the palette controlled; no extra accent colours.
+Gold, white, azure. Keep the palette controlled; no extra accent colours.
 
 Background:
 Fully transparent background (PNG with alpha). No floor, no pedestal, no cast shadow on a surface.
@@ -1938,7 +1938,7 @@ Lighting:
 Studio product lighting: large soft key from upper left, gentle fill from the right, crisp rim light from behind to separate the silhouette, soft self-shadowing in the eye sockets and under the brow.
 
 Color:
-Magenta, black, violet.. Keep the palette controlled; no extra accent colours.
+Magenta, black, violet. Keep the palette controlled; no extra accent colours.
 
 Background:
 Fully transparent background (PNG with alpha). No floor, no pedestal, no cast shadow on a surface.
@@ -2065,7 +2065,7 @@ Lighting:
 Studio product lighting: large soft key from upper left, gentle fill from the right, crisp rim light from behind to separate the silhouette, soft self-shadowing in the eye sockets and under the brow.
 
 Color:
-Black, blood red, silver.. Keep the palette controlled; no extra accent colours.
+Black, blood red, silver. Keep the palette controlled; no extra accent colours.
 
 Background:
 Fully transparent background (PNG with alpha). No floor, no pedestal, no cast shadow on a surface.
@@ -2192,7 +2192,7 @@ Lighting:
 Studio product lighting: large soft key from upper left, gentle fill from the right, crisp rim light from behind to separate the silhouette, soft self-shadowing in the eye sockets and under the brow.
 
 Color:
-Orange, ivory, ink black.. Keep the palette controlled; no extra accent colours.
+Orange, ivory, ink black. Keep the palette controlled; no extra accent colours.
 
 Background:
 Fully transparent background (PNG with alpha). No floor, no pedestal, no cast shadow on a surface.
@@ -2319,7 +2319,7 @@ Lighting:
 Studio product lighting: large soft key from upper left, gentle fill from the right, crisp rim light from behind to separate the silhouette, soft self-shadowing in the eye sockets and under the brow.
 
 Color:
-Smoke grey, cyan, silver.. Keep the palette controlled; no extra accent colours.
+Smoke grey, cyan, silver. Keep the palette controlled; no extra accent colours.
 
 Background:
 Fully transparent background (PNG with alpha). No floor, no pedestal, no cast shadow on a surface.
@@ -2446,7 +2446,7 @@ Lighting:
 Studio product lighting: large soft key from upper left, gentle fill from the right, crisp rim light from behind to separate the silhouette, soft self-shadowing in the eye sockets and under the brow.
 
 Color:
-Amber, black, brass.. Keep the palette controlled; no extra accent colours.
+Amber, black, brass. Keep the palette controlled; no extra accent colours.
 
 Background:
 Fully transparent background (PNG with alpha). No floor, no pedestal, no cast shadow on a surface.
@@ -2573,7 +2573,7 @@ Lighting:
 Studio product lighting: large soft key from upper left, gentle fill from the right, crisp rim light from behind to separate the silhouette, soft self-shadowing in the eye sockets and under the brow.
 
 Color:
-Plum, cream, gold.. Keep the palette controlled; no extra accent colours.
+Plum, cream, gold. Keep the palette controlled; no extra accent colours.
 
 Background:
 Fully transparent background (PNG with alpha). No floor, no pedestal, no cast shadow on a surface.
@@ -2700,7 +2700,7 @@ Lighting:
 Studio product lighting: large soft key from upper left, gentle fill from the right, crisp rim light from behind to separate the silhouette, soft self-shadowing in the eye sockets and under the brow.
 
 Color:
-Steel grey, deep blue, white.. Keep the palette controlled; no extra accent colours.
+Steel grey, deep blue, white. Keep the palette controlled; no extra accent colours.
 
 Background:
 Fully transparent background (PNG with alpha). No floor, no pedestal, no cast shadow on a surface.
@@ -2827,7 +2827,7 @@ Lighting:
 Studio product lighting: large soft key from upper left, gentle fill from the right, crisp rim light from behind to separate the silhouette, soft self-shadowing in the eye sockets and under the brow.
 
 Color:
-Silver, violet, black.. Keep the palette controlled; no extra accent colours.
+Silver, violet, black. Keep the palette controlled; no extra accent colours.
 
 Background:
 Fully transparent background (PNG with alpha). No floor, no pedestal, no cast shadow on a surface.
@@ -2954,7 +2954,7 @@ Lighting:
 Studio product lighting: large soft key from upper left, gentle fill from the right, crisp rim light from behind to separate the silhouette, soft self-shadowing in the eye sockets and under the brow.
 
 Color:
-Charcoal, copper, ivory.. Keep the palette controlled; no extra accent colours.
+Charcoal, copper, ivory. Keep the palette controlled; no extra accent colours.
 
 Background:
 Fully transparent background (PNG with alpha). No floor, no pedestal, no cast shadow on a surface.
@@ -3081,7 +3081,7 @@ Lighting:
 Studio product lighting: large soft key from upper left, gentle fill from the right, crisp rim light from behind to separate the silhouette, soft self-shadowing in the eye sockets and under the brow.
 
 Color:
-White, black, grey.. Keep the palette controlled; no extra accent colours.
+White, black, grey. Keep the palette controlled; no extra accent colours.
 
 Background:
 Fully transparent background (PNG with alpha). No floor, no pedestal, no cast shadow on a surface.
