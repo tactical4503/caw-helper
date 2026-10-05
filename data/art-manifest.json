@@ -1,0 +1,1717 @@
+{
+  "version": 2,
+  "generator": "ChatGPT image generation (OpenAI GPT image model)",
+  "rules": "See ASSET_PIPELINE.md. Status `needs-generation` = no generated file in the repo yet; the app keeps showing the authored SVG study art listed in `current`. Status `approved` = reviewed, ingested with scripts/ingest-art.mjs and served by the app.",
+  "sizes": {
+    "world": [
+      1536,
+      1024,
+      640
+    ],
+    "mask": [
+      1024,
+      640,
+      320
+    ]
+  },
+  "worlds": [
+    {
+      "id": "home",
+      "title": "HOME — The Arena Concourse",
+      "ui": "HOME world: full-bleed background layer `.home-art` behind the CAW HELPER title (title sits on the left 45% of the frame).",
+      "what": "The empty backstage tunnel of a historic wrestling arena moments before doors open.",
+      "why": "Establishes the CAW Helper universe in one image: wrestling history, craft and anticipation.",
+      "communicates": "You are about to walk out and build a character. Grand, theatrical, physical.",
+      "differs": "The only world that shows the ring/arena itself; every other world is a workroom.",
+      "subject": "A long, high-ceilinged entrance tunnel of an old municipal wrestling arena, looking out toward a single empty ring bathed in a pale spotlight at the far end. On a steamer trunk in the right foreground rests one folded original wrestling mask (crimson leather with gold trim, no symbols) beside taped boots and a coiled rope.",
+      "composition": "Camera low (knee height) in the tunnel, 28mm lens, one-point perspective. Foreground right: trunk with folded mask and boots, sharp. Middle ground: tunnel walls of painted brick with faded, wordless poster frames and cable runs. Background: the lit ring and dark tiered seating. Keep the left 45% of the frame calm and dark for the UI title.",
+      "construction": "Worn painted brick, scuffed concrete floor with taped markings, riveted steel tunnel beams, canvas ring apron, hemp-wrapped ropes, scratched steamer trunk with brass corners.",
+      "lighting": "Key: cold white spotlight on the ring far away producing volumetric beams. Fill: weak tungsten work lamps along the tunnel. Rim: warm amber kicker on the trunk and mask. Deep shadows on the left.",
+      "color": "Near-black and smoked brown base, warm bone and restrained gold accents, a single muted red note on the mask. No neon.",
+      "atmosphere": "Light haze and floating dust in the beams; slight depth fog toward the ring.",
+      "aspect": "3:2 landscape (generate at 1536×1024)",
+      "status": "needs-generation",
+      "current": "assets/objects/masks/celestial-guardian.svg",
+      "files": {
+        "640": "assets/art/worlds/world-home-640.webp",
+        "1024": "assets/art/worlds/world-home-1024.webp",
+        "1536": "assets/art/worlds/world-home-1536.webp"
+      }
+    },
+    {
+      "id": "create",
+      "title": "CREATE — The Character Drafting Table",
+      "ui": "CREATE world: background layer behind the light \"BUILD THE WHOLE THING\" layout; the world uses a warm paper palette, so this image is shown light and slightly desaturated.",
+      "what": "A top-down view of a character designer's drafting table mid-project.",
+      "why": "CREATE connects body, attire, moves and entrance into one project; a planning table shows all pieces together.",
+      "communicates": "Planning, drafting and assembling an entire wrestler, not just one item.",
+      "differs": "Only light, overhead, paper-dominant image in the set; shot from directly above.",
+      "subject": "Directly overhead view of a large oak drafting table covered with loose sheets of heavy cream paper bearing pencil figure sketches of an original wrestler (front/back turnaround poses), fabric swatches pinned with brass pins, a small leather boot sample, a measuring tape, graphite pencils, a pencil sharpener, and a folded original mask swatch. Absolutely no readable text, no logos.",
+      "composition": "Flat lay, camera perpendicular to the table. Objects arranged in a loose asymmetric cluster along the right and bottom edges; the upper-left 50% stays mostly clean cream paper for UI copy.",
+      "construction": "Oak with visible grain, toothy cream paper with soft graphite lines and smudges, satin and lycra swatches, brass pins, cloth measuring tape, a cut leather boot vamp with visible stitching.",
+      "lighting": "Large soft window key from the upper left, gentle fill, soft contact shadows under every object; no harsh specular.",
+      "color": "Warm paper (#dcd6ca range), oak brown, graphite grey, one muted red and one gold swatch.",
+      "atmosphere": "Calm, tactile, studio quiet; very fine paper texture.",
+      "aspect": "3:2 landscape (generate at 1536×1024)",
+      "status": "needs-generation",
+      "current": null,
+      "files": {
+        "640": "assets/art/worlds/world-create-640.webp",
+        "1024": "assets/art/worlds/world-create-1024.webp",
+        "1536": "assets/art/worlds/world-create-1536.webp"
+      }
+    },
+    {
+      "id": "mask-archive",
+      "title": "MASK ARCHIVE — The Mask Wall",
+      "ui": "MASK MAKER world (mask wall): full-bleed `.mask-bg` layer behind the mask grid and inspector; darkened to ~68% brightness under UI.",
+      "what": "A vast, old archive hall where hundreds of original wrestling masks hang on display.",
+      "why": "Flagship world. The archive is the place you study masks before making one.",
+      "communicates": "Scale, history and reverence for the craft; masks as real objects, not icons.",
+      "differs": "The only world with many masks at multiple depths; architectural and museum-like.",
+      "subject": "A cavernous archive hall with tall aged plaster walls lined floor to ceiling with dark wooden display shelving and wall-mounted head forms, each holding a different original wrestling mask (varied silhouettes: horned, crested, smooth, winged; leather, satin, metallic). Rolling library ladders, glass vitrines on wooden plinths in the middle ground, brass inventory tags hanging from string (tags blank).",
+      "composition": "Camera at standing eye height, 35mm, two-point perspective looking down the hall. Foreground: a vitrine edge and one mask on a head form, slightly out of focus at frame right. Middle ground: rows of shelving receding. Background: an arched end wall dissolving into haze. Masks at clearly different distances.",
+      "construction": "Aged lime plaster with water stains, dark stained walnut shelving, brass rails and tag hooks, worn parquet floor, glass vitrines with bevelled edges, linen-covered head forms.",
+      "lighting": "Key: high clerestory windows casting slanted shafts. Fill: low warm picture lights over shelving. Rim: thin gold edge light on foreground mask. Strong falloff into dark corners.",
+      "color": "Deep umber, black, aged ivory plaster, restrained gold; masks provide scattered muted reds, blues and silvers.",
+      "atmosphere": "Visible dust motes in light shafts, soft fog toward the back wall.",
+      "aspect": "3:2 landscape (generate at 1536×1024)",
+      "status": "needs-generation",
+      "current": "assets/worlds/mask-archive.svg",
+      "files": {
+        "640": "assets/art/worlds/world-mask-archive-640.webp",
+        "1024": "assets/art/worlds/world-mask-archive-1024.webp",
+        "1536": "assets/art/worlds/world-mask-archive-1536.webp"
+      }
+    },
+    {
+      "id": "mask-workbench",
+      "title": "MASK MAKER — The Mask Construction Bench",
+      "ui": "MASK BUILDER world: `.builder-backdrop` layer behind the builder controls and live preview stage (darkened to ~42%).",
+      "what": "The workbench where masks are physically patterned, cut and stitched.",
+      "why": "The builder is about construction choices; the backdrop should show how masks are actually made.",
+      "communicates": "Craft and construction: patterns, panels, stitching, materials.",
+      "differs": "Archive = finished masks on display; this = unfinished masks in pieces on a bench.",
+      "subject": "A heavy wooden mask-maker's workbench beneath a pegboard wall. A canvas-covered head form in the centre wears a half-finished original mask (one panel pinned, unstitched). Around it: paper pattern pieces for mask panels, cut leather and stretch-satin panels, an industrial sewing machine at frame left, spools of heavy thread, an awl, leather shears, grommet setter, lace, eyelets in a tin.",
+      "composition": "Camera at bench height, 3/4 angle, 40mm. Foreground: scattered eyelets and thread, shallow focus. Middle ground: head form and panels (focal). Background: pegboard with hanging tools and pattern templates. Keep the right-centre area (where the live preview renders) relatively dark and uncluttered.",
+      "construction": "Scarred maple bench, perforated pegboard, steel tools with worn handles, cut leather edges showing thickness, satin with sheen, waxed thread, brass eyelets.",
+      "lighting": "Key: a single articulated task lamp above the head form (warm). Fill: very low cool ambient. Rim: lamp spill on tool edges. Deep shadow in the corners.",
+      "color": "Dark wood brown, black, warm lamp gold, a muted red leather panel, steel grey.",
+      "atmosphere": "Faint thread lint and dust in the lamp cone; intimate, focused.",
+      "aspect": "3:2 landscape (generate at 1536×1024)",
+      "status": "needs-generation",
+      "current": "assets/worlds/mask-archive.svg",
+      "files": {
+        "640": "assets/art/worlds/world-mask-workbench-640.webp",
+        "1024": "assets/art/worlds/world-mask-workbench-1024.webp",
+        "1536": "assets/art/worlds/world-mask-workbench-1536.webp"
+      }
+    },
+    {
+      "id": "body-lab",
+      "title": "BODY LAB — The Physique Laboratory",
+      "ui": "BODY world: `.generic-art` layer of the BODY workshop (dimmed to ~36% under the three study cards).",
+      "what": "An athletic anatomy and proportion laboratory.",
+      "why": "BODY is about proportion, stance and physical presence before attire.",
+      "communicates": "Measurement, structure, honest study of the human form.",
+      "differs": "Clinical and clean; the only cool-lit world. No masks or gear.",
+      "subject": "A clean, high-ceilinged physique study room. Centre: a full-size articulated neutral grey mannequin (featureless head, athletic heavyweight wrestler build) standing on a turntable platform in front of a large measurement grid wall. Around it: a vintage height rod, a wall-mounted calliper, a balance scale, plaster anatomy casts (shoulder, forearm, torso) on shelves, posture reference silhouettes on frosted glass panels (no text).",
+      "composition": "Camera at chest height, frontal-left 3/4, 35mm. Foreground: edge of an equipment cart with callipers and tape, softly blurred. Middle ground: mannequin on turntable (focal, right of centre). Background: grid wall and shelves of casts.",
+      "construction": "Matte grey mannequin with visible joint segments, painted steel grid wall, white plaster casts, chrome measurement tools, terrazzo floor, frosted glass.",
+      "lighting": "Controlled studio lighting: large overhead softbox key, cool fill from the left, crisp white rim on the mannequin silhouette. Clean shadows.",
+      "color": "Cool greys and off-white, steel blue shadows, a single thin gold measurement line accent.",
+      "atmosphere": "Very slight clean haze; precise, quiet.",
+      "aspect": "3:2 landscape (generate at 1536×1024)",
+      "status": "needs-generation",
+      "current": "assets/worlds/anatomy-lab.svg",
+      "files": {
+        "640": "assets/art/worlds/world-body-lab-640.webp",
+        "1024": "assets/art/worlds/world-body-lab-1024.webp",
+        "1536": "assets/art/worlds/world-body-lab-1536.webp"
+      }
+    },
+    {
+      "id": "attire-workshop",
+      "title": "LEGS / ATTIRE WORKSHOP — The Gear Tailor",
+      "ui": "ATTIRE world: `.generic-art` layer of the ATTIRE workshop.",
+      "what": "A wrestling-gear tailor's workroom focused on tights, trunks and kneepads.",
+      "why": "ATTIRE is about lower-body gear layers and material coordination.",
+      "communicates": "Garments as built objects: patterns, fabrics, padding.",
+      "differs": "Fabric-dominant; hanging garments and a dress form, unlike the boot bench or mask bench.",
+      "subject": "A tailor's workroom: a lower-body dress form wearing original long wrestling tights with contrasting side panels and quilted kneepads; a rolling garment rail holding trunks and tights in several fabrics; a cutting table with chalk-marked stretch fabric, rotary cutter, pattern weights; bolts of lycra, metallic spandex and velvet on a wall rack.",
+      "composition": "Camera at hip height, 35mm, slight 3/4. Foreground: cutting table edge with chalk and pins. Middle ground: dress form (focal, centre-right). Background: fabric bolt wall and garment rail receding.",
+      "construction": "Stretch lycra with sheen, metallic spandex, velvet nap, quilted vinyl kneepads with visible stitch lines, painted wood rack, steel garment rail.",
+      "lighting": "Key: warm overhead pendant over the cutting table. Fill: soft window light from the right. Rim: sheen highlights along the tights panels.",
+      "color": "Black and charcoal base, deep oxblood and teal fabrics, cream chalk, small gold accents.",
+      "atmosphere": "Light fabric dust; lived-in workshop warmth.",
+      "aspect": "3:2 landscape (generate at 1536×1024)",
+      "status": "needs-generation",
+      "current": "assets/worlds/boot-workshop.svg",
+      "files": {
+        "640": "assets/art/worlds/world-attire-workshop-640.webp",
+        "1024": "assets/art/worlds/world-attire-workshop-1024.webp",
+        "1536": "assets/art/worlds/world-attire-workshop-1536.webp"
+      }
+    },
+    {
+      "id": "boot-workshop",
+      "title": "SHOE WORKSHOP — The Boot Maker",
+      "ui": "SHOES world: `.generic-art` layer of the SHOES workshop.",
+      "what": "A wrestling boot-maker's cobbler bench.",
+      "why": "Boots are their own craft: lasts, soles, lacing, padding.",
+      "communicates": "Leather, stitching, soles and tools, real footwear construction.",
+      "differs": "Leather and tool dominant, lowest and closest camera of the set.",
+      "subject": "A cobbler's bench holding an unfinished tall original wrestling boot on a wooden last (knee-high, lace-up front, padded collar, contrasting toe cap). Around it: cut leather vamp and quarter pieces, a stack of rubber soles, a cast-iron last stand, hammers, awls, edge bevelers, a pot of contact cement, waxed laces, a tray of brass eyelets, a finished pair of boots on a shelf behind.",
+      "composition": "Camera low at bench height, close, 50mm. Foreground: tools and eyelets, shallow focus. Middle ground: boot on last (focal, left-centre). Background: shelves of lasts and finished boots fading into shadow.",
+      "construction": "Full-grain leather showing pores and cut edges, heavy saddle stitching, black gum rubber soles with tread, beech lasts, cast iron, waxed thread.",
+      "lighting": "Key: warm low-angle lamp raking across the leather to show texture. Fill: very low. Rim: cool back light outlining the boot shaft.",
+      "color": "Dark leather browns and black, oxblood, brass, bone thread.",
+      "atmosphere": "Fine leather dust in the light; dense, crafted, close.",
+      "aspect": "3:2 landscape (generate at 1536×1024)",
+      "status": "needs-generation",
+      "current": "assets/worlds/boot-workshop.svg",
+      "files": {
+        "640": "assets/art/worlds/world-boot-workshop-640.webp",
+        "1024": "assets/art/worlds/world-boot-workshop-1024.webp",
+        "1536": "assets/art/worlds/world-boot-workshop-1536.webp"
+      }
+    },
+    {
+      "id": "dressing-room",
+      "title": "ACCESSORIES — The Dressing Room",
+      "ui": "ACCESSORIES world: `.generic-art` layer of the ACCESSORIES workshop.",
+      "what": "A wrestler's backstage dressing room before a show.",
+      "why": "Accessories finish a character: gloves, belts, jewellery, glasses, robes, props.",
+      "communicates": "Personal identity objects laid out ready to wear.",
+      "differs": "The only world with mirrors and bulb lighting; personal and theatrical.",
+      "subject": "A backstage dressing room: a long counter beneath a row of bulb-framed mirrors. On the counter: fingerless leather gloves, wrist tape rolls, sunglasses, a heavy chain, rings, an open jewellery case. A generic championship-style belt with an original, wordless, abstract metal plate hangs on a hook. An original sequinned entrance robe on a rail, metal lockers, a folding chair with a towel.",
+      "composition": "Camera at seated eye height, 3/4 down the counter, 35mm. Foreground: gloves and tape sharp. Middle ground: mirrors reflecting the room (no people in reflections). Background: robe rail and lockers.",
+      "construction": "Glossy mirror glass with slight desilvering at the edges, bulb sockets, chrome and brass, worn leather gloves, sequins, painted steel lockers, linoleum floor.",
+      "lighting": "Key: warm vanity bulbs. Fill: cool fluorescent spill from an open door. Rim: specular glints on chain and belt plate.",
+      "color": "Warm amber, black, gold and chrome, one deep purple robe accent.",
+      "atmosphere": "Slight haze and a lived-in, pre-show tension.",
+      "aspect": "3:2 landscape (generate at 1536×1024)",
+      "status": "needs-generation",
+      "current": "assets/worlds/mask-archive.svg",
+      "files": {
+        "640": "assets/art/worlds/world-dressing-room-640.webp",
+        "1024": "assets/art/worlds/world-dressing-room-1024.webp",
+        "1536": "assets/art/worlds/world-dressing-room-1536.webp"
+      }
+    },
+    {
+      "id": "explore-hall",
+      "title": "EXPLORE — The Collection Gallery",
+      "ui": "EXPLORE world: `.generic-art` layer behind ORIGINALS / COLLECTIONS / CREATOR NOTES.",
+      "what": "A curated gallery of complete character looks.",
+      "why": "EXPLORE is discovery across categories, not only masks.",
+      "communicates": "Breadth and curation: many finished original characters to browse.",
+      "differs": "Shows whole-character outfits on mannequins in a gallery, not single objects.",
+      "subject": "A long gallery corridor with polished dark floors and a row of illuminated display alcoves, each holding a faceless mannequin dressed in a different complete original wrestler look (masked luchador style, brawler in jacket and jeans, high-flyer in long tights, monster-heel in coat). Wordless brass plaques below each alcove.",
+      "composition": "Camera at standing height, looking down the corridor, 24mm, strong depth. Foreground: first alcove at frame right, close. Middle ground: alcoves recede left-to-right. Background: corridor end in deep shadow.",
+      "construction": "Polished black terrazzo, dark wood alcove frames, brass plaques and rails, mixed garment materials on mannequins.",
+      "lighting": "Each alcove lit from above by a warm spot, pools of light in a dark corridor; reflections on the floor.",
+      "color": "Black and walnut with warm gold pools; outfits supply varied but muted colours.",
+      "atmosphere": "Light haze in each spot cone; museum hush.",
+      "aspect": "3:2 landscape (generate at 1536×1024)",
+      "status": "needs-generation",
+      "current": "assets/worlds/mask-archive.svg",
+      "files": {
+        "640": "assets/art/worlds/world-explore-hall-640.webp",
+        "1024": "assets/art/worlds/world-explore-hall-1024.webp",
+        "1536": "assets/art/worlds/world-explore-hall-1536.webp"
+      }
+    },
+    {
+      "id": "learn-classroom",
+      "title": "LEARN — The Design Classroom",
+      "ui": "LEARN world: `.generic-art` layer behind SILHOUETTE / MATERIAL / COMPOSITION lessons.",
+      "what": "A wrestling-design classroom with study materials on display.",
+      "why": "LEARN teaches silhouette, material and composition through exercises.",
+      "communicates": "Teaching and study: structured, hands-on, approachable.",
+      "differs": "Classroom with silhouette cut-outs and material swatch boards, not a workshop or gallery.",
+      "subject": "A daylit classroom with a large slate chalkboard covered in chalk sketches of mask silhouettes and proportion diagrams (no words), a row of black cardboard silhouette cut-outs of wrestler shapes pinned on a cork wall, framed material swatch boards (leather, satin, rubber, metal mesh) and wooden student tables with sketchbooks and colour chips.",
+      "composition": "Camera from the back of the room at seated height, 35mm. Foreground: a table edge with an open sketchbook and colour chips. Middle ground: chalkboard (focal). Background: cork wall and window light.",
+      "construction": "Slate with chalk dust, cork board, cardboard cut-outs, framed swatches, scuffed wooden tables, paper.",
+      "lighting": "Key: tall side windows (soft daylight from the left). Fill: warm ceiling globe lights. Gentle rim on chalkboard frame.",
+      "color": "Slate black, chalk white, warm wood, muted swatch colours, a gold frame accent.",
+      "atmosphere": "Chalk dust in the window light; calm.",
+      "aspect": "3:2 landscape (generate at 1536×1024)",
+      "status": "needs-generation",
+      "current": "assets/worlds/anatomy-lab.svg",
+      "files": {
+        "640": "assets/art/worlds/world-learn-classroom-640.webp",
+        "1024": "assets/art/worlds/world-learn-classroom-1024.webp",
+        "1536": "assets/art/worlds/world-learn-classroom-1536.webp"
+      }
+    },
+    {
+      "id": "study-room",
+      "title": "STUDY MODE — The Inspection Room",
+      "ui": "STUDY MODE: background of the mask inspection modal `.modal-visual` behind the selected mask (the mask image sits centred on top, so the centre must be empty).",
+      "what": "A close-up conservation/inspection station where a single object is examined.",
+      "why": "Study mode isolates one mask to read its construction.",
+      "communicates": "Focus, scrutiny, close reading of an object.",
+      "differs": "Intentionally empty centre: the stage for one object, not an environment to browse.",
+      "subject": "A conservation inspection table seen at a low angle: black felt table surface, an empty central area, an articulated magnifier lamp at the left edge, a measuring scale ruler, white cotton conservator gloves, a small brush, a loupe, a grey card at the right edge, a dark curtain behind.",
+      "composition": "Camera at table height, 50mm, symmetrical. Foreground: felt surface edge. Middle ground: completely empty centre (the UI places the mask here). Tools only at far left and right edges. Background: dark velvet curtain with soft falloff.",
+      "construction": "Black felt with fibres visible, brushed aluminium lamp arm, glass lens, steel ruler, white cotton gloves, velvet.",
+      "lighting": "Key: a single focused overhead pool on the empty centre. Faint warm fill from the magnifier lamp. Everything else falls off to near black.",
+      "color": "Black and charcoal, a soft neutral pool of light, small warm brass and steel accents.",
+      "atmosphere": "Very faint dust in the light pool; silent and focused.",
+      "aspect": "1:1 square (generate at 1024×1024)",
+      "status": "needs-generation",
+      "current": null,
+      "files": {
+        "640": "assets/art/worlds/world-study-room-640.webp",
+        "1024": "assets/art/worlds/world-study-room-1024.webp",
+        "1536": "assets/art/worlds/world-study-room-1536.webp"
+      }
+    },
+    {
+      "id": "library-vault",
+      "title": "LIBRARY — The Personal Vault",
+      "ui": "LIBRARY world: background layer behind \"YOUR WORLD\" and the saved project versions list.",
+      "what": "A private storage vault for the user's own saved designs.",
+      "why": "LIBRARY holds the user's versions; it should feel like personal archived work.",
+      "communicates": "Ownership, safekeeping and versioned progress.",
+      "differs": "Storage drawers and garment boxes, private and compact rather than a public archive.",
+      "subject": "A compact private vault room: walls of flat-file steel drawers and labelled-but-wordless archival garment boxes, one drawer pulled open showing tissue-wrapped folded mask and gear pieces, a reading table with a closed leather portfolio and a lamp, a heavy vault door ajar at frame left.",
+      "composition": "Camera at standing height, 35mm, slight 3/4. Foreground: open drawer with tissue-wrapped pieces (right). Middle ground: reading table. Background: drawer walls. Keep the left 50% darker for the UI list.",
+      "construction": "Powder-coated steel drawers with brass label holders (empty), acid-free grey boxes, tissue paper, leather portfolio, thick steel vault door with bolt work.",
+      "lighting": "Key: warm reading lamp. Fill: dim cool overhead. Rim: highlight along drawer edges.",
+      "color": "Graphite, warm brass, archival grey, muted red accent on one wrapped piece.",
+      "atmosphere": "Still air, slight haze, safe and private.",
+      "aspect": "3:2 landscape (generate at 1536×1024)",
+      "status": "needs-generation",
+      "current": null,
+      "files": {
+        "640": "assets/art/worlds/world-library-vault-640.webp",
+        "1024": "assets/art/worlds/world-library-vault-1024.webp",
+        "1536": "assets/art/worlds/world-library-vault-1536.webp"
+      }
+    }
+  ],
+  "masks": [
+    {
+      "id": "ember-dragon",
+      "name": "Ember Dragon",
+      "concept": "A dragon-fire full-head mask built like armour from overlapping leather scales that rise into a swept-back crest.",
+      "silhouette": "Angular full hood; a central ridge of three tall overlapping leather fins runs from forehead to crown and sweeps backward; cheek panels flare slightly into jaw points.",
+      "construction": "Black stretch base hood; layered crimson leather scale panels stitched in rows from brow to cheeks; gold metallic vinyl trim piping along every scale edge; rear black lacing with brass eyelets.",
+      "eyes": "Sharp angular eye openings trimmed in gold piping, pointed outer corners sweeping upward toward the temples.",
+      "mouth": "Closed: the mouth area is covered by a jaw panel of small crimson scales.",
+      "surface": "Slightly aged leather with burnished highlights on scale tips, raised stitching, metallic trim catching light.",
+      "palette": "Deep crimson, burnished gold, black.",
+      "personality": "Aggressive, regal, a heavyweight champion's armour.",
+      "current": "assets/objects/masks/ember-dragon.svg",
+      "model3d": null,
+      "views": [
+        {
+          "angle": "front",
+          "label": "FRONT",
+          "camera": "Camera dead-on at eye level, the mask facing the lens squarely; both eye openings equal; centred, the whole head form in frame with ~12% margin on every side.",
+          "status": "needs-generation",
+          "files": {
+            "320": "assets/art/masks/ember-dragon/mask-ember-dragon-front-320.webp",
+            "640": "assets/art/masks/ember-dragon/mask-ember-dragon-front-640.webp",
+            "1024": "assets/art/masks/ember-dragon/mask-ember-dragon-front-1024.webp"
+          }
+        },
+        {
+          "angle": "three-quarter",
+          "label": "3/4 FRONT",
+          "camera": "Camera rotated 40 degrees to the mask's left, at eye level; the near cheek panel foreshortens, the far eye opening narrows, the nose bridge breaks the far contour.",
+          "status": "needs-generation",
+          "files": {
+            "320": "assets/art/masks/ember-dragon/mask-ember-dragon-three-quarter-320.webp",
+            "640": "assets/art/masks/ember-dragon/mask-ember-dragon-three-quarter-640.webp",
+            "1024": "assets/art/masks/ember-dragon/mask-ember-dragon-three-quarter-1024.webp"
+          }
+        },
+        {
+          "angle": "side",
+          "label": "SIDE",
+          "camera": "True 90-degree profile facing frame left, at eye level; shows brow projection, nose/mouth relief depth, the ear opening (if any) and where the face panel meets the crown and back panels.",
+          "status": "needs-generation",
+          "files": {
+            "320": "assets/art/masks/ember-dragon/mask-ember-dragon-side-320.webp",
+            "640": "assets/art/masks/ember-dragon/mask-ember-dragon-side-640.webp",
+            "1024": "assets/art/masks/ember-dragon/mask-ember-dragon-side-1024.webp"
+          }
+        },
+        {
+          "angle": "three-quarter-back",
+          "label": "3/4 BACK",
+          "camera": "Camera 135 degrees around, slightly behind the mask's right ear; reveals the crown seam, the start of the rear lacing channel and how the side panels wrap.",
+          "status": "needs-generation",
+          "files": {
+            "320": "assets/art/masks/ember-dragon/mask-ember-dragon-three-quarter-back-320.webp",
+            "640": "assets/art/masks/ember-dragon/mask-ember-dragon-three-quarter-back-640.webp",
+            "1024": "assets/art/masks/ember-dragon/mask-ember-dragon-three-quarter-back-1024.webp"
+          }
+        },
+        {
+          "angle": "back",
+          "label": "BACK",
+          "camera": "Camera directly behind at eye level; full rear lacing (eyelets, laces, tongue/gusset), the back-of-head panel layout and the neck edge finishing.",
+          "status": "needs-generation",
+          "files": {
+            "320": "assets/art/masks/ember-dragon/mask-ember-dragon-back-320.webp",
+            "640": "assets/art/masks/ember-dragon/mask-ember-dragon-back-640.webp",
+            "1024": "assets/art/masks/ember-dragon/mask-ember-dragon-back-1024.webp"
+          }
+        }
+      ]
+    },
+    {
+      "id": "frost-phoenix",
+      "name": "Frost Phoenix",
+      "concept": "A phoenix mask rendered in cold materials: white satin wings frozen into the brow.",
+      "silhouette": "Tapered hood with two wide feathered wing shapes extending from the temples back over the ears, tips slightly beyond the head outline.",
+      "construction": "White satin base; ice-blue leather feather panels appliquéd in layers on the brow and wings; silver metallic edge piping; tapered chin; white lacing at the back.",
+      "eyes": "Winged eye openings with long silver-trimmed tails that flow into the wing feathers.",
+      "mouth": "Closed: smooth white satin over the mouth with a subtle silver centre seam.",
+      "surface": "Satin sheen with soft blue reflected light, crisp feather edges, slightly frosted metallic trim.",
+      "palette": "White, ice blue, silver.",
+      "personality": "Graceful, aerial, a high-flyer.",
+      "current": "assets/objects/masks/frost-phoenix.svg",
+      "model3d": null,
+      "views": [
+        {
+          "angle": "front",
+          "label": "FRONT",
+          "camera": "Camera dead-on at eye level, the mask facing the lens squarely; both eye openings equal; centred, the whole head form in frame with ~12% margin on every side.",
+          "status": "needs-generation",
+          "files": {
+            "320": "assets/art/masks/frost-phoenix/mask-frost-phoenix-front-320.webp",
+            "640": "assets/art/masks/frost-phoenix/mask-frost-phoenix-front-640.webp",
+            "1024": "assets/art/masks/frost-phoenix/mask-frost-phoenix-front-1024.webp"
+          }
+        },
+        {
+          "angle": "three-quarter",
+          "label": "3/4 FRONT",
+          "camera": "Camera rotated 40 degrees to the mask's left, at eye level; the near cheek panel foreshortens, the far eye opening narrows, the nose bridge breaks the far contour.",
+          "status": "needs-generation",
+          "files": {
+            "320": "assets/art/masks/frost-phoenix/mask-frost-phoenix-three-quarter-320.webp",
+            "640": "assets/art/masks/frost-phoenix/mask-frost-phoenix-three-quarter-640.webp",
+            "1024": "assets/art/masks/frost-phoenix/mask-frost-phoenix-three-quarter-1024.webp"
+          }
+        },
+        {
+          "angle": "side",
+          "label": "SIDE",
+          "camera": "True 90-degree profile facing frame left, at eye level; shows brow projection, nose/mouth relief depth, the ear opening (if any) and where the face panel meets the crown and back panels.",
+          "status": "needs-generation",
+          "files": {
+            "320": "assets/art/masks/frost-phoenix/mask-frost-phoenix-side-320.webp",
+            "640": "assets/art/masks/frost-phoenix/mask-frost-phoenix-side-640.webp",
+            "1024": "assets/art/masks/frost-phoenix/mask-frost-phoenix-side-1024.webp"
+          }
+        },
+        {
+          "angle": "three-quarter-back",
+          "label": "3/4 BACK",
+          "camera": "Camera 135 degrees around, slightly behind the mask's right ear; reveals the crown seam, the start of the rear lacing channel and how the side panels wrap.",
+          "status": "needs-generation",
+          "files": {
+            "320": "assets/art/masks/frost-phoenix/mask-frost-phoenix-three-quarter-back-320.webp",
+            "640": "assets/art/masks/frost-phoenix/mask-frost-phoenix-three-quarter-back-640.webp",
+            "1024": "assets/art/masks/frost-phoenix/mask-frost-phoenix-three-quarter-back-1024.webp"
+          }
+        },
+        {
+          "angle": "back",
+          "label": "BACK",
+          "camera": "Camera directly behind at eye level; full rear lacing (eyelets, laces, tongue/gusset), the back-of-head panel layout and the neck edge finishing.",
+          "status": "needs-generation",
+          "files": {
+            "320": "assets/art/masks/frost-phoenix/mask-frost-phoenix-back-320.webp",
+            "640": "assets/art/masks/frost-phoenix/mask-frost-phoenix-back-640.webp",
+            "1024": "assets/art/masks/frost-phoenix/mask-frost-phoenix-back-1024.webp"
+          }
+        }
+      ]
+    },
+    {
+      "id": "jungle-spirit",
+      "name": "Jungle Spirit",
+      "concept": "A forest-spirit mask in embossed suede with organic leaf-vein panels.",
+      "silhouette": "Rounded organic hood, broad at the cheeks, with three short leaf-shaped tabs at the top of the crown.",
+      "construction": "Deep green suede base; embossed leaf-vein patterning; black leather leaf panels at the cheeks with gold-thread veining embroidery; open mouth with a stitched suede rim; side lacing behind the ears.",
+      "eyes": "Wide, slightly rounded eye openings framed by overlapping black leaf panels.",
+      "mouth": "Open oval mouth with a reinforced, hand-stitched suede rim.",
+      "surface": "Matte suede nap with directional texture, embossing catching raking light, gold thread glints.",
+      "palette": "Forest green, black, antique gold.",
+      "personality": "Wild, earthy, a striker connected to nature.",
+      "current": "assets/objects/masks/jungle-spirit.svg",
+      "model3d": null,
+      "views": [
+        {
+          "angle": "front",
+          "label": "FRONT",
+          "camera": "Camera dead-on at eye level, the mask facing the lens squarely; both eye openings equal; centred, the whole head form in frame with ~12% margin on every side.",
+          "status": "needs-generation",
+          "files": {
+            "320": "assets/art/masks/jungle-spirit/mask-jungle-spirit-front-320.webp",
+            "640": "assets/art/masks/jungle-spirit/mask-jungle-spirit-front-640.webp",
+            "1024": "assets/art/masks/jungle-spirit/mask-jungle-spirit-front-1024.webp"
+          }
+        },
+        {
+          "angle": "three-quarter",
+          "label": "3/4 FRONT",
+          "camera": "Camera rotated 40 degrees to the mask's left, at eye level; the near cheek panel foreshortens, the far eye opening narrows, the nose bridge breaks the far contour.",
+          "status": "needs-generation",
+          "files": {
+            "320": "assets/art/masks/jungle-spirit/mask-jungle-spirit-three-quarter-320.webp",
+            "640": "assets/art/masks/jungle-spirit/mask-jungle-spirit-three-quarter-640.webp",
+            "1024": "assets/art/masks/jungle-spirit/mask-jungle-spirit-three-quarter-1024.webp"
+          }
+        },
+        {
+          "angle": "side",
+          "label": "SIDE",
+          "camera": "True 90-degree profile facing frame left, at eye level; shows brow projection, nose/mouth relief depth, the ear opening (if any) and where the face panel meets the crown and back panels.",
+          "status": "needs-generation",
+          "files": {
+            "320": "assets/art/masks/jungle-spirit/mask-jungle-spirit-side-320.webp",
+            "640": "assets/art/masks/jungle-spirit/mask-jungle-spirit-side-640.webp",
+            "1024": "assets/art/masks/jungle-spirit/mask-jungle-spirit-side-1024.webp"
+          }
+        },
+        {
+          "angle": "three-quarter-back",
+          "label": "3/4 BACK",
+          "camera": "Camera 135 degrees around, slightly behind the mask's right ear; reveals the crown seam, the start of the rear lacing channel and how the side panels wrap.",
+          "status": "needs-generation",
+          "files": {
+            "320": "assets/art/masks/jungle-spirit/mask-jungle-spirit-three-quarter-back-320.webp",
+            "640": "assets/art/masks/jungle-spirit/mask-jungle-spirit-three-quarter-back-640.webp",
+            "1024": "assets/art/masks/jungle-spirit/mask-jungle-spirit-three-quarter-back-1024.webp"
+          }
+        },
+        {
+          "angle": "back",
+          "label": "BACK",
+          "camera": "Camera directly behind at eye level; full rear lacing (eyelets, laces, tongue/gusset), the back-of-head panel layout and the neck edge finishing.",
+          "status": "needs-generation",
+          "files": {
+            "320": "assets/art/masks/jungle-spirit/mask-jungle-spirit-back-320.webp",
+            "640": "assets/art/masks/jungle-spirit/mask-jungle-spirit-back-640.webp",
+            "1024": "assets/art/masks/jungle-spirit/mask-jungle-spirit-back-1024.webp"
+          }
+        }
+      ]
+    },
+    {
+      "id": "sol-invictus",
+      "name": "Sol Invictus",
+      "concept": "A classical radial sun mask: a sunburst that frames the face like a halo.",
+      "silhouette": "Smooth full hood with a sunburst of stiffened leather rays rising around the forehead and temples (rays stay close to the head, not a giant headdress).",
+      "construction": "Ivory leather base face; gold metallic leather sunburst rays individually stitched; red leather centre medallion (plain, no symbol) on the forehead; red edge piping; black back panel with red lacing.",
+      "eyes": "Almond eye openings outlined in red piping with a thin gold border.",
+      "mouth": "Closed: ivory panel with a stitched horizontal seam.",
+      "surface": "Polished leather sheen, metallic rays with slight wear at the tips, visible thread.",
+      "palette": "Gold, ivory, deep red.",
+      "personality": "Heroic, classical, a traditional técnico.",
+      "current": "assets/objects/masks/sol-invictus.svg",
+      "model3d": null,
+      "views": [
+        {
+          "angle": "front",
+          "label": "FRONT",
+          "camera": "Camera dead-on at eye level, the mask facing the lens squarely; both eye openings equal; centred, the whole head form in frame with ~12% margin on every side.",
+          "status": "needs-generation",
+          "files": {
+            "320": "assets/art/masks/sol-invictus/mask-sol-invictus-front-320.webp",
+            "640": "assets/art/masks/sol-invictus/mask-sol-invictus-front-640.webp",
+            "1024": "assets/art/masks/sol-invictus/mask-sol-invictus-front-1024.webp"
+          }
+        },
+        {
+          "angle": "three-quarter",
+          "label": "3/4 FRONT",
+          "camera": "Camera rotated 40 degrees to the mask's left, at eye level; the near cheek panel foreshortens, the far eye opening narrows, the nose bridge breaks the far contour.",
+          "status": "needs-generation",
+          "files": {
+            "320": "assets/art/masks/sol-invictus/mask-sol-invictus-three-quarter-320.webp",
+            "640": "assets/art/masks/sol-invictus/mask-sol-invictus-three-quarter-640.webp",
+            "1024": "assets/art/masks/sol-invictus/mask-sol-invictus-three-quarter-1024.webp"
+          }
+        },
+        {
+          "angle": "side",
+          "label": "SIDE",
+          "camera": "True 90-degree profile facing frame left, at eye level; shows brow projection, nose/mouth relief depth, the ear opening (if any) and where the face panel meets the crown and back panels.",
+          "status": "needs-generation",
+          "files": {
+            "320": "assets/art/masks/sol-invictus/mask-sol-invictus-side-320.webp",
+            "640": "assets/art/masks/sol-invictus/mask-sol-invictus-side-640.webp",
+            "1024": "assets/art/masks/sol-invictus/mask-sol-invictus-side-1024.webp"
+          }
+        },
+        {
+          "angle": "three-quarter-back",
+          "label": "3/4 BACK",
+          "camera": "Camera 135 degrees around, slightly behind the mask's right ear; reveals the crown seam, the start of the rear lacing channel and how the side panels wrap.",
+          "status": "needs-generation",
+          "files": {
+            "320": "assets/art/masks/sol-invictus/mask-sol-invictus-three-quarter-back-320.webp",
+            "640": "assets/art/masks/sol-invictus/mask-sol-invictus-three-quarter-back-640.webp",
+            "1024": "assets/art/masks/sol-invictus/mask-sol-invictus-three-quarter-back-1024.webp"
+          }
+        },
+        {
+          "angle": "back",
+          "label": "BACK",
+          "camera": "Camera directly behind at eye level; full rear lacing (eyelets, laces, tongue/gusset), the back-of-head panel layout and the neck edge finishing.",
+          "status": "needs-generation",
+          "files": {
+            "320": "assets/art/masks/sol-invictus/mask-sol-invictus-back-320.webp",
+            "640": "assets/art/masks/sol-invictus/mask-sol-invictus-back-640.webp",
+            "1024": "assets/art/masks/sol-invictus/mask-sol-invictus-back-1024.webp"
+          }
+        }
+      ]
+    },
+    {
+      "id": "void-walker",
+      "name": "Void Walker",
+      "concept": "An unsettling, near-featureless mask of dark rubber and mesh that compresses the face.",
+      "silhouette": "Compressed, slightly narrow hood that pulls tight to the skull; smooth with no protrusions.",
+      "construction": "Matte black rubberised panels; a violet-tinted fine mesh panel over the lower face; thin silver seams dividing the face into vertical strips; rear zipper with a covered placket instead of lacing.",
+      "eyes": "Narrow horizontal eye slits backed with dark mesh so the eyes are barely visible.",
+      "mouth": "Closed: covered by the violet mesh panel.",
+      "surface": "Dull rubber with soft sheen at the cheekbones, mesh with fine grid texture, silver seams catching thin highlights.",
+      "palette": "Black, deep violet, silver.",
+      "personality": "Cold, alien, a silent menace.",
+      "current": "assets/objects/masks/void-walker.svg",
+      "model3d": null,
+      "views": [
+        {
+          "angle": "front",
+          "label": "FRONT",
+          "camera": "Camera dead-on at eye level, the mask facing the lens squarely; both eye openings equal; centred, the whole head form in frame with ~12% margin on every side.",
+          "status": "needs-generation",
+          "files": {
+            "320": "assets/art/masks/void-walker/mask-void-walker-front-320.webp",
+            "640": "assets/art/masks/void-walker/mask-void-walker-front-640.webp",
+            "1024": "assets/art/masks/void-walker/mask-void-walker-front-1024.webp"
+          }
+        },
+        {
+          "angle": "three-quarter",
+          "label": "3/4 FRONT",
+          "camera": "Camera rotated 40 degrees to the mask's left, at eye level; the near cheek panel foreshortens, the far eye opening narrows, the nose bridge breaks the far contour.",
+          "status": "needs-generation",
+          "files": {
+            "320": "assets/art/masks/void-walker/mask-void-walker-three-quarter-320.webp",
+            "640": "assets/art/masks/void-walker/mask-void-walker-three-quarter-640.webp",
+            "1024": "assets/art/masks/void-walker/mask-void-walker-three-quarter-1024.webp"
+          }
+        },
+        {
+          "angle": "side",
+          "label": "SIDE",
+          "camera": "True 90-degree profile facing frame left, at eye level; shows brow projection, nose/mouth relief depth, the ear opening (if any) and where the face panel meets the crown and back panels.",
+          "status": "needs-generation",
+          "files": {
+            "320": "assets/art/masks/void-walker/mask-void-walker-side-320.webp",
+            "640": "assets/art/masks/void-walker/mask-void-walker-side-640.webp",
+            "1024": "assets/art/masks/void-walker/mask-void-walker-side-1024.webp"
+          }
+        },
+        {
+          "angle": "three-quarter-back",
+          "label": "3/4 BACK",
+          "camera": "Camera 135 degrees around, slightly behind the mask's right ear; reveals the crown seam, the start of the rear lacing channel and how the side panels wrap.",
+          "status": "needs-generation",
+          "files": {
+            "320": "assets/art/masks/void-walker/mask-void-walker-three-quarter-back-320.webp",
+            "640": "assets/art/masks/void-walker/mask-void-walker-three-quarter-back-640.webp",
+            "1024": "assets/art/masks/void-walker/mask-void-walker-three-quarter-back-1024.webp"
+          }
+        },
+        {
+          "angle": "back",
+          "label": "BACK",
+          "camera": "Camera directly behind at eye level; full rear lacing (eyelets, laces, tongue/gusset), the back-of-head panel layout and the neck edge finishing.",
+          "status": "needs-generation",
+          "files": {
+            "320": "assets/art/masks/void-walker/mask-void-walker-back-320.webp",
+            "640": "assets/art/masks/void-walker/mask-void-walker-back-640.webp",
+            "1024": "assets/art/masks/void-walker/mask-void-walker-back-1024.webp"
+          }
+        }
+      ]
+    },
+    {
+      "id": "crimson-skull",
+      "name": "Crimson Skull",
+      "concept": "A punk-horror skull mask made of patchworked latex and leather, more DIY than polished.",
+      "silhouette": "Jagged hood with an irregular row of short leather spikes along the crown and a squared jaw.",
+      "construction": "Red latex base; bone-coloured leather skull-plate panels (brow, cheekbones, jaw) stitched with heavy black cross-stitching; riveted metal studs; open mouth with stitched teeth-shaped leather tabs; black lacing at back.",
+      "eyes": "Deep sunken eye openings ringed with black leather panels.",
+      "mouth": "Open mouth with bone leather tooth tabs stitched around the rim.",
+      "surface": "Glossy latex highlights, scuffed leather, heavy visible stitches, slightly tarnished rivets.",
+      "palette": "Blood red, bone, black.",
+      "personality": "Chaotic, violent, a hardcore brawler.",
+      "current": "assets/objects/masks/crimson-skull.svg",
+      "model3d": null,
+      "views": [
+        {
+          "angle": "front",
+          "label": "FRONT",
+          "camera": "Camera dead-on at eye level, the mask facing the lens squarely; both eye openings equal; centred, the whole head form in frame with ~12% margin on every side.",
+          "status": "needs-generation",
+          "files": {
+            "320": "assets/art/masks/crimson-skull/mask-crimson-skull-front-320.webp",
+            "640": "assets/art/masks/crimson-skull/mask-crimson-skull-front-640.webp",
+            "1024": "assets/art/masks/crimson-skull/mask-crimson-skull-front-1024.webp"
+          }
+        },
+        {
+          "angle": "three-quarter",
+          "label": "3/4 FRONT",
+          "camera": "Camera rotated 40 degrees to the mask's left, at eye level; the near cheek panel foreshortens, the far eye opening narrows, the nose bridge breaks the far contour.",
+          "status": "needs-generation",
+          "files": {
+            "320": "assets/art/masks/crimson-skull/mask-crimson-skull-three-quarter-320.webp",
+            "640": "assets/art/masks/crimson-skull/mask-crimson-skull-three-quarter-640.webp",
+            "1024": "assets/art/masks/crimson-skull/mask-crimson-skull-three-quarter-1024.webp"
+          }
+        },
+        {
+          "angle": "side",
+          "label": "SIDE",
+          "camera": "True 90-degree profile facing frame left, at eye level; shows brow projection, nose/mouth relief depth, the ear opening (if any) and where the face panel meets the crown and back panels.",
+          "status": "needs-generation",
+          "files": {
+            "320": "assets/art/masks/crimson-skull/mask-crimson-skull-side-320.webp",
+            "640": "assets/art/masks/crimson-skull/mask-crimson-skull-side-640.webp",
+            "1024": "assets/art/masks/crimson-skull/mask-crimson-skull-side-1024.webp"
+          }
+        },
+        {
+          "angle": "three-quarter-back",
+          "label": "3/4 BACK",
+          "camera": "Camera 135 degrees around, slightly behind the mask's right ear; reveals the crown seam, the start of the rear lacing channel and how the side panels wrap.",
+          "status": "needs-generation",
+          "files": {
+            "320": "assets/art/masks/crimson-skull/mask-crimson-skull-three-quarter-back-320.webp",
+            "640": "assets/art/masks/crimson-skull/mask-crimson-skull-three-quarter-back-640.webp",
+            "1024": "assets/art/masks/crimson-skull/mask-crimson-skull-three-quarter-back-1024.webp"
+          }
+        },
+        {
+          "angle": "back",
+          "label": "BACK",
+          "camera": "Camera directly behind at eye level; full rear lacing (eyelets, laces, tongue/gusset), the back-of-head panel layout and the neck edge finishing.",
+          "status": "needs-generation",
+          "files": {
+            "320": "assets/art/masks/crimson-skull/mask-crimson-skull-back-320.webp",
+            "640": "assets/art/masks/crimson-skull/mask-crimson-skull-back-640.webp",
+            "1024": "assets/art/masks/crimson-skull/mask-crimson-skull-back-1024.webp"
+          }
+        }
+      ]
+    },
+    {
+      "id": "ocean-king",
+      "name": "Ocean King",
+      "concept": "A regal sea-monarch mask whose panels flow like waves.",
+      "silhouette": "Flowing hood with a low three-point crown at the forehead and wave-shaped panels sweeping back over the ears.",
+      "construction": "Royal blue satin base; white leather wave appliqués curving from the eyes back to the ears; gold metallic crown panel with stitched edge; gold piping on the waves; white lacing.",
+      "eyes": "Sharp, slightly elongated eye openings trimmed in white leather.",
+      "mouth": "Closed: blue satin mouth panel with a gold piped chin line.",
+      "surface": "Satin sheen with flowing highlights, matte white leather, polished metallic crown.",
+      "palette": "Royal blue, white, gold.",
+      "personality": "Noble, commanding, a champion from the coast.",
+      "current": "assets/objects/masks/ocean-king.svg",
+      "model3d": null,
+      "views": [
+        {
+          "angle": "front",
+          "label": "FRONT",
+          "camera": "Camera dead-on at eye level, the mask facing the lens squarely; both eye openings equal; centred, the whole head form in frame with ~12% margin on every side.",
+          "status": "needs-generation",
+          "files": {
+            "320": "assets/art/masks/ocean-king/mask-ocean-king-front-320.webp",
+            "640": "assets/art/masks/ocean-king/mask-ocean-king-front-640.webp",
+            "1024": "assets/art/masks/ocean-king/mask-ocean-king-front-1024.webp"
+          }
+        },
+        {
+          "angle": "three-quarter",
+          "label": "3/4 FRONT",
+          "camera": "Camera rotated 40 degrees to the mask's left, at eye level; the near cheek panel foreshortens, the far eye opening narrows, the nose bridge breaks the far contour.",
+          "status": "needs-generation",
+          "files": {
+            "320": "assets/art/masks/ocean-king/mask-ocean-king-three-quarter-320.webp",
+            "640": "assets/art/masks/ocean-king/mask-ocean-king-three-quarter-640.webp",
+            "1024": "assets/art/masks/ocean-king/mask-ocean-king-three-quarter-1024.webp"
+          }
+        },
+        {
+          "angle": "side",
+          "label": "SIDE",
+          "camera": "True 90-degree profile facing frame left, at eye level; shows brow projection, nose/mouth relief depth, the ear opening (if any) and where the face panel meets the crown and back panels.",
+          "status": "needs-generation",
+          "files": {
+            "320": "assets/art/masks/ocean-king/mask-ocean-king-side-320.webp",
+            "640": "assets/art/masks/ocean-king/mask-ocean-king-side-640.webp",
+            "1024": "assets/art/masks/ocean-king/mask-ocean-king-side-1024.webp"
+          }
+        },
+        {
+          "angle": "three-quarter-back",
+          "label": "3/4 BACK",
+          "camera": "Camera 135 degrees around, slightly behind the mask's right ear; reveals the crown seam, the start of the rear lacing channel and how the side panels wrap.",
+          "status": "needs-generation",
+          "files": {
+            "320": "assets/art/masks/ocean-king/mask-ocean-king-three-quarter-back-320.webp",
+            "640": "assets/art/masks/ocean-king/mask-ocean-king-three-quarter-back-640.webp",
+            "1024": "assets/art/masks/ocean-king/mask-ocean-king-three-quarter-back-1024.webp"
+          }
+        },
+        {
+          "angle": "back",
+          "label": "BACK",
+          "camera": "Camera directly behind at eye level; full rear lacing (eyelets, laces, tongue/gusset), the back-of-head panel layout and the neck edge finishing.",
+          "status": "needs-generation",
+          "files": {
+            "320": "assets/art/masks/ocean-king/mask-ocean-king-back-320.webp",
+            "640": "assets/art/masks/ocean-king/mask-ocean-king-back-640.webp",
+            "1024": "assets/art/masks/ocean-king/mask-ocean-king-back-1024.webp"
+          }
+        }
+      ]
+    },
+    {
+      "id": "shadow-fox",
+      "name": "Shadow Fox",
+      "concept": "A trickster fox mask influenced by theatrical fox masks but built as a wrestling hood.",
+      "silhouette": "Pointed: two upright stiffened leather fox ears on the crown and a slightly tapered muzzle shape at the nose.",
+      "construction": "White leather face; black suede ears and back of head; red leather flame-shaped markings sweeping from the eyes to the ears; black lacing.",
+      "eyes": "Narrow slit eyes angled upward, backed with black mesh.",
+      "mouth": "Closed: white leather muzzle panel with a fine red stitched centre line.",
+      "surface": "Smooth white leather with soft sheen, velvety suede ears, crisp red edges.",
+      "palette": "White, black, red.",
+      "personality": "Cunning, fast, a trickster.",
+      "current": "assets/objects/masks/shadow-fox.svg",
+      "model3d": null,
+      "views": [
+        {
+          "angle": "front",
+          "label": "FRONT",
+          "camera": "Camera dead-on at eye level, the mask facing the lens squarely; both eye openings equal; centred, the whole head form in frame with ~12% margin on every side.",
+          "status": "needs-generation",
+          "files": {
+            "320": "assets/art/masks/shadow-fox/mask-shadow-fox-front-320.webp",
+            "640": "assets/art/masks/shadow-fox/mask-shadow-fox-front-640.webp",
+            "1024": "assets/art/masks/shadow-fox/mask-shadow-fox-front-1024.webp"
+          }
+        },
+        {
+          "angle": "three-quarter",
+          "label": "3/4 FRONT",
+          "camera": "Camera rotated 40 degrees to the mask's left, at eye level; the near cheek panel foreshortens, the far eye opening narrows, the nose bridge breaks the far contour.",
+          "status": "needs-generation",
+          "files": {
+            "320": "assets/art/masks/shadow-fox/mask-shadow-fox-three-quarter-320.webp",
+            "640": "assets/art/masks/shadow-fox/mask-shadow-fox-three-quarter-640.webp",
+            "1024": "assets/art/masks/shadow-fox/mask-shadow-fox-three-quarter-1024.webp"
+          }
+        },
+        {
+          "angle": "side",
+          "label": "SIDE",
+          "camera": "True 90-degree profile facing frame left, at eye level; shows brow projection, nose/mouth relief depth, the ear opening (if any) and where the face panel meets the crown and back panels.",
+          "status": "needs-generation",
+          "files": {
+            "320": "assets/art/masks/shadow-fox/mask-shadow-fox-side-320.webp",
+            "640": "assets/art/masks/shadow-fox/mask-shadow-fox-side-640.webp",
+            "1024": "assets/art/masks/shadow-fox/mask-shadow-fox-side-1024.webp"
+          }
+        },
+        {
+          "angle": "three-quarter-back",
+          "label": "3/4 BACK",
+          "camera": "Camera 135 degrees around, slightly behind the mask's right ear; reveals the crown seam, the start of the rear lacing channel and how the side panels wrap.",
+          "status": "needs-generation",
+          "files": {
+            "320": "assets/art/masks/shadow-fox/mask-shadow-fox-three-quarter-back-320.webp",
+            "640": "assets/art/masks/shadow-fox/mask-shadow-fox-three-quarter-back-640.webp",
+            "1024": "assets/art/masks/shadow-fox/mask-shadow-fox-three-quarter-back-1024.webp"
+          }
+        },
+        {
+          "angle": "back",
+          "label": "BACK",
+          "camera": "Camera directly behind at eye level; full rear lacing (eyelets, laces, tongue/gusset), the back-of-head panel layout and the neck edge finishing.",
+          "status": "needs-generation",
+          "files": {
+            "320": "assets/art/masks/shadow-fox/mask-shadow-fox-back-320.webp",
+            "640": "assets/art/masks/shadow-fox/mask-shadow-fox-back-640.webp",
+            "1024": "assets/art/masks/shadow-fox/mask-shadow-fox-back-1024.webp"
+          }
+        }
+      ]
+    },
+    {
+      "id": "iron-serpent",
+      "name": "Iron Serpent",
+      "concept": "An armoured serpent mask combining brushed metal plates and leather.",
+      "silhouette": "Layered hood with overlapping horizontal plates like snake scales, a slight ridge along the centre line.",
+      "construction": "Gunmetal brushed metal-look plates riveted onto a dark green leather base; plates overlap from crown to cheeks; leather gussets between plates for flexibility; rear lacing with steel eyelets.",
+      "eyes": "Slanted eye openings with metal plate edges as frames.",
+      "mouth": "Closed: segmented dark green leather jaw guard.",
+      "surface": "Brushed metal with directional scratches and subtle edge wear, oiled leather, rivets with highlights.",
+      "palette": "Gunmetal, dark green, black.",
+      "personality": "Cold, methodical, a technical grappler.",
+      "current": "assets/objects/masks/iron-serpent.svg",
+      "model3d": null,
+      "views": [
+        {
+          "angle": "front",
+          "label": "FRONT",
+          "camera": "Camera dead-on at eye level, the mask facing the lens squarely; both eye openings equal; centred, the whole head form in frame with ~12% margin on every side.",
+          "status": "needs-generation",
+          "files": {
+            "320": "assets/art/masks/iron-serpent/mask-iron-serpent-front-320.webp",
+            "640": "assets/art/masks/iron-serpent/mask-iron-serpent-front-640.webp",
+            "1024": "assets/art/masks/iron-serpent/mask-iron-serpent-front-1024.webp"
+          }
+        },
+        {
+          "angle": "three-quarter",
+          "label": "3/4 FRONT",
+          "camera": "Camera rotated 40 degrees to the mask's left, at eye level; the near cheek panel foreshortens, the far eye opening narrows, the nose bridge breaks the far contour.",
+          "status": "needs-generation",
+          "files": {
+            "320": "assets/art/masks/iron-serpent/mask-iron-serpent-three-quarter-320.webp",
+            "640": "assets/art/masks/iron-serpent/mask-iron-serpent-three-quarter-640.webp",
+            "1024": "assets/art/masks/iron-serpent/mask-iron-serpent-three-quarter-1024.webp"
+          }
+        },
+        {
+          "angle": "side",
+          "label": "SIDE",
+          "camera": "True 90-degree profile facing frame left, at eye level; shows brow projection, nose/mouth relief depth, the ear opening (if any) and where the face panel meets the crown and back panels.",
+          "status": "needs-generation",
+          "files": {
+            "320": "assets/art/masks/iron-serpent/mask-iron-serpent-side-320.webp",
+            "640": "assets/art/masks/iron-serpent/mask-iron-serpent-side-640.webp",
+            "1024": "assets/art/masks/iron-serpent/mask-iron-serpent-side-1024.webp"
+          }
+        },
+        {
+          "angle": "three-quarter-back",
+          "label": "3/4 BACK",
+          "camera": "Camera 135 degrees around, slightly behind the mask's right ear; reveals the crown seam, the start of the rear lacing channel and how the side panels wrap.",
+          "status": "needs-generation",
+          "files": {
+            "320": "assets/art/masks/iron-serpent/mask-iron-serpent-three-quarter-back-320.webp",
+            "640": "assets/art/masks/iron-serpent/mask-iron-serpent-three-quarter-back-640.webp",
+            "1024": "assets/art/masks/iron-serpent/mask-iron-serpent-three-quarter-back-1024.webp"
+          }
+        },
+        {
+          "angle": "back",
+          "label": "BACK",
+          "camera": "Camera directly behind at eye level; full rear lacing (eyelets, laces, tongue/gusset), the back-of-head panel layout and the neck edge finishing.",
+          "status": "needs-generation",
+          "files": {
+            "320": "assets/art/masks/iron-serpent/mask-iron-serpent-back-320.webp",
+            "640": "assets/art/masks/iron-serpent/mask-iron-serpent-back-640.webp",
+            "1024": "assets/art/masks/iron-serpent/mask-iron-serpent-back-1024.webp"
+          }
+        }
+      ]
+    },
+    {
+      "id": "celestial-guardian",
+      "name": "Celestial Guardian",
+      "concept": "A mythic guardian mask with a low crown and celestial panelling.",
+      "silhouette": "Crowned: a short structured crown band of metallic leather around the forehead with five gentle points; otherwise smooth rounded hood.",
+      "construction": "White satin base; gold metallic leather crown band; azure leather panels framing the eyes and cheeks in symmetrical arcs; small embroidered star-points along the panels; gold piping; white lacing.",
+      "eyes": "Round eye openings framed by azure panels with gold piping.",
+      "mouth": "Closed: white satin with a gold piped chin arc.",
+      "surface": "Satin sheen, polished metallic crown, fine embroidery texture.",
+      "palette": "Gold, white, azure.",
+      "personality": "Protective, heroic, mythic.",
+      "current": "assets/objects/masks/celestial-guardian.svg",
+      "model3d": null,
+      "views": [
+        {
+          "angle": "front",
+          "label": "FRONT",
+          "camera": "Camera dead-on at eye level, the mask facing the lens squarely; both eye openings equal; centred, the whole head form in frame with ~12% margin on every side.",
+          "status": "needs-generation",
+          "files": {
+            "320": "assets/art/masks/celestial-guardian/mask-celestial-guardian-front-320.webp",
+            "640": "assets/art/masks/celestial-guardian/mask-celestial-guardian-front-640.webp",
+            "1024": "assets/art/masks/celestial-guardian/mask-celestial-guardian-front-1024.webp"
+          }
+        },
+        {
+          "angle": "three-quarter",
+          "label": "3/4 FRONT",
+          "camera": "Camera rotated 40 degrees to the mask's left, at eye level; the near cheek panel foreshortens, the far eye opening narrows, the nose bridge breaks the far contour.",
+          "status": "needs-generation",
+          "files": {
+            "320": "assets/art/masks/celestial-guardian/mask-celestial-guardian-three-quarter-320.webp",
+            "640": "assets/art/masks/celestial-guardian/mask-celestial-guardian-three-quarter-640.webp",
+            "1024": "assets/art/masks/celestial-guardian/mask-celestial-guardian-three-quarter-1024.webp"
+          }
+        },
+        {
+          "angle": "side",
+          "label": "SIDE",
+          "camera": "True 90-degree profile facing frame left, at eye level; shows brow projection, nose/mouth relief depth, the ear opening (if any) and where the face panel meets the crown and back panels.",
+          "status": "needs-generation",
+          "files": {
+            "320": "assets/art/masks/celestial-guardian/mask-celestial-guardian-side-320.webp",
+            "640": "assets/art/masks/celestial-guardian/mask-celestial-guardian-side-640.webp",
+            "1024": "assets/art/masks/celestial-guardian/mask-celestial-guardian-side-1024.webp"
+          }
+        },
+        {
+          "angle": "three-quarter-back",
+          "label": "3/4 BACK",
+          "camera": "Camera 135 degrees around, slightly behind the mask's right ear; reveals the crown seam, the start of the rear lacing channel and how the side panels wrap.",
+          "status": "needs-generation",
+          "files": {
+            "320": "assets/art/masks/celestial-guardian/mask-celestial-guardian-three-quarter-back-320.webp",
+            "640": "assets/art/masks/celestial-guardian/mask-celestial-guardian-three-quarter-back-640.webp",
+            "1024": "assets/art/masks/celestial-guardian/mask-celestial-guardian-three-quarter-back-1024.webp"
+          }
+        },
+        {
+          "angle": "back",
+          "label": "BACK",
+          "camera": "Camera directly behind at eye level; full rear lacing (eyelets, laces, tongue/gusset), the back-of-head panel layout and the neck edge finishing.",
+          "status": "needs-generation",
+          "files": {
+            "320": "assets/art/masks/celestial-guardian/mask-celestial-guardian-back-320.webp",
+            "640": "assets/art/masks/celestial-guardian/mask-celestial-guardian-back-640.webp",
+            "1024": "assets/art/masks/celestial-guardian/mask-celestial-guardian-back-1024.webp"
+          }
+        }
+      ]
+    },
+    {
+      "id": "night-blossom",
+      "name": "Night Blossom",
+      "concept": "A floral night mask in velvet whose petals frame the face.",
+      "silhouette": "Petaled: layered velvet petal shapes around the face perimeter, forming a soft scalloped outline.",
+      "construction": "Black velvet base; magenta leather petals stitched in two overlapping layers around the face; violet satin inner panel around the eyes; black lacing with magenta laces.",
+      "eyes": "Tapered eye openings shaped like petals, edged in violet satin.",
+      "mouth": "Closed: smooth black velvet with no seam visible.",
+      "surface": "Deep velvet nap absorbing light, glossy leather petal edges, satin shimmer.",
+      "palette": "Magenta, black, violet.",
+      "personality": "Elegant, mysterious, dangerous beauty.",
+      "current": "assets/objects/masks/night-blossom.svg",
+      "model3d": null,
+      "views": [
+        {
+          "angle": "front",
+          "label": "FRONT",
+          "camera": "Camera dead-on at eye level, the mask facing the lens squarely; both eye openings equal; centred, the whole head form in frame with ~12% margin on every side.",
+          "status": "needs-generation",
+          "files": {
+            "320": "assets/art/masks/night-blossom/mask-night-blossom-front-320.webp",
+            "640": "assets/art/masks/night-blossom/mask-night-blossom-front-640.webp",
+            "1024": "assets/art/masks/night-blossom/mask-night-blossom-front-1024.webp"
+          }
+        },
+        {
+          "angle": "three-quarter",
+          "label": "3/4 FRONT",
+          "camera": "Camera rotated 40 degrees to the mask's left, at eye level; the near cheek panel foreshortens, the far eye opening narrows, the nose bridge breaks the far contour.",
+          "status": "needs-generation",
+          "files": {
+            "320": "assets/art/masks/night-blossom/mask-night-blossom-three-quarter-320.webp",
+            "640": "assets/art/masks/night-blossom/mask-night-blossom-three-quarter-640.webp",
+            "1024": "assets/art/masks/night-blossom/mask-night-blossom-three-quarter-1024.webp"
+          }
+        },
+        {
+          "angle": "side",
+          "label": "SIDE",
+          "camera": "True 90-degree profile facing frame left, at eye level; shows brow projection, nose/mouth relief depth, the ear opening (if any) and where the face panel meets the crown and back panels.",
+          "status": "needs-generation",
+          "files": {
+            "320": "assets/art/masks/night-blossom/mask-night-blossom-side-320.webp",
+            "640": "assets/art/masks/night-blossom/mask-night-blossom-side-640.webp",
+            "1024": "assets/art/masks/night-blossom/mask-night-blossom-side-1024.webp"
+          }
+        },
+        {
+          "angle": "three-quarter-back",
+          "label": "3/4 BACK",
+          "camera": "Camera 135 degrees around, slightly behind the mask's right ear; reveals the crown seam, the start of the rear lacing channel and how the side panels wrap.",
+          "status": "needs-generation",
+          "files": {
+            "320": "assets/art/masks/night-blossom/mask-night-blossom-three-quarter-back-320.webp",
+            "640": "assets/art/masks/night-blossom/mask-night-blossom-three-quarter-back-640.webp",
+            "1024": "assets/art/masks/night-blossom/mask-night-blossom-three-quarter-back-1024.webp"
+          }
+        },
+        {
+          "angle": "back",
+          "label": "BACK",
+          "camera": "Camera directly behind at eye level; full rear lacing (eyelets, laces, tongue/gusset), the back-of-head panel layout and the neck edge finishing.",
+          "status": "needs-generation",
+          "files": {
+            "320": "assets/art/masks/night-blossom/mask-night-blossom-back-320.webp",
+            "640": "assets/art/masks/night-blossom/mask-night-blossom-back-640.webp",
+            "1024": "assets/art/masks/night-blossom/mask-night-blossom-back-1024.webp"
+          }
+        }
+      ]
+    },
+    {
+      "id": "blood-moon",
+      "name": "Blood Moon",
+      "concept": "A ritual crescent-moon mask with a stark horror edge.",
+      "silhouette": "Crescent: a large crescent-moon shaped panel wraps from one temple over the forehead to the other, its tips curving down toward the cheeks.",
+      "construction": "Black leather base; red latex crescent panel raised slightly with padding; silver metallic stitching outlining the crescent; open mouth with silver-trimmed rim; black lacing.",
+      "eyes": "Deep, heavy-lidded eye openings sunk into black leather with silver trim.",
+      "mouth": "Open mouth with silver trim.",
+      "surface": "Matte black leather, glossy red latex with sharp reflections, bright silver thread.",
+      "palette": "Black, blood red, silver.",
+      "personality": "Ritualistic, ominous, a cult leader.",
+      "current": "assets/objects/masks/blood-moon.svg",
+      "model3d": null,
+      "views": [
+        {
+          "angle": "front",
+          "label": "FRONT",
+          "camera": "Camera dead-on at eye level, the mask facing the lens squarely; both eye openings equal; centred, the whole head form in frame with ~12% margin on every side.",
+          "status": "needs-generation",
+          "files": {
+            "320": "assets/art/masks/blood-moon/mask-blood-moon-front-320.webp",
+            "640": "assets/art/masks/blood-moon/mask-blood-moon-front-640.webp",
+            "1024": "assets/art/masks/blood-moon/mask-blood-moon-front-1024.webp"
+          }
+        },
+        {
+          "angle": "three-quarter",
+          "label": "3/4 FRONT",
+          "camera": "Camera rotated 40 degrees to the mask's left, at eye level; the near cheek panel foreshortens, the far eye opening narrows, the nose bridge breaks the far contour.",
+          "status": "needs-generation",
+          "files": {
+            "320": "assets/art/masks/blood-moon/mask-blood-moon-three-quarter-320.webp",
+            "640": "assets/art/masks/blood-moon/mask-blood-moon-three-quarter-640.webp",
+            "1024": "assets/art/masks/blood-moon/mask-blood-moon-three-quarter-1024.webp"
+          }
+        },
+        {
+          "angle": "side",
+          "label": "SIDE",
+          "camera": "True 90-degree profile facing frame left, at eye level; shows brow projection, nose/mouth relief depth, the ear opening (if any) and where the face panel meets the crown and back panels.",
+          "status": "needs-generation",
+          "files": {
+            "320": "assets/art/masks/blood-moon/mask-blood-moon-side-320.webp",
+            "640": "assets/art/masks/blood-moon/mask-blood-moon-side-640.webp",
+            "1024": "assets/art/masks/blood-moon/mask-blood-moon-side-1024.webp"
+          }
+        },
+        {
+          "angle": "three-quarter-back",
+          "label": "3/4 BACK",
+          "camera": "Camera 135 degrees around, slightly behind the mask's right ear; reveals the crown seam, the start of the rear lacing channel and how the side panels wrap.",
+          "status": "needs-generation",
+          "files": {
+            "320": "assets/art/masks/blood-moon/mask-blood-moon-three-quarter-back-320.webp",
+            "640": "assets/art/masks/blood-moon/mask-blood-moon-three-quarter-back-640.webp",
+            "1024": "assets/art/masks/blood-moon/mask-blood-moon-three-quarter-back-1024.webp"
+          }
+        },
+        {
+          "angle": "back",
+          "label": "BACK",
+          "camera": "Camera directly behind at eye level; full rear lacing (eyelets, laces, tongue/gusset), the back-of-head panel layout and the neck edge finishing.",
+          "status": "needs-generation",
+          "files": {
+            "320": "assets/art/masks/blood-moon/mask-blood-moon-back-320.webp",
+            "640": "assets/art/masks/blood-moon/mask-blood-moon-back-640.webp",
+            "1024": "assets/art/masks/blood-moon/mask-blood-moon-back-1024.webp"
+          }
+        }
+      ]
+    },
+    {
+      "id": "paper-tiger",
+      "name": "Paper Tiger",
+      "concept": "An experimental tiger mask that looks folded from stiff fabric like origami.",
+      "silhouette": "Folded/faceted: the hood is built from flat triangular fabric planes with crisp creases, two folded ear points on top.",
+      "construction": "Orange heavy cotton canvas panels stiffened and folded; ink-black stripe panels inset between planes; ivory muzzle and brow panels; visible topstitching along every fold; ivory lacing.",
+      "eyes": "Round eye openings with folded ivory canvas rims.",
+      "mouth": "Open: a folded diamond-shaped opening.",
+      "surface": "Matte canvas weave texture, crisp fold highlights, slight fraying on raw edges.",
+      "palette": "Orange, ivory, ink black.",
+      "personality": "Playful, clever, deceptively tough.",
+      "current": "assets/objects/masks/paper-tiger.svg",
+      "model3d": null,
+      "views": [
+        {
+          "angle": "front",
+          "label": "FRONT",
+          "camera": "Camera dead-on at eye level, the mask facing the lens squarely; both eye openings equal; centred, the whole head form in frame with ~12% margin on every side.",
+          "status": "needs-generation",
+          "files": {
+            "320": "assets/art/masks/paper-tiger/mask-paper-tiger-front-320.webp",
+            "640": "assets/art/masks/paper-tiger/mask-paper-tiger-front-640.webp",
+            "1024": "assets/art/masks/paper-tiger/mask-paper-tiger-front-1024.webp"
+          }
+        },
+        {
+          "angle": "three-quarter",
+          "label": "3/4 FRONT",
+          "camera": "Camera rotated 40 degrees to the mask's left, at eye level; the near cheek panel foreshortens, the far eye opening narrows, the nose bridge breaks the far contour.",
+          "status": "needs-generation",
+          "files": {
+            "320": "assets/art/masks/paper-tiger/mask-paper-tiger-three-quarter-320.webp",
+            "640": "assets/art/masks/paper-tiger/mask-paper-tiger-three-quarter-640.webp",
+            "1024": "assets/art/masks/paper-tiger/mask-paper-tiger-three-quarter-1024.webp"
+          }
+        },
+        {
+          "angle": "side",
+          "label": "SIDE",
+          "camera": "True 90-degree profile facing frame left, at eye level; shows brow projection, nose/mouth relief depth, the ear opening (if any) and where the face panel meets the crown and back panels.",
+          "status": "needs-generation",
+          "files": {
+            "320": "assets/art/masks/paper-tiger/mask-paper-tiger-side-320.webp",
+            "640": "assets/art/masks/paper-tiger/mask-paper-tiger-side-640.webp",
+            "1024": "assets/art/masks/paper-tiger/mask-paper-tiger-side-1024.webp"
+          }
+        },
+        {
+          "angle": "three-quarter-back",
+          "label": "3/4 BACK",
+          "camera": "Camera 135 degrees around, slightly behind the mask's right ear; reveals the crown seam, the start of the rear lacing channel and how the side panels wrap.",
+          "status": "needs-generation",
+          "files": {
+            "320": "assets/art/masks/paper-tiger/mask-paper-tiger-three-quarter-back-320.webp",
+            "640": "assets/art/masks/paper-tiger/mask-paper-tiger-three-quarter-back-640.webp",
+            "1024": "assets/art/masks/paper-tiger/mask-paper-tiger-three-quarter-back-1024.webp"
+          }
+        },
+        {
+          "angle": "back",
+          "label": "BACK",
+          "camera": "Camera directly behind at eye level; full rear lacing (eyelets, laces, tongue/gusset), the back-of-head panel layout and the neck edge finishing.",
+          "status": "needs-generation",
+          "files": {
+            "320": "assets/art/masks/paper-tiger/mask-paper-tiger-back-320.webp",
+            "640": "assets/art/masks/paper-tiger/mask-paper-tiger-back-640.webp",
+            "1024": "assets/art/masks/paper-tiger/mask-paper-tiger-back-1024.webp"
+          }
+        }
+      ]
+    },
+    {
+      "id": "glass-wraith",
+      "name": "Glass Wraith",
+      "concept": "A future-era spectre mask with translucent polymer panels over dark mesh.",
+      "silhouette": "Faceted elongated hood; a long, slightly pointed chin and angular cheek facets.",
+      "construction": "Black mesh base hood; smoky translucent polymer facet panels bonded over it, edges sealed with silver piping; faint cyan inner lining visible through the polymer; rear magnetic closure strip instead of lacing.",
+      "eyes": "Long narrow eye openings that extend along the facets, edged in silver.",
+      "mouth": "Closed: a smoky polymer panel.",
+      "surface": "Translucent polymer with internal reflections and refraction, mesh visible beneath, sharp specular edges.",
+      "palette": "Smoke grey, cyan, silver.",
+      "personality": "Ethereal, futuristic, untouchable.",
+      "current": "assets/objects/masks/glass-wraith.svg",
+      "model3d": null,
+      "views": [
+        {
+          "angle": "front",
+          "label": "FRONT",
+          "camera": "Camera dead-on at eye level, the mask facing the lens squarely; both eye openings equal; centred, the whole head form in frame with ~12% margin on every side.",
+          "status": "needs-generation",
+          "files": {
+            "320": "assets/art/masks/glass-wraith/mask-glass-wraith-front-320.webp",
+            "640": "assets/art/masks/glass-wraith/mask-glass-wraith-front-640.webp",
+            "1024": "assets/art/masks/glass-wraith/mask-glass-wraith-front-1024.webp"
+          }
+        },
+        {
+          "angle": "three-quarter",
+          "label": "3/4 FRONT",
+          "camera": "Camera rotated 40 degrees to the mask's left, at eye level; the near cheek panel foreshortens, the far eye opening narrows, the nose bridge breaks the far contour.",
+          "status": "needs-generation",
+          "files": {
+            "320": "assets/art/masks/glass-wraith/mask-glass-wraith-three-quarter-320.webp",
+            "640": "assets/art/masks/glass-wraith/mask-glass-wraith-three-quarter-640.webp",
+            "1024": "assets/art/masks/glass-wraith/mask-glass-wraith-three-quarter-1024.webp"
+          }
+        },
+        {
+          "angle": "side",
+          "label": "SIDE",
+          "camera": "True 90-degree profile facing frame left, at eye level; shows brow projection, nose/mouth relief depth, the ear opening (if any) and where the face panel meets the crown and back panels.",
+          "status": "needs-generation",
+          "files": {
+            "320": "assets/art/masks/glass-wraith/mask-glass-wraith-side-320.webp",
+            "640": "assets/art/masks/glass-wraith/mask-glass-wraith-side-640.webp",
+            "1024": "assets/art/masks/glass-wraith/mask-glass-wraith-side-1024.webp"
+          }
+        },
+        {
+          "angle": "three-quarter-back",
+          "label": "3/4 BACK",
+          "camera": "Camera 135 degrees around, slightly behind the mask's right ear; reveals the crown seam, the start of the rear lacing channel and how the side panels wrap.",
+          "status": "needs-generation",
+          "files": {
+            "320": "assets/art/masks/glass-wraith/mask-glass-wraith-three-quarter-back-320.webp",
+            "640": "assets/art/masks/glass-wraith/mask-glass-wraith-three-quarter-back-640.webp",
+            "1024": "assets/art/masks/glass-wraith/mask-glass-wraith-three-quarter-back-1024.webp"
+          }
+        },
+        {
+          "angle": "back",
+          "label": "BACK",
+          "camera": "Camera directly behind at eye level; full rear lacing (eyelets, laces, tongue/gusset), the back-of-head panel layout and the neck edge finishing.",
+          "status": "needs-generation",
+          "files": {
+            "320": "assets/art/masks/glass-wraith/mask-glass-wraith-back-320.webp",
+            "640": "assets/art/masks/glass-wraith/mask-glass-wraith-back-640.webp",
+            "1024": "assets/art/masks/glass-wraith/mask-glass-wraith-back-1024.webp"
+          }
+        }
+      ]
+    },
+    {
+      "id": "sun-eater",
+      "name": "Sun Eater",
+      "concept": "A predatory solar mask in leather and brass with fanged jaw detailing.",
+      "silhouette": "Fanged: a pronounced brow ridge and a lower jaw panel ending in two short downward brass-tipped fang points at the chin.",
+      "construction": "Amber leather base; black leather brow and jaw panels; brass studs and brass fang caps; a partial brass ring around the face perimeter; black lacing.",
+      "eyes": "Sharp, angled eye openings under a heavy black leather brow.",
+      "mouth": "Covered: a black leather jaw panel over the mouth with stitched vertical lines.",
+      "surface": "Burnished amber leather, aged brass with patina, matte black leather.",
+      "palette": "Amber, black, brass.",
+      "personality": "Hungry, dominant, a monster heel.",
+      "current": "assets/objects/masks/sun-eater.svg",
+      "model3d": null,
+      "views": [
+        {
+          "angle": "front",
+          "label": "FRONT",
+          "camera": "Camera dead-on at eye level, the mask facing the lens squarely; both eye openings equal; centred, the whole head form in frame with ~12% margin on every side.",
+          "status": "needs-generation",
+          "files": {
+            "320": "assets/art/masks/sun-eater/mask-sun-eater-front-320.webp",
+            "640": "assets/art/masks/sun-eater/mask-sun-eater-front-640.webp",
+            "1024": "assets/art/masks/sun-eater/mask-sun-eater-front-1024.webp"
+          }
+        },
+        {
+          "angle": "three-quarter",
+          "label": "3/4 FRONT",
+          "camera": "Camera rotated 40 degrees to the mask's left, at eye level; the near cheek panel foreshortens, the far eye opening narrows, the nose bridge breaks the far contour.",
+          "status": "needs-generation",
+          "files": {
+            "320": "assets/art/masks/sun-eater/mask-sun-eater-three-quarter-320.webp",
+            "640": "assets/art/masks/sun-eater/mask-sun-eater-three-quarter-640.webp",
+            "1024": "assets/art/masks/sun-eater/mask-sun-eater-three-quarter-1024.webp"
+          }
+        },
+        {
+          "angle": "side",
+          "label": "SIDE",
+          "camera": "True 90-degree profile facing frame left, at eye level; shows brow projection, nose/mouth relief depth, the ear opening (if any) and where the face panel meets the crown and back panels.",
+          "status": "needs-generation",
+          "files": {
+            "320": "assets/art/masks/sun-eater/mask-sun-eater-side-320.webp",
+            "640": "assets/art/masks/sun-eater/mask-sun-eater-side-640.webp",
+            "1024": "assets/art/masks/sun-eater/mask-sun-eater-side-1024.webp"
+          }
+        },
+        {
+          "angle": "three-quarter-back",
+          "label": "3/4 BACK",
+          "camera": "Camera 135 degrees around, slightly behind the mask's right ear; reveals the crown seam, the start of the rear lacing channel and how the side panels wrap.",
+          "status": "needs-generation",
+          "files": {
+            "320": "assets/art/masks/sun-eater/mask-sun-eater-three-quarter-back-320.webp",
+            "640": "assets/art/masks/sun-eater/mask-sun-eater-three-quarter-back-640.webp",
+            "1024": "assets/art/masks/sun-eater/mask-sun-eater-three-quarter-back-1024.webp"
+          }
+        },
+        {
+          "angle": "back",
+          "label": "BACK",
+          "camera": "Camera directly behind at eye level; full rear lacing (eyelets, laces, tongue/gusset), the back-of-head panel layout and the neck edge finishing.",
+          "status": "needs-generation",
+          "files": {
+            "320": "assets/art/masks/sun-eater/mask-sun-eater-back-320.webp",
+            "640": "assets/art/masks/sun-eater/mask-sun-eater-back-640.webp",
+            "1024": "assets/art/masks/sun-eater/mask-sun-eater-back-1024.webp"
+          }
+        }
+      ]
+    },
+    {
+      "id": "velvet-jester",
+      "name": "Velvet Jester",
+      "concept": "A theatrical jester mask in velvet with embroidered detail, comedic but well made.",
+      "silhouette": "Soft rounded hood with three short soft velvet points flopping at the crown (no bells), cheeks slightly puffed.",
+      "construction": "Plum velvet base; cream satin diamond panels on the cheeks; gold embroidered scrollwork around the eyes; grinning mouth opening trimmed in gold cord; plum lacing.",
+      "eyes": "Round eye openings with gold embroidered surrounds.",
+      "mouth": "Grinning: a wide crescent-smile opening edged in gold cord.",
+      "surface": "Velvet nap with soft highlights, satin sheen, raised embroidery.",
+      "palette": "Plum, cream, gold.",
+      "personality": "Mischievous, theatrical, crowd-pleasing.",
+      "current": "assets/objects/masks/velvet-jester.svg",
+      "model3d": null,
+      "views": [
+        {
+          "angle": "front",
+          "label": "FRONT",
+          "camera": "Camera dead-on at eye level, the mask facing the lens squarely; both eye openings equal; centred, the whole head form in frame with ~12% margin on every side.",
+          "status": "needs-generation",
+          "files": {
+            "320": "assets/art/masks/velvet-jester/mask-velvet-jester-front-320.webp",
+            "640": "assets/art/masks/velvet-jester/mask-velvet-jester-front-640.webp",
+            "1024": "assets/art/masks/velvet-jester/mask-velvet-jester-front-1024.webp"
+          }
+        },
+        {
+          "angle": "three-quarter",
+          "label": "3/4 FRONT",
+          "camera": "Camera rotated 40 degrees to the mask's left, at eye level; the near cheek panel foreshortens, the far eye opening narrows, the nose bridge breaks the far contour.",
+          "status": "needs-generation",
+          "files": {
+            "320": "assets/art/masks/velvet-jester/mask-velvet-jester-three-quarter-320.webp",
+            "640": "assets/art/masks/velvet-jester/mask-velvet-jester-three-quarter-640.webp",
+            "1024": "assets/art/masks/velvet-jester/mask-velvet-jester-three-quarter-1024.webp"
+          }
+        },
+        {
+          "angle": "side",
+          "label": "SIDE",
+          "camera": "True 90-degree profile facing frame left, at eye level; shows brow projection, nose/mouth relief depth, the ear opening (if any) and where the face panel meets the crown and back panels.",
+          "status": "needs-generation",
+          "files": {
+            "320": "assets/art/masks/velvet-jester/mask-velvet-jester-side-320.webp",
+            "640": "assets/art/masks/velvet-jester/mask-velvet-jester-side-640.webp",
+            "1024": "assets/art/masks/velvet-jester/mask-velvet-jester-side-1024.webp"
+          }
+        },
+        {
+          "angle": "three-quarter-back",
+          "label": "3/4 BACK",
+          "camera": "Camera 135 degrees around, slightly behind the mask's right ear; reveals the crown seam, the start of the rear lacing channel and how the side panels wrap.",
+          "status": "needs-generation",
+          "files": {
+            "320": "assets/art/masks/velvet-jester/mask-velvet-jester-three-quarter-back-320.webp",
+            "640": "assets/art/masks/velvet-jester/mask-velvet-jester-three-quarter-back-640.webp",
+            "1024": "assets/art/masks/velvet-jester/mask-velvet-jester-three-quarter-back-1024.webp"
+          }
+        },
+        {
+          "angle": "back",
+          "label": "BACK",
+          "camera": "Camera directly behind at eye level; full rear lacing (eyelets, laces, tongue/gusset), the back-of-head panel layout and the neck edge finishing.",
+          "status": "needs-generation",
+          "files": {
+            "320": "assets/art/masks/velvet-jester/mask-velvet-jester-back-320.webp",
+            "640": "assets/art/masks/velvet-jester/mask-velvet-jester-back-640.webp",
+            "1024": "assets/art/masks/velvet-jester/mask-velvet-jester-back-1024.webp"
+          }
+        }
+      ]
+    },
+    {
+      "id": "storm-ram",
+      "name": "Storm Ram",
+      "concept": "A heavy ram mask with curled horns, built for a powerhouse.",
+      "silhouette": "Horned: two thick curled horns of moulded rubber spiral from the temples, close to the head; heavy brow.",
+      "construction": "Steel-grey rubberised base; dark blue leather panels at brow and cheeks; white lightning-bolt shaped piping lines (abstract, not a logo) across the brow panels; horns with ridged texture; metal eyelets and heavy lacing.",
+      "eyes": "Heavy, low eye openings under a thick padded brow.",
+      "mouth": "Closed: grey panel with a reinforced chin cup.",
+      "surface": "Satin-matte rubber with ridges catching light, leather sheen, metal eyelets.",
+      "palette": "Steel grey, deep blue, white.",
+      "personality": "Relentless power, a battering ram.",
+      "current": "assets/objects/masks/storm-ram.svg",
+      "model3d": null,
+      "views": [
+        {
+          "angle": "front",
+          "label": "FRONT",
+          "camera": "Camera dead-on at eye level, the mask facing the lens squarely; both eye openings equal; centred, the whole head form in frame with ~12% margin on every side.",
+          "status": "needs-generation",
+          "files": {
+            "320": "assets/art/masks/storm-ram/mask-storm-ram-front-320.webp",
+            "640": "assets/art/masks/storm-ram/mask-storm-ram-front-640.webp",
+            "1024": "assets/art/masks/storm-ram/mask-storm-ram-front-1024.webp"
+          }
+        },
+        {
+          "angle": "three-quarter",
+          "label": "3/4 FRONT",
+          "camera": "Camera rotated 40 degrees to the mask's left, at eye level; the near cheek panel foreshortens, the far eye opening narrows, the nose bridge breaks the far contour.",
+          "status": "needs-generation",
+          "files": {
+            "320": "assets/art/masks/storm-ram/mask-storm-ram-three-quarter-320.webp",
+            "640": "assets/art/masks/storm-ram/mask-storm-ram-three-quarter-640.webp",
+            "1024": "assets/art/masks/storm-ram/mask-storm-ram-three-quarter-1024.webp"
+          }
+        },
+        {
+          "angle": "side",
+          "label": "SIDE",
+          "camera": "True 90-degree profile facing frame left, at eye level; shows brow projection, nose/mouth relief depth, the ear opening (if any) and where the face panel meets the crown and back panels.",
+          "status": "needs-generation",
+          "files": {
+            "320": "assets/art/masks/storm-ram/mask-storm-ram-side-320.webp",
+            "640": "assets/art/masks/storm-ram/mask-storm-ram-side-640.webp",
+            "1024": "assets/art/masks/storm-ram/mask-storm-ram-side-1024.webp"
+          }
+        },
+        {
+          "angle": "three-quarter-back",
+          "label": "3/4 BACK",
+          "camera": "Camera 135 degrees around, slightly behind the mask's right ear; reveals the crown seam, the start of the rear lacing channel and how the side panels wrap.",
+          "status": "needs-generation",
+          "files": {
+            "320": "assets/art/masks/storm-ram/mask-storm-ram-three-quarter-back-320.webp",
+            "640": "assets/art/masks/storm-ram/mask-storm-ram-three-quarter-back-640.webp",
+            "1024": "assets/art/masks/storm-ram/mask-storm-ram-three-quarter-back-1024.webp"
+          }
+        },
+        {
+          "angle": "back",
+          "label": "BACK",
+          "camera": "Camera directly behind at eye level; full rear lacing (eyelets, laces, tongue/gusset), the back-of-head panel layout and the neck edge finishing.",
+          "status": "needs-generation",
+          "files": {
+            "320": "assets/art/masks/storm-ram/mask-storm-ram-back-320.webp",
+            "640": "assets/art/masks/storm-ram/mask-storm-ram-back-640.webp",
+            "1024": "assets/art/masks/storm-ram/mask-storm-ram-back-1024.webp"
+          }
+        }
+      ]
+    },
+    {
+      "id": "moon-viper",
+      "name": "Moon Viper",
+      "concept": "A serpentine horror mask with a viper-head shape and moon-silver accents.",
+      "silhouette": "Serpentine: a smooth, slightly elongated head with a viper-like flattened crown that tapers backward, and subtle scale-shaped brow ridges.",
+      "construction": "Matte black leather base; violet satin side panels; silver metallic leather crescent shapes above each eye; fine scale-texture embossing on the crown; black lacing with silver eyelets.",
+      "eyes": "Narrow vertical-slit-shaped eye openings framed in silver.",
+      "mouth": "Closed: matte black panel with a thin silver seam.",
+      "surface": "Matte leather with subtle embossed scales, satin sheen, bright silver.",
+      "palette": "Silver, violet, black.",
+      "personality": "Patient, venomous, a submission specialist.",
+      "current": "assets/objects/masks/moon-viper.svg",
+      "model3d": null,
+      "views": [
+        {
+          "angle": "front",
+          "label": "FRONT",
+          "camera": "Camera dead-on at eye level, the mask facing the lens squarely; both eye openings equal; centred, the whole head form in frame with ~12% margin on every side.",
+          "status": "needs-generation",
+          "files": {
+            "320": "assets/art/masks/moon-viper/mask-moon-viper-front-320.webp",
+            "640": "assets/art/masks/moon-viper/mask-moon-viper-front-640.webp",
+            "1024": "assets/art/masks/moon-viper/mask-moon-viper-front-1024.webp"
+          }
+        },
+        {
+          "angle": "three-quarter",
+          "label": "3/4 FRONT",
+          "camera": "Camera rotated 40 degrees to the mask's left, at eye level; the near cheek panel foreshortens, the far eye opening narrows, the nose bridge breaks the far contour.",
+          "status": "needs-generation",
+          "files": {
+            "320": "assets/art/masks/moon-viper/mask-moon-viper-three-quarter-320.webp",
+            "640": "assets/art/masks/moon-viper/mask-moon-viper-three-quarter-640.webp",
+            "1024": "assets/art/masks/moon-viper/mask-moon-viper-three-quarter-1024.webp"
+          }
+        },
+        {
+          "angle": "side",
+          "label": "SIDE",
+          "camera": "True 90-degree profile facing frame left, at eye level; shows brow projection, nose/mouth relief depth, the ear opening (if any) and where the face panel meets the crown and back panels.",
+          "status": "needs-generation",
+          "files": {
+            "320": "assets/art/masks/moon-viper/mask-moon-viper-side-320.webp",
+            "640": "assets/art/masks/moon-viper/mask-moon-viper-side-640.webp",
+            "1024": "assets/art/masks/moon-viper/mask-moon-viper-side-1024.webp"
+          }
+        },
+        {
+          "angle": "three-quarter-back",
+          "label": "3/4 BACK",
+          "camera": "Camera 135 degrees around, slightly behind the mask's right ear; reveals the crown seam, the start of the rear lacing channel and how the side panels wrap.",
+          "status": "needs-generation",
+          "files": {
+            "320": "assets/art/masks/moon-viper/mask-moon-viper-three-quarter-back-320.webp",
+            "640": "assets/art/masks/moon-viper/mask-moon-viper-three-quarter-back-640.webp",
+            "1024": "assets/art/masks/moon-viper/mask-moon-viper-three-quarter-back-1024.webp"
+          }
+        },
+        {
+          "angle": "back",
+          "label": "BACK",
+          "camera": "Camera directly behind at eye level; full rear lacing (eyelets, laces, tongue/gusset), the back-of-head panel layout and the neck edge finishing.",
+          "status": "needs-generation",
+          "files": {
+            "320": "assets/art/masks/moon-viper/mask-moon-viper-back-320.webp",
+            "640": "assets/art/masks/moon-viper/mask-moon-viper-back-640.webp",
+            "1024": "assets/art/masks/moon-viper/mask-moon-viper-back-1024.webp"
+          }
+        }
+      ]
+    },
+    {
+      "id": "cinder-owl",
+      "name": "Cinder Owl",
+      "concept": "An ash-coloured owl mask with feathered suede panels and copper detail.",
+      "silhouette": "Feathered: rounded broad hood with two short feather tufts at the brow corners and a layered feather ruff at the cheeks.",
+      "construction": "Charcoal suede base; layered suede feather panels in charcoal and ash grey; copper metal-look disc frames around the eyes; ivory leather beak-shaped nose bridge; charcoal lacing.",
+      "eyes": "Large round eye openings framed with copper rings.",
+      "mouth": "Closed: charcoal suede with a small ivory beak tip above.",
+      "surface": "Soft suede nap, feather edges with slight fraying, aged copper.",
+      "palette": "Charcoal, copper, ivory.",
+      "personality": "Wise, watchful, a veteran tactician.",
+      "current": "assets/objects/masks/cinder-owl.svg",
+      "model3d": null,
+      "views": [
+        {
+          "angle": "front",
+          "label": "FRONT",
+          "camera": "Camera dead-on at eye level, the mask facing the lens squarely; both eye openings equal; centred, the whole head form in frame with ~12% margin on every side.",
+          "status": "needs-generation",
+          "files": {
+            "320": "assets/art/masks/cinder-owl/mask-cinder-owl-front-320.webp",
+            "640": "assets/art/masks/cinder-owl/mask-cinder-owl-front-640.webp",
+            "1024": "assets/art/masks/cinder-owl/mask-cinder-owl-front-1024.webp"
+          }
+        },
+        {
+          "angle": "three-quarter",
+          "label": "3/4 FRONT",
+          "camera": "Camera rotated 40 degrees to the mask's left, at eye level; the near cheek panel foreshortens, the far eye opening narrows, the nose bridge breaks the far contour.",
+          "status": "needs-generation",
+          "files": {
+            "320": "assets/art/masks/cinder-owl/mask-cinder-owl-three-quarter-320.webp",
+            "640": "assets/art/masks/cinder-owl/mask-cinder-owl-three-quarter-640.webp",
+            "1024": "assets/art/masks/cinder-owl/mask-cinder-owl-three-quarter-1024.webp"
+          }
+        },
+        {
+          "angle": "side",
+          "label": "SIDE",
+          "camera": "True 90-degree profile facing frame left, at eye level; shows brow projection, nose/mouth relief depth, the ear opening (if any) and where the face panel meets the crown and back panels.",
+          "status": "needs-generation",
+          "files": {
+            "320": "assets/art/masks/cinder-owl/mask-cinder-owl-side-320.webp",
+            "640": "assets/art/masks/cinder-owl/mask-cinder-owl-side-640.webp",
+            "1024": "assets/art/masks/cinder-owl/mask-cinder-owl-side-1024.webp"
+          }
+        },
+        {
+          "angle": "three-quarter-back",
+          "label": "3/4 BACK",
+          "camera": "Camera 135 degrees around, slightly behind the mask's right ear; reveals the crown seam, the start of the rear lacing channel and how the side panels wrap.",
+          "status": "needs-generation",
+          "files": {
+            "320": "assets/art/masks/cinder-owl/mask-cinder-owl-three-quarter-back-320.webp",
+            "640": "assets/art/masks/cinder-owl/mask-cinder-owl-three-quarter-back-640.webp",
+            "1024": "assets/art/masks/cinder-owl/mask-cinder-owl-three-quarter-back-1024.webp"
+          }
+        },
+        {
+          "angle": "back",
+          "label": "BACK",
+          "camera": "Camera directly behind at eye level; full rear lacing (eyelets, laces, tongue/gusset), the back-of-head panel layout and the neck edge finishing.",
+          "status": "needs-generation",
+          "files": {
+            "320": "assets/art/masks/cinder-owl/mask-cinder-owl-back-320.webp",
+            "640": "assets/art/masks/cinder-owl/mask-cinder-owl-back-640.webp",
+            "1024": "assets/art/masks/cinder-owl/mask-cinder-owl-back-1024.webp"
+          }
+        }
+      ]
+    },
+    {
+      "id": "white-noise",
+      "name": "White Noise",
+      "concept": "An abstract signal-interference mask with deliberately broken asymmetric panelling.",
+      "silhouette": "Asymmetric: one side smooth, the other side broken into offset rectangular panels that step outward slightly.",
+      "construction": "White stretch fabric base; offset rectangular panels of black and grey rubber on the left half only, as if the face is glitching; a grey rubber strip covers the mouth; black lacing.",
+      "eyes": "Broken: one clean oval eye opening and one eye opening interrupted by a horizontal grey bar.",
+      "mouth": "Covered by a grey rubber strip.",
+      "surface": "Matte white fabric with fine knit texture, slightly glossy rubber panels with crisp edges.",
+      "palette": "White, black, grey.",
+      "personality": "Disruptive, enigmatic, an anti-hero.",
+      "current": "assets/objects/masks/white-noise.svg",
+      "model3d": null,
+      "views": [
+        {
+          "angle": "front",
+          "label": "FRONT",
+          "camera": "Camera dead-on at eye level, the mask facing the lens squarely; both eye openings equal; centred, the whole head form in frame with ~12% margin on every side.",
+          "status": "needs-generation",
+          "files": {
+            "320": "assets/art/masks/white-noise/mask-white-noise-front-320.webp",
+            "640": "assets/art/masks/white-noise/mask-white-noise-front-640.webp",
+            "1024": "assets/art/masks/white-noise/mask-white-noise-front-1024.webp"
+          }
+        },
+        {
+          "angle": "three-quarter",
+          "label": "3/4 FRONT",
+          "camera": "Camera rotated 40 degrees to the mask's left, at eye level; the near cheek panel foreshortens, the far eye opening narrows, the nose bridge breaks the far contour.",
+          "status": "needs-generation",
+          "files": {
+            "320": "assets/art/masks/white-noise/mask-white-noise-three-quarter-320.webp",
+            "640": "assets/art/masks/white-noise/mask-white-noise-three-quarter-640.webp",
+            "1024": "assets/art/masks/white-noise/mask-white-noise-three-quarter-1024.webp"
+          }
+        },
+        {
+          "angle": "side",
+          "label": "SIDE",
+          "camera": "True 90-degree profile facing frame left, at eye level; shows brow projection, nose/mouth relief depth, the ear opening (if any) and where the face panel meets the crown and back panels.",
+          "status": "needs-generation",
+          "files": {
+            "320": "assets/art/masks/white-noise/mask-white-noise-side-320.webp",
+            "640": "assets/art/masks/white-noise/mask-white-noise-side-640.webp",
+            "1024": "assets/art/masks/white-noise/mask-white-noise-side-1024.webp"
+          }
+        },
+        {
+          "angle": "three-quarter-back",
+          "label": "3/4 BACK",
+          "camera": "Camera 135 degrees around, slightly behind the mask's right ear; reveals the crown seam, the start of the rear lacing channel and how the side panels wrap.",
+          "status": "needs-generation",
+          "files": {
+            "320": "assets/art/masks/white-noise/mask-white-noise-three-quarter-back-320.webp",
+            "640": "assets/art/masks/white-noise/mask-white-noise-three-quarter-back-640.webp",
+            "1024": "assets/art/masks/white-noise/mask-white-noise-three-quarter-back-1024.webp"
+          }
+        },
+        {
+          "angle": "back",
+          "label": "BACK",
+          "camera": "Camera directly behind at eye level; full rear lacing (eyelets, laces, tongue/gusset), the back-of-head panel layout and the neck edge finishing.",
+          "status": "needs-generation",
+          "files": {
+            "320": "assets/art/masks/white-noise/mask-white-noise-back-320.webp",
+            "640": "assets/art/masks/white-noise/mask-white-noise-back-640.webp",
+            "1024": "assets/art/masks/white-noise/mask-white-noise-back-1024.webp"
+          }
+        }
+      ]
+    }
+  ]
+}

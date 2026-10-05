@@ -21,4 +21,4 @@ Avoid:
 - decorative effects without UX purpose
 - flattened screenshot-only interfaces
 
-When a generated binary asset cannot be committed through the available repository connector, keep the runtime deterministic with an original local fallback rather than silently substituting an external image.
+Generated artwork follows ASSET_PIPELINE.md: every asset has a written brief in `data/art-manifest.json`, is generated with ChatGPT image generation, passes the QC checklist, and is ingested with `scripts/ingest-art.mjs`. Never substitute an external, stock or placeholder image. Until an asset is approved, the authored SVG study art is shown. That is a stopgap, and it is listed as outstanding work.

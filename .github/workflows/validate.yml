@@ -19,9 +19,15 @@ jobs:
           test -f assets/worlds/mask-archive.svg
           test -f assets/worlds/anatomy-lab.svg
           test -f assets/worlds/boot-workshop.svg
+      - name: Validate assets and art manifest
+        run: node scripts/validate-assets.mjs
+      - name: Verify ASSET_PROMPTS.md matches the manifest
+        run: |
+          node scripts/build-prompts.mjs
+          git diff --exit-code ASSET_PROMPTS.md
       - name: Reject broken generated asset references
         run: |
-          ! grep -R "assets/generated/" -n . --exclude-dir=.git
+          ! grep -R "assets/generated/" -n . --exclude-dir=.git --exclude-dir=.github
       - name: Verify all physical mask assets
         run: |
           for f in             ember-dragon frost-phoenix jungle-spirit sol-invictus void-walker             crimson-skull ocean-king shadow-fox iron-serpent celestial-guardian             night-blossom blood-moon paper-tiger glass-wraith sun-eater             velvet-jester storm-ram moon-viper cinder-owl white-noise

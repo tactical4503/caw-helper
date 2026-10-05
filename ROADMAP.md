@@ -20,6 +20,14 @@
 - [x] Original-mask builder concept
 - [x] Local object assets
 
+## Generated art (see ASSET_PIPELINE.md)
+- [x] Art manifest with per-asset briefs, purpose and UI location
+- [x] ChatGPT prompt sheet generated from the manifest
+- [x] Ingest (WebP sizes) and validation scripts, CI checks
+- [x] UI consumes approved art; honest single-view / multi-angle labelling
+- [ ] Generate and approve 12 world environments
+- [ ] Generate and approve 20 masks × 5 angles
+
 ## Next production layers
 - [ ] Real GLB mask models
 - [ ] 3D orbit/inspection
