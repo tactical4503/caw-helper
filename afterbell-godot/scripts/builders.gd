@@ -162,8 +162,8 @@ static func build_arena(parent: Node3D) -> Arena:
 	root.add_child(bell_light)
 	bell_light.look_at(Vector3(0, 1.2, BELL_POS.z), Vector3.FORWARD)
 
-	put(box(18, 0.1, 20), ST.textured("marble_cream", 0.35, ST.procedural(Color("b9a98a"), TILE, "marble")), Vector3(0, -0.05, 0), root, false)
-	put(box(16, 0.02, 18), ST.procedural(Color("1f3a2a"), CARPET_LIGHT, "carpet", 1.5), Vector3(0, 0.01, 0), root, false)
+	put(box(18, 0.1, 20), ST.textured("tile_cream", 0.6, ST.procedural(Color("b9a98a"), TILE, "marble")), Vector3(0, -0.05, 0), root, false)
+	put(box(16, 0.02, 18), ST.textured("carpet_green", 0.5, ST.procedural(Color("1f3a2a"), CARPET_LIGHT, "carpet", 1.5)), Vector3(0, 0.01, 0), root, false)
 	# Three carpet inlays fan toward the bell: decoration that also reads as approach lanes.
 	var lever_z := -6.1
 	put(box(4, 0.02, 12), mat(PLUM, 0.9), Vector3(0, 0.025, lever_z + 6.2), root, false)
@@ -172,7 +172,7 @@ static func build_arena(parent: Node3D) -> Arena:
 		strip.rotation.y = s * 0.33
 		put(box(0.08, 0.021, 12), mat(CREAM, 0.9), Vector3(s * 2.04, 0.03, lever_z + 6.2), root, false)
 	# North wall, display platform split around the bell recess.
-	var wall := ST.procedural(Color("2a1222"), PLUM, "stone", 0.35)
+	var wall := ST.textured("plaster_plum", 0.3, ST.procedural(Color("2a1222"), PLUM, "stone", 0.35))
 	put(box(16, 4.2, 0.3), wall, Vector3(0, 2.1, -9.15), root)
 	put(box(16, 0.18, 0.34), mat(CREAM, 0.6), Vector3(0, 0.09, -8.98), root)
 	for s in [-1.0, 1.0]:
@@ -275,7 +275,7 @@ static func build_arena(parent: Node3D) -> Arena:
 static func build_rack(index: int) -> Rack:
 	var r := Rack.new()
 	r.node = Node3D.new()
-	var frame := mat(Color("2b2b2e"), 0.4, 0.7)
+	var frame := ST.textured("metal_charcoal", 2.0, mat(Color("2b2b2e"), 0.4, 0.7), 0.6)
 	for z in [-0.8, 0.8]:
 		put(box(0.05, 1.6, 0.05), frame, Vector3(0, 0.85, z), r.node)
 		put(box(0.6, 0.05, 0.05), frame, Vector3(0, 0.08, z), r.node)
