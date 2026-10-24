@@ -23,6 +23,10 @@ func check(ok: bool, what: String) -> void:
 		_failures += 1
 
 
+func _init() -> void:
+	Engine.set_meta("afterbell_testing", true)
+
+
 func fresh() -> Node:
 	var room: Node = load("res://rooms/cosmetics.tscn").instantiate()
 	root.add_child(room)
@@ -123,6 +127,4 @@ func _run() -> void:
 	room.virtual["left"] = true
 	until(room, func(): return room.leaving, 200)
 	room.virtual["left"] = false
-	check(room.leaving, "walking through the open gate continues to the boss court")
-	check(Engine.has_meta("afterbell_skip_title"), "boss court will skip its title card")
-	Engine.remove_meta("afterbell_skip_title")
+	check(room.leaving and room.next_scene == "res://rooms/hats.tscn", "walking through the open gate continues to Hats")

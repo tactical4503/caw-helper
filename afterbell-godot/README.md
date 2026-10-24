@@ -5,7 +5,11 @@ A Godot 4 port of the Installment 002 boss fight: **BS-01, the Floor Manager**, 
 Open this folder from the Godot project manager (**Import** → select `project.godot`), then press F5. Built and tested on **Godot 4.3**; other 4.x versions should work.
 
 ## Playable flow (demonstration build)
-F5 starts in **DS-01 Cosmetics** (`rooms/cosmetics.tscn`, `scripts/room_cosmetics.gd`). It is the safe reflection lesson: the attendant flips a sale sign across the aisle every 6 s, and you return it with a timed guard (K) to the receiver over the west door, which opens the hats gate. The sign can't hurt you here. After three misses, T turns on reflection assist and H asks Mika to hold the catch. E examines the mirror, atomizer and price card. Leaving through the west gate goes to the Floor Manager fight (`main.tscn`). Checks: `godot --headless --path afterbell-godot -s res://tests/room_test.gd`.
+F5 starts in **DS-01 Cosmetics**, continues to **DS-02 Hats**, then the **Floor Manager's court**. This is a condensed slice: Alterations and the atrium are skipped.
+- **Cosmetics** (`rooms/cosmetics.tscn`): the safe reflection lesson. Return the attendant's sale sign with a timed guard (K) to the receiver over the west door, which opens the hats gate. The sign can't hurt you here. After three misses, T turns on reflection assist and H asks Mika to hold the catch. E examines the mirror, atomizer and price card.
+- **Hats** (`rooms/hats.tscn`): the first etiquette guards (EN-H01). Each has a 0.85 s baton tell and two stability pips: three light hits topple it, or one wound heavy strike during its tell or recovery does. They sit down and are never destroyed. The movable rack runs on a guide with two stops (hold guard at a handle and walk). The east stop opens the north aisle; the west stop opens the alcove with souvenir pin SV-01. The second guard appears once you've moved the rack, and only one guard strikes at a time.
+- Checks: `tests/room_test.gd`, `tests/hats_test.gd`, `tests/sim_test.gd` (all headless).
+- Sounds: drop files into `assets/sfx/` (see the README there).
 
 ## Layout
 - `scripts/main.gd`: the fight. Contains the state machine, the timing table constants (Section 11), input, camera, and which clip plays when.

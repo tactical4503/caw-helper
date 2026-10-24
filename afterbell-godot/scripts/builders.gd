@@ -176,7 +176,7 @@ static func build_arena(parent: Node3D) -> Arena:
 	put(box(16, 4.2, 0.3), wall, Vector3(0, 2.1, -9.15), root)
 	put(box(16, 0.18, 0.34), mat(CREAM, 0.6), Vector3(0, 0.09, -8.98), root)
 	for s in [-1.0, 1.0]:
-		put(box(4.4, 0.32, 1.6), ST.textured("laminate_walnut", 0.8, ST.procedural(Color("6a4528"), Color("b0814f"), "wood", 0.4)), Vector3(s * 4.6, 0.16, -8.15), root)
+		put(box(4.4, 0.32, 1.6), ST.plastic(Color("6e4326"), 0.35, 0.0), Vector3(s * 4.6, 0.16, -8.15), root)
 	# West wall with the service door; waist-high east barrier over the atrium; low south wall and gate.
 	put(box(0.3, 2.6, 15.2), wall, Vector3(-8.15, 1.3, -1.4), root)
 	put(box(0.3, 2.6, 0.6), wall, Vector3(-8.15, 1.3, 8.7), root)

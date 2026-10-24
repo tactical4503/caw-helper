@@ -61,6 +61,7 @@ var receiver: Node3D
 var linkage: Node3D
 var gate_progress := 0.0
 var leaving := false
+var next_scene := "res://rooms/hats.tscn"
 var interactables := []       # [Vector2 pos, name]
 var used := {}
 
@@ -516,8 +517,8 @@ func _update_gate(dt: float) -> void:
 
 func _leave() -> void:
 	leaving = true
-	Engine.set_meta("afterbell_skip_title", true)
-	get_tree().change_scene_to_file("res://main.tscn")
+	if not Engine.has_meta("afterbell_testing"):
+		get_tree().change_scene_to_file(next_scene)
 
 
 func _update_subs(dt: float) -> void:
