@@ -44,6 +44,8 @@ var _unit := 1.0              # metres -> skeleton units
 var _sword_src: Node3D
 var _sword_view: Node3D
 var _hand := -1
+var _left_hand := -1
+const HAND_SCALE := 0.8
 
 
 func _ready() -> void:
@@ -80,6 +82,8 @@ func _ready() -> void:
 	for mi in _rig.get_node("Pelvis").find_children("*", "MeshInstance3D", true, false):
 		mi.visible = false
 	_hand = _skel.find_bone(sword_bone)
+	_left_hand = _skel.find_bone("LeftHand")
+	_restyle(skin)
 	_sword_src = _rig.get_node_or_null("Pelvis/Torso/ArmR/ForearmR/Sword")
 	if _sword_src and _hand >= 0:
 		_sword_view = Node3D.new()
@@ -96,6 +100,24 @@ func _ready() -> void:
 			_sword_view.add_child(copy)
 			for mi in copy.find_children("*", "MeshInstance3D", true, false):
 				mi.visible = true
+
+
+## Match the game's glossy 90s-CGI finish: keep Meshy's textures, add a sharp clearcoat and
+## tighten the roughness so the armour shows hard highlights like the rest of the scene.
+func _restyle(skin: Node) -> void:
+	for mi in skin.find_children("*", "MeshInstance3D", true, false):
+		var m3 := mi as MeshInstance3D
+		for i in m3.mesh.get_surface_count():
+			var src := m3.get_active_material(i) as StandardMaterial3D
+			if src == null:
+				continue
+			var m := src.duplicate() as StandardMaterial3D
+			m.clearcoat_enabled = true
+			m.clearcoat = 0.55
+			m.clearcoat_roughness = 0.08
+			m.roughness = minf(m.roughness, 0.55)
+			m.metallic_specular = 0.6
+			m3.set_surface_override_material(i, m)
 
 
 func _process(_delta: float) -> void:
@@ -123,6 +145,8 @@ func _process(_delta: float) -> void:
 		globals[i] = (globals[parent] * local) if parent >= 0 else local
 		_skel.set_bone_pose_rotation(i, local.basis.get_rotation_quaternion())
 		_skel.set_bone_pose_position(i, local.origin)
+		if i == _hand or i == _left_hand:
+			_skel.set_bone_pose_scale(i, Vector3.ONE * HAND_SCALE)
 	if _sword_view and _hand >= 0:
 		var forearm := _sword_src.get_parent() as Node3D
 		var hand_world := _skel.global_transform * globals[_hand].origin

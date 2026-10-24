@@ -260,7 +260,7 @@ static func ren_rest() -> Dictionary:
 		LEG_L: Vector3(0, 0, 0.03), LEG_R: Vector3(0, 0, -0.03), KNEE_L: Vector3(0.05, 0, 0), KNEE_R: Vector3(0.05, 0, 0),
 		TORSO: Vector3(0.03, 0, 0), RHEAD: Vector3.ZERO,
 		ARM_L_: Vector3(0.1, 0, 0.12), FORE_L: Vector3(-0.25, 0, 0),
-		ARM_R_: Vector3(-0.25, 0, -0.12), FORE_R: Vector3(-0.55, 0, 0), SWORD: Vector3(-0.9, 0, 0)}
+		ARM_R_: Vector3(-0.2, 0, -0.12), FORE_R: Vector3(-0.45, 0, 0), SWORD: Vector3(0.05, 0, 0)}
 
 
 ## Guard: braced stance, Knock held level across the chest with its broad flat face toward the
@@ -273,8 +273,8 @@ static func level_blade(arm_x: float, fore_x: float) -> Vector3:
 static func guard_pose() -> Dictionary:
 	return {PELVIS_P: Vector3(0, HIP_Y - 0.07, 0), LEG_L: Vector3(-0.35, 0, 0.12), KNEE_L: Vector3(0.55, 0, 0),
 		LEG_R: Vector3(0.25, 0, -0.12), KNEE_R: Vector3(0.5, 0, 0), TORSO: Vector3(0.1, 0.15, 0), RHEAD: Vector3(-0.05, -0.15, 0),
-		ARM_R_: Vector3(-1.2, 0, 0), FORE_R: Vector3(-0.3, 0, 0), SWORD: level_blade(-1.2, -0.3),
-		ARM_L_: Vector3(-1.15, 0, -0.3), FORE_L: Vector3(-0.55, 0, 0)}
+		ARM_R_: Vector3(-0.75, 0, 0.25), FORE_R: Vector3(-1.05, 0, 0), SWORD: level_blade(-0.75, -1.05),
+		ARM_L_: Vector3(-0.7, 0, -0.35), FORE_L: Vector3(-1.25, 0, 0)}
 
 
 ## Fully wound heavy strike: blade cocked far behind the shoulder, torso twisted away.
@@ -292,7 +292,7 @@ static func ren_clips() -> Dictionary:
 	c["idle"] = [2.4, true, [
 		[0.0, rest, SMOOTH],
 		[1.2, {PELVIS_P: Vector3(0, HIP_Y - 0.012, 0), TORSO: Vector3(0.06, 0, 0), RHEAD: Vector3(0.03, 0.04, 0),
-			ARM_L_: Vector3(0.12, 0, 0.13), SWORD: Vector3(-0.95, 0, 0)}, SMOOTH],
+			ARM_L_: Vector3(0.12, 0, 0.13), SWORD: Vector3(0.0, 0, 0)}, SMOOTH],
 		[2.4, rest, SMOOTH]]]
 
 	# Run: contact / passing / contact / passing at 0.6 s per two steps; pelvis drops on contact,
@@ -326,7 +326,7 @@ static func ren_clips() -> Dictionary:
 	# Reflect: from guard, punch the flat of the blade forward and return to guard.
 	c["reflect"] = [0.3, false, [
 		[0.0, o([rest, guard_pose()]), SNAP],
-		[0.05, {ARM_R_: Vector3(-1.45, 0, 0), FORE_R: Vector3(-0.05, 0, 0), SWORD: level_blade(-1.45, -0.05), TORSO: Vector3(0.22, 0.15, 0),
+		[0.05, {ARM_R_: Vector3(-1.05, 0, 0.2), FORE_R: Vector3(-0.6, 0, 0), SWORD: level_blade(-1.05, -0.6), TORSO: Vector3(0.22, 0.15, 0),
 			ARM_L_: Vector3(-1.4, 0, -0.3), FORE_L: Vector3(-0.2, 0, 0)}, SMOOTH],
 		[0.3, guard_pose(), LIN]]]
 

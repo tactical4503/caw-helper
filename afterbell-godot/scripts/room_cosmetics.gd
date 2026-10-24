@@ -218,15 +218,34 @@ func _build_room() -> void:
 	attendant.position = Vector3(THROW_FROM.x + 0.4, 0, THROW_FROM.y)
 	attendant.rotation.y = -PI / 2.0
 	add_child(attendant)
-	var ivory := B.mat(B.IVORY, 0.4)
-	B.put(B.capsule(0.2, 0.9), ivory, Vector3(0, 1.15, 0), attendant)
-	B.put(B.sphere(0.16), ivory, Vector3(0, 1.95, 0), attendant)
-	B.put(B.cyl(0.2, 0.2, 0.06), B.mat(B.RED, 0.4), Vector3(0, 2.08, 0.06), attendant)  # red sale visor
-	B.put(B.cyl(0.08, 0.1, 0.9), ivory, Vector3(0, 0.45, 0), attendant)
+	# Placeholder display mannequin (sale herald): glossy ivory, brass ball joints, on a stand.
+	var ivory := ST.plastic(B.IVORY, 0.3, 0.0)
+	var joint := B.brass()
+	B.put(B.cyl(0.22, 0.26, 0.06), B.mat(B.BLACK, 0.3), Vector3(0, 0.03, 0), attendant)       # stand base
+	B.put(B.cyl(0.025, 0.025, 0.5), joint, Vector3(0, 0.3, 0), attendant)                      # stand rod
+	for side in [-1.0, 1.0]:
+		B.put(B.capsule(0.07, 0.38), ivory, Vector3(side * 0.1, 0.75, 0), attendant)          # thighs
+		B.put(B.sphere(0.06), joint, Vector3(side * 0.1, 0.55, 0), attendant)                  # knees
+		B.put(B.capsule(0.06, 0.34), ivory, Vector3(side * 0.1, 0.33, 0), attendant)          # shins
+	var torso := B.put(B.cyl(0.19, 0.14, 0.62), ivory, Vector3(0, 1.28, 0), attendant)
+	torso.scale = Vector3(1.0, 1.0, 0.7)
+	B.put(B.sphere(0.15), ivory, Vector3(0, 0.98, 0), attendant).scale = Vector3(1.1, 0.8, 0.8)   # hips
+	B.put(B.cyl(0.055, 0.06, 0.12), ivory, Vector3(0, 1.64, 0), attendant)                     # neck
+	B.put(B.sphere(0.13), ivory, Vector3(0, 1.82, 0), attendant).scale = Vector3(0.9, 1.2, 1.0)   # egg head
+	B.put(B.cyl(0.14, 0.14, 0.05), B.mat(B.RED, 0.3), Vector3(0, 1.94, 0), attendant)           # sale visor crown
+	B.put(B.box(0.26, 0.02, 0.14), B.mat(B.RED, 0.3), Vector3(0, 1.92, 0.15), attendant)        # visor brim
+	for side in [-1.0, 1.0]:
+		B.put(B.sphere(0.065), joint, Vector3(side * 0.24, 1.55, 0), attendant)                # shoulders
+	var left_arm := Node3D.new()
+	left_arm.position = Vector3(0.24, 1.55, 0)
+	attendant.add_child(left_arm)
+	B.put(B.capsule(0.045, 0.5), ivory, Vector3(0, -0.3, 0), left_arm)
+	left_arm.rotation.z = 0.12
 	attendant_arm = Node3D.new()
-	attendant_arm.position = Vector3(-0.26, 1.55, 0)
+	attendant_arm.position = Vector3(-0.24, 1.55, 0)
 	attendant.add_child(attendant_arm)
-	B.put(B.capsule(0.05, 0.5), ivory, Vector3(0, -0.3, 0), attendant_arm)
+	B.put(B.capsule(0.045, 0.5), ivory, Vector3(0, -0.3, 0), attendant_arm)
+	B.put(B.sphere(0.05), ivory, Vector3(0, -0.6, 0), attendant_arm)                          # hand
 	# A warm spotlight picks out the attendant so the demonstration reads at a glance.
 	var spot := SpotLight3D.new()
 	spot.light_color = Color("ffd9a0")
