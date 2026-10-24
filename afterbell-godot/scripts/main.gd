@@ -1015,16 +1015,24 @@ func _render(dt: float) -> void:
 	var wound := charging and charge_t >= HEAVY_CHARGE
 	ren_ring_mat.albedo_color.a = damp(ren_ring_mat.albedo_color.a, 0.85 if wound else (0.3 if charging else 0.0), 12.0, dt)
 
-	# Camera: high three-quarter view; pulls back during the opening to show chair and bell together.
+	# Camera: low over Ren's shoulder, facing the Manager and the bell beyond him; pulls back and up
+	# during the opening so chair and bell share the frame.
 	var vp := get_viewport().get_visible_rect().size
 	var portrait := vp.x < vp.y
-	camera.fov = 62.0 if portrait else 46.0
-	var wide := 1.18 if (exp_on or m_state == "bell_scene") else 1.0
-	var fx := p_pos.x * (0.8 if portrait else 0.6) + m_pos.x * (0.2 if portrait else 0.4)
-	var fz := p_pos.y * 0.62 + m_pos.y * 0.38 + (2.6 if portrait else 0.0)
-	var cam_target := Vector3(fx, 11.5 * wide, fz + 10.5 * wide)
+	camera.fov = 70.0 if portrait else 55.0
+	var wide := 1.35 if (exp_on or m_state == "bell_scene") else 1.0
+	var look := m_pos - p_pos
+	var facing := look.normalized() if look.length() > 0.5 else Vector2(0, -1)
+	var side := Vector2(-facing.y, facing.x)
+	var back := p_pos - facing * 4.2 * wide + side * 0.9
+	back.x = clampf(back.x, MIN_X, MAX_X)
+	back.y = clampf(back.y, MIN_Z - 1.0, MAX_Z + 0.2)
+	var cam_target := Vector3(back.x, 2.3 * wide, back.y)
+	var aim := p_pos.lerp(m_pos, 0.45)
+	var fx := aim.x
+	var fz := aim.y
 	var k_cam := 1.0 - exp(-4.0 * dt) if dt > 0.0 else 1.0
 	camera.position = camera.position.lerp(cam_target, k_cam)
 	shake = maxf(0.0, shake - dt)
 	var sh := shake * 0.4
-	camera.look_at(Vector3(fx + (randf() - 0.5) * sh, 1.0 + (randf() - 0.5) * sh, fz - 0.6), Vector3.UP)
+	camera.look_at(Vector3(fx + (randf() - 0.5) * sh, 1.5 + (randf() - 0.5) * sh, fz), Vector3.UP)

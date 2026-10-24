@@ -187,7 +187,7 @@ static func build_arena(parent: Node3D) -> Arena:
 	put(box(16, 1.0, 0.25), mat(CREAM, 0.6), Vector3(0, 0.5, 9.1), root)
 	for i in range(-2, 3):
 		put(box(0.05, 1.6, 0.05), brass(), Vector3(i * 0.45, 1.3, 9.1), root)
-	put(box(30, 0.1, 40), ST.water(), Vector3(23, -0.6, 0), root, false)
+	_build_hall(root)
 	# Six low shoe plinths form the outer edge.
 	for p in [Vector2(-7.0, -3.6), Vector2(-7.0, 2.4), Vector2(7.0, -3.6), Vector2(7.0, 2.4), Vector2(-3.6, 8.0), Vector2(3.6, 8.0)]:
 		put(box(1.1, 0.5, 1.1), mat(CREAM, 0.6), Vector3(p.x, 0.25, p.y), root)
@@ -270,6 +270,52 @@ static func build_arena(parent: Node3D) -> Arena:
 	var head := put(box(0.6, 0.01, 0.6), arrow_mat, Vector3(0, 0.05, 1.7), a.aim_arrow, false)
 	head.rotation.y = PI / 4.0
 	return a
+
+
+## Interior dressing: ceiling, columns with plum banners, brass wall lamps, and the atrium
+## beyond the east balcony, so the low over-the-shoulder camera sees a store, not a void.
+static func _build_hall(root: Node3D) -> void:
+	var cream := mat(CREAM, 0.5)
+	var wall := ST.textured("plaster_plum", 0.3, mat(PLUM_DEEP, 0.85))
+	var ceiling := put(box(40, 0.2, 30), mat(Color("cbbd9f"), 0.8), Vector3(4, 5.6, 0), root, false)
+	ceiling.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	# Coffered beams.
+	for z in range(-8, 10, 4):
+		put(box(40, 0.35, 0.4), cream, Vector3(4, 5.35, z), root, false)
+	# Atrium beyond the east balcony: lower floor, far wall, a skylight glow.
+	put(box(14, 0.1, 22), ST.textured("tile_cream", 0.6, cream), Vector3(15.5, -4.2, 0), root, false)
+	put(box(0.4, 10, 22), wall, Vector3(22.5, 0.8, 0), root)
+	var sky := StandardMaterial3D.new()
+	sky.albedo_color = Color("ffb27a")
+	sky.emission_enabled = true
+	sky.emission = Color("ff9a5c")
+	sky.emission_energy_multiplier = 1.6
+	put(box(0.1, 4, 6), sky, Vector3(22.25, 3.2, -2), root, false)  # arched window at sunset
+	# Columns along the walls, each with a hanging banner and a lamp.
+	var banner := ST.textured("plaster_plum", 0.8, mat(PLUM, 0.6))
+	var lamp_glass := StandardMaterial3D.new()
+	lamp_glass.albedo_color = Color("fff1d0")
+	lamp_glass.emission_enabled = true
+	lamp_glass.emission = Color("ffd08a")
+	lamp_glass.emission_energy_multiplier = 3.0
+	for spot in [Vector2(-7.75, -6), Vector2(-7.75, -1), Vector2(-7.75, 4), Vector2(7.95, -6), Vector2(7.95, -1), Vector2(7.95, 4),
+			Vector2(-4, -8.85), Vector2(4, -8.85)]:
+		var on_side: bool = absf(spot.x) > 7.0
+		var face := Vector3(-signf(spot.x), 0, 0) if on_side else Vector3(0, 0, 1)
+		put(box(0.7, 5.4, 0.7), cream, Vector3(spot.x, 2.7, spot.y), root)
+		put(box(0.8, 0.18, 0.8), brass(), Vector3(spot.x, 5.1, spot.y), root)
+		put(box(0.8, 0.18, 0.8), brass(), Vector3(spot.x, 0.09, spot.y), root)
+		var b := put(box(0.75 if not on_side else 0.06, 2.0, 0.06 if not on_side else 0.75), banner, Vector3(spot.x, 3.9, spot.y) + face * 0.4, root)
+		put(box(0.79 if not on_side else 0.07, 0.08, 0.07 if not on_side else 0.79), brass(), b.position + Vector3(0, 1.0, 0), root)
+		var lamp_pos := Vector3(spot.x, 2.6, spot.y) + face * 0.55
+		put(sphere(0.06), brass(), lamp_pos - face * 0.15, root)
+		put(sphere(0.16), lamp_glass, lamp_pos, root, false)
+		var light := OmniLight3D.new()
+		light.light_color = Color("ffc98a")
+		light.light_energy = 1.1
+		light.omni_range = 6.5
+		light.position = lamp_pos + face * 0.2
+		root.add_child(light)
 
 
 static func build_rack(index: int) -> Rack:

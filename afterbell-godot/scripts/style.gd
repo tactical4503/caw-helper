@@ -137,48 +137,38 @@ static func water() -> StandardMaterial3D:
 
 
 static func environment() -> Environment:
-	var sky_mat := ProceduralSkyMaterial.new()
-	sky_mat.sky_top_color = Color("1d47b8")
-	sky_mat.sky_horizon_color = Color("a9d4ff")
-	sky_mat.sky_curve = 0.12
-	sky_mat.ground_horizon_color = Color("a9d4ff")
-	sky_mat.ground_bottom_color = Color("24406e")
-	sky_mat.sun_angle_max = 20.0
-	var sky := Sky.new()
-	sky.sky_material = sky_mat
+	# Warm department-store interior: lamplight, warm bounce, soft bloom on the lamps and brass.
 	var e := Environment.new()
-	e.background_mode = Environment.BG_SKY
-	e.sky = sky
-	e.ambient_light_source = Environment.AMBIENT_SOURCE_SKY
-	e.ambient_light_energy = 0.35
-	e.ambient_light_sky_contribution = 0.35
-	e.ambient_light_color = Color("ffe8cc")
-	e.ambient_light_source = Environment.AMBIENT_SOURCE_SKY
-	e.reflected_light_source = Environment.REFLECTION_SOURCE_SKY
-	# 90s renderers had no tone mapping: colours stay pure and hotspots simply clip to white.
-	e.tonemap_mode = Environment.TONE_MAPPER_LINEAR
+	e.background_mode = Environment.BG_COLOR
+	e.background_color = Color("2a1c1a")
+	e.ambient_light_source = Environment.AMBIENT_SOURCE_COLOR
+	e.ambient_light_color = Color("ffd9b0")
+	e.ambient_light_energy = 0.22
+	e.reflected_light_source = Environment.REFLECTION_SOURCE_BG
+	e.tonemap_mode = Environment.TONE_MAPPER_FILMIC
 	e.tonemap_exposure = 0.85
-	e.ssr_enabled = true            # glossy floors and water mirror the scene (Forward+)
+	e.ssr_enabled = true            # glossy floors and counters mirror the lamps (Forward+)
 	e.ssr_max_steps = 48
-	e.glow_enabled = true           # specular hotspots bloom slightly, as in the old renders
-	e.glow_intensity = 0.35
-	e.glow_bloom = 0.04
-	e.glow_hdr_threshold = 1.1
-	e.fog_enabled = true            # blue atmospheric depth
-	e.fog_light_color = Color("9cc8ff")
-	e.fog_density = 0.0015
-	e.fog_aerial_perspective = 0.6
+	e.ssao_enabled = true           # contact shadows under counters and along walls
+	e.ssao_intensity = 1.5
+	e.glow_enabled = true           # lamps and brass bloom softly
+	e.glow_intensity = 0.6
+	e.glow_bloom = 0.08
+	e.glow_hdr_threshold = 1.2
+	e.fog_enabled = true            # warm haze gives the hall depth
+	e.fog_light_color = Color("c99a70")
+	e.fog_density = 0.008
 	e.adjustment_enabled = true
-	e.adjustment_saturation = 1.0
-	e.adjustment_contrast = 1.1
+	e.adjustment_saturation = 1.15
+	e.adjustment_contrast = 1.05
 	return e
 
 
 ## One strong sun with crisp shadows and full specular.
 static func sun() -> DirectionalLight3D:
 	var key := DirectionalLight3D.new()
-	key.light_color = Color("fff6e4")
-	key.light_energy = 1.35
+	key.light_color = Color("ffd2a0")   # late sun through the atrium skylight
+	key.light_energy = 0.5
 	key.light_specular = 1.0
 	key.shadow_enabled = true
 	key.shadow_blur = 0.3
