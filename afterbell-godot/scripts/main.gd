@@ -148,9 +148,8 @@ var camera: Camera3D
 var hud: B.Hud
 var sfx: B.Sfx
 
-var _subs: Array = []
-var _sub_cur = null
-var _sub_t := 0.0
+const Dialogue := preload("res://scripts/dialogue.gd")
+var dialogue
 
 
 func _ready() -> void:
@@ -185,6 +184,7 @@ func _ready() -> void:
 	sfx = B.Sfx.new()
 	add_child(sfx)
 	hud = B.build_hud(self)
+	dialogue = Dialogue.new(sfx, hud.subtitle_who, hud.subtitle)
 	hud.start_button.pressed.connect(_on_start)
 	hud.again_button.pressed.connect(_on_again)
 	for key in hud.options:
@@ -299,30 +299,17 @@ func reset_attempt(keep: bool) -> void:
 		r.state = "park"
 		r.dir = 1
 	arena.lane_marks.visible = phase >= 2
-	_subs.clear()
-	_sub_cur = null
+	dialogue.clear()
 	say("MIKA", "Bell's behind him. Get his brake open and we can reach the governor.", 3.0)
 	_update_hud()
 
 
 func say(who: String, text: String, dur := 2.6) -> void:
-	_subs.append([who, text, dur])
+	dialogue.say(who, text, dur)
 
 
 func _update_subs(dt: float) -> void:
-	if _sub_cur != null:
-		_sub_t -= dt
-		if _sub_t <= 0.0:
-			_sub_cur = null
-	if _sub_cur == null and not _subs.is_empty():
-		_sub_cur = _subs.pop_front()
-		_sub_t = _sub_cur[2]
-	if _sub_cur == null:
-		hud.subtitle_who.text = ""
-		hud.subtitle.text = ""
-	else:
-		hud.subtitle_who.text = _sub_cur[0]
-		hud.subtitle.text = _sub_cur[1]
+	dialogue.update(dt)
 
 
 func _update_hud() -> void:

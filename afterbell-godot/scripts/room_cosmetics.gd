@@ -69,9 +69,8 @@ var sfx
 var subtitle: Label
 var who: Label
 var prompt: Label
-var _subs: Array = []
-var _sub_cur = null
-var _sub_t := 0.0
+const Dialogue := preload("res://scripts/dialogue.gd")
+var dialogue
 var settings := {"reflect_assist": false}
 
 
@@ -267,10 +266,11 @@ func _build_hud() -> void:
 	for l in [prompt, who, subtitle]:
 		l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		bottom.add_child(l)
+	dialogue = Dialogue.new(sfx, who, subtitle)
 
 
 func say(speaker: String, text: String, dur := 2.6) -> void:
-	_subs.append([speaker, text, dur])
+	dialogue.say(speaker, text, dur)
 
 
 # ---------------------------------------------------------------- loop
@@ -492,15 +492,7 @@ func _leave() -> void:
 
 
 func _update_subs(dt: float) -> void:
-	if _sub_cur != null:
-		_sub_t -= dt
-		if _sub_t <= 0.0:
-			_sub_cur = null
-	if _sub_cur == null and not _subs.is_empty():
-		_sub_cur = _subs.pop_front()
-		_sub_t = _sub_cur[2]
-	who.text = _sub_cur[0] if _sub_cur != null else ""
-	subtitle.text = _sub_cur[1] if _sub_cur != null else ""
+	dialogue.update(dt)
 
 
 func _place_camera(delta: float) -> void:

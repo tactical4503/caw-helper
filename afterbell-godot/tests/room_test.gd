@@ -63,6 +63,25 @@ func _run() -> void:
 	check(room.gate.position.y > 2.0, "gate has rolled up")
 	room.queue_free()
 
+	print("Dialogue blips:")
+	var d = room.dialogue
+	d.clear()
+	var before: int = d.blips_played
+	d.say("FLOOR MANAGER", "Please read.", 1.0)
+	d.update(0.1)
+	check(room.subtitle.visible_characters > 0 and room.subtitle.visible_characters < 12, "line types out letter by letter")
+	for i in 30:
+		d.update(1.0 / 60.0)
+	check(d.blips_played > before, "the speaker's voice blips play as it types")
+	for i in 200:
+		d.update(1.0 / 60.0)
+	check(d.is_idle(), "finished lines clear from the screen")
+	var after_speech: int = d.blips_played
+	d.say("", "Narration is silent.", 1.0)
+	for i in 200:
+		d.update(1.0 / 60.0)
+	check(d.blips_played == after_speech, "narration adds no blips")
+
 	print("Help route (three misses):")
 	room = fresh()
 	room.p_pos = Vector2(0.0, -1.4)
