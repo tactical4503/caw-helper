@@ -348,8 +348,8 @@ static func _lower_hall(a: Node3D) -> void:
 static func _lights(a: Node3D) -> void:
 	# Sunset through the window: a long warm wash down the atrium onto the bell area.
 	var sun_in := SpotLight3D.new()
-	sun_in.light_color = Color("ffbf9c")   # peach
-	sun_in.light_energy = 2.8
+	sun_in.light_color = Color("ffb48c")   # peach
+	sun_in.light_energy = 3.4
 	sun_in.light_specular = 0.2
 	sun_in.spot_range = 34.0
 	sun_in.spot_angle = 42.0

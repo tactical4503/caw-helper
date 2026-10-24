@@ -143,7 +143,7 @@ static func environment() -> Environment:
 	e.ambient_light_energy = 0.36
 	e.reflected_light_source = Environment.REFLECTION_SOURCE_BG
 	e.tonemap_mode = Environment.TONE_MAPPER_FILMIC
-	e.tonemap_exposure = 1.0
+	e.tonemap_exposure = 0.92   # keeps cream walls off pure white
 	e.tonemap_white = 6.0
 	e.ssr_enabled = false           # expensive; off by default (glossy materials still catch lamp highlights)
 	e.ssao_enabled = true           # contact shadows: corners, under counters, around feet
@@ -168,13 +168,13 @@ static func environment() -> Environment:
 ## fall under things rather than across the room. Kept low; the lamps do the warm work.
 static func sun() -> DirectionalLight3D:
 	var key := DirectionalLight3D.new()
-	key.light_color = Color("ffe4cc")
-	key.light_energy = 0.35
+	key.light_color = Color("ffcfae")   # peach: late sun through the skylights
+	key.light_energy = 0.4
 	key.light_specular = 0.6
 	key.shadow_enabled = true
-	key.shadow_blur = 4.0
-	key.light_angular_distance = 2.5   # wide source: shadow edges soften with distance
-	key.shadow_opacity = 0.75
+	key.shadow_blur = 5.0
+	key.light_angular_distance = 4.0   # wide source: shadow edges soften with distance
+	key.shadow_opacity = 0.65
 	key.shadow_bias = 0.04
 	key.directional_shadow_max_distance = 25.0
 	key.rotation = Vector3(deg_to_rad(-78), deg_to_rad(-20), 0)
@@ -190,35 +190,56 @@ static var _lamp_glass: StandardMaterial3D
 static func lamp(parent: Node3D, at: Vector3, energy := 0.9, reach := 5.5, light_offset := Vector3.ZERO) -> OmniLight3D:
 	globe(parent, at)
 	var light := OmniLight3D.new()
-	light.light_color = Color("ffc488")
-	light.light_energy = energy * 0.7   # soft pools, no hot spot on the column beside it
+	light.light_color = Color("ffbb80")
+	light.light_energy = energy * 0.6   # soft pools, no hot spot on the column beside it
 	light.light_specular = 0.1
 	light.omni_range = reach
-	light.omni_attenuation = 1.6
+	light.omni_attenuation = 1.0   # broad, even falloff rather than a hot core
 	light.position = at + light_offset
 	parent.add_child(light)
 	return light
 
 
-## A frosted, glowing lamp globe with no light of its own: for distant fixtures where a real
-## light would cost more than it shows.
+static var _lamp_cap: StandardMaterial3D
+
+
+## A lamp fixture with no light of its own: a squat amber glass shade under a brass cap. Its glow
+## stays under the bloom threshold so it reads as warm glass, never a white blob.
 static func globe(parent: Node3D, at: Vector3, radius := 0.14) -> MeshInstance3D:
 	if _lamp_glass == null:
 		_lamp_glass = StandardMaterial3D.new()
-		_lamp_glass.albedo_color = Color("eec08a")   # amber frosted glass
-		_lamp_glass.roughness = 0.7
+		_lamp_glass.albedo_color = Color("c98a52")   # amber glass
+		_lamp_glass.roughness = 0.75
 		_lamp_glass.emission_enabled = true
-		_lamp_glass.emission = Color("ffae66")
-		_lamp_glass.emission_energy_multiplier = 0.65
+		_lamp_glass.emission = Color("ff9448")
+		_lamp_glass.emission_energy_multiplier = 0.45
+		_lamp_cap = StandardMaterial3D.new()
+		_lamp_cap.albedo_color = Color("b58d3f")
+		_lamp_cap.metallic = 0.85
+		_lamp_cap.roughness = 0.35
 	var g := MeshInstance3D.new()
 	var sphere := SphereMesh.new()
 	sphere.radius = radius
 	sphere.height = radius * 2.0
+	sphere.radial_segments = 20
+	sphere.rings = 10
 	g.mesh = sphere
+	g.scale = Vector3(1.0, 0.82, 1.0)
 	g.material_override = _lamp_glass
 	g.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 	g.position = at
 	parent.add_child(g)
+	var cap := MeshInstance3D.new()
+	var cyl := CylinderMesh.new()
+	cyl.top_radius = radius * 0.35
+	cyl.bottom_radius = radius * 0.75
+	cyl.height = radius * 0.45
+	cyl.radial_segments = 16
+	cap.mesh = cyl
+	cap.material_override = _lamp_cap
+	cap.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	cap.position = at + Vector3(0, radius * 0.85, 0)
+	parent.add_child(cap)
 	return g
 
 
