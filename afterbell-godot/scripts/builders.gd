@@ -18,6 +18,7 @@ const STEEL := Color("9aa0a6")
 const DARK := Color("0c0a0d")
 
 const ST := preload("res://scripts/style.gd")
+const Atrium := preload("res://scripts/atrium.gd")
 
 const RACK_HOME := [Vector2(-4.9, 0.6), Vector2(4.9, 0.6)]
 const BELL_POS := Vector3(0, 0, -7.0)
@@ -171,10 +172,12 @@ static func build_arena(parent: Node3D) -> Arena:
 		var strip := put(box(1.4, 0.02, 10), ST.textured("carpet_sage", 0.5, mat(CARPET_LIGHT, 0.9)), Vector3(s * 4.2, 0.022, lever_z + 5.4), root, false)
 		strip.rotation.y = s * 0.33
 		put(box(0.08, 0.021, 12), mat(CREAM, 0.9), Vector3(s * 2.04, 0.03, lever_z + 6.2), root, false)
-	# North wall, display platform split around the bell recess.
+	# Bell partition (the rest of the north side opens onto the atrium), display platforms either side.
 	var wall := ST.textured("plaster_plum", 0.3, ST.procedural(Color("2a1222"), PLUM, "stone", 0.35))
-	put(box(16, 4.2, 0.3), wall, Vector3(0, 2.1, -9.15), root)
-	put(box(16, 0.18, 0.34), mat(CREAM, 0.6), Vector3(0, 0.09, -8.98), root)
+	put(box(3.8, 4.3, 0.3), wall, Vector3(0, 2.15, -9.15), root)
+	put(box(4.1, 0.26, 0.5), mat(CREAM, 0.6), Vector3(0, 4.4, -9.15), root)
+	put(box(4.16, 0.06, 0.54), brass(), Vector3(0, 4.24, -9.15), root)
+	put(box(3.8, 0.18, 0.34), mat(CREAM, 0.6), Vector3(0, 0.09, -8.98), root)
 	for s in [-1.0, 1.0]:
 		put(box(4.4, 0.32, 1.6), ST.plastic(Color("6e4326"), 0.35, 0.0), Vector3(s * 4.6, 0.16, -8.15), root)
 	# West wall with the service door; waist-high east barrier over the atrium; low south wall and gate.
@@ -187,7 +190,7 @@ static func build_arena(parent: Node3D) -> Arena:
 	put(box(16, 1.0, 0.25), mat(CREAM, 0.6), Vector3(0, 0.5, 9.1), root)
 	for i in range(-2, 3):
 		put(box(0.05, 1.6, 0.05), brass(), Vector3(i * 0.45, 1.3, 9.1), root)
-	wainscot(root, Vector3(0, 0, -8.98), Vector3(16, 0, 0))      # north wall
+	wainscot(root, Vector3(0, 0, -8.98), Vector3(3.8, 0, 0))     # bell partition
 	wainscot(root, Vector3(-7.98, 0, -1.4), Vector3(0, 0, 15.2))  # west wall
 	_build_hall(root)
 	# Six low shoe plinths form the outer edge.
@@ -288,42 +291,44 @@ static func wainscot(root: Node3D, centre: Vector3, span: Vector3) -> void:
 	put(box(kick.x, kick.y, kick.z), ST.textured("laminate_plum", 1.0, mat(PLUM, 0.4)), centre + Vector3(0, 0.07, 0), root)
 
 
-## Interior dressing: ceiling, columns with plum banners, brass wall lamps, and the atrium
-## beyond the east balcony, so the low over-the-shoulder camera sees a store, not a void.
-static func _build_hall(root: Node3D) -> void:
+## Interior dressing: full-height columns with plum banners and brass lamps, chandeliers on long
+## drops from the atrium roof, and the atrium itself (scripts/atrium.gd) rising three floors
+## around the court.
+static func _build_hall(arena_root: Node3D) -> void:
 	var cream := mat(CREAM, 0.5)
-	var wall := ST.textured("plaster_plum", 0.3, mat(PLUM_DEEP, 0.85))
-	var ceiling := put(box(40, 0.2, 30), mat(Color("cbbd9f"), 0.8), Vector3(4, 5.6, 0), root, false)
-	ceiling.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
-	# Coffered beams.
-	for z in range(-8, 10, 4):
-		put(box(40, 0.35, 0.4), cream, Vector3(4, 5.35, z), root, false)
-	# Atrium beyond the east balcony: lower floor, far wall, a skylight glow.
-	put(box(14, 0.1, 22), ST.textured("tile_cream", 0.6, cream), Vector3(15.5, -4.2, 0), root, false)
-	put(box(0.4, 10, 22), wall, Vector3(22.5, 0.8, 0), root)
-	var sky := StandardMaterial3D.new()
-	sky.albedo_color = Color("ffb27a")
-	sky.emission_enabled = true
-	sky.emission = Color("ff9a5c")
-	sky.emission_energy_multiplier = 1.6
-	put(box(0.1, 4, 6), sky, Vector3(22.25, 3.2, -2), root, false)  # arched window at sunset
-	# Columns along the walls, each with a hanging banner and a lamp.
+	Atrium.build(arena_root)
+	var root := Node3D.new()
+	root.name = "Hall"
+	arena_root.add_child(root)
+	# Columns along the court, each running up past both galleries to the roof.
 	var banner := ST.textured("plaster_plum", 0.8, mat(PLUM, 0.6))
 	for spot in [Vector2(-7.75, -6), Vector2(-7.75, -1), Vector2(-7.75, 4), Vector2(7.95, -6), Vector2(7.95, -1), Vector2(7.95, 4),
 			Vector2(-4, -8.85), Vector2(4, -8.85)]:
 		var on_side: bool = absf(spot.x) > 7.0
 		var face := Vector3(-signf(spot.x), 0, 0) if on_side else Vector3(0, 0, 1)
-		put(box(0.7, 5.4, 0.7), cream, Vector3(spot.x, 2.7, spot.y), root)
-		put(box(0.8, 0.18, 0.8), brass(), Vector3(spot.x, 5.1, spot.y), root)
+		put(box(0.7, Atrium.ROOF, 0.7), cream, Vector3(spot.x, Atrium.ROOF * 0.5, spot.y), root)
 		put(box(0.8, 0.18, 0.8), brass(), Vector3(spot.x, 0.09, spot.y), root)
-		var b := put(box(0.75 if not on_side else 0.06, 2.0, 0.06 if not on_side else 0.75), banner, Vector3(spot.x, 3.9, spot.y) + face * 0.4, root)
-		put(box(0.79 if not on_side else 0.07, 0.08, 0.07 if not on_side else 0.79), brass(), b.position + Vector3(0, 1.0, 0), root)
+		for level in Atrium.LEVELS:
+			put(box(0.8, 0.18, 0.8), brass(), Vector3(spot.x, level - 0.5, spot.y), root)
+		put(box(0.9, 0.3, 0.9), cream, Vector3(spot.x, Atrium.ROOF - 0.6, spot.y), root)
+		# Lower banner, and a long one between the galleries.
+		for b in [[3.9, 2.0], [7.7, 3.4]]:
+			var bb := put(box(0.75 if not on_side else 0.06, b[1], 0.06 if not on_side else 0.75), banner, Vector3(spot.x, b[0], spot.y) + face * 0.4, root)
+			put(box(0.79 if not on_side else 0.07, 0.08, 0.07 if not on_side else 0.79), brass(), bb.position + Vector3(0, b[1] * 0.5, 0), root)
+			Atrium.fleur(root, bb.position + Vector3(0, b[1] * 0.12, 0) + face * 0.05, face, 0.36)
 		var lamp_pos := Vector3(spot.x, 2.6, spot.y) + face * 0.55
 		put(sphere(0.06), brass(), lamp_pos - face * 0.15, root)
 		ST.lamp(root, lamp_pos, 0.8, 5.5)
-	# Ceiling fixtures: pools of light down the court's centre and over the bell.
+		ST.globe(root, Vector3(spot.x, 12.6, spot.y) + face * 0.55)
+	# Chandeliers on long drops from the roof: pools of light down the court and over the bell.
 	for z in [5.0, 0.0, -5.0]:
+		put(cyl(0.02, 0.02, Atrium.ROOF - 5.6, 6), brass(), Vector3(0, (Atrium.ROOF + 5.6) * 0.5, z), root, false)
+		put(cyl(0.5, 0.15, 0.25, 16), brass(), Vector3(0, 5.5, z), root, false)
+		for i in 6:
+			var ang := TAU * i / 6.0
+			ST.globe(root, Vector3(cos(ang) * 0.5, 5.25, z + sin(ang) * 0.5), 0.11)
 		ST.ceiling_light(root, Vector3(0, 5.0, z), 0.9, 8.0)
+	Atrium.merge(root)
 
 
 static func build_rack(index: int) -> Rack:

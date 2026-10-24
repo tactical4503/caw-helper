@@ -189,22 +189,7 @@ static var _lamp_glass: StandardMaterial3D
 ## A wall or column lamp: a frosted cream globe that glows without blowing out, and a warm soft
 ## pool of light. No shadows (cheap); low specular so walls get a sheen, not a hot spot.
 static func lamp(parent: Node3D, at: Vector3, energy := 0.9, reach := 5.5) -> OmniLight3D:
-	if _lamp_glass == null:
-		_lamp_glass = StandardMaterial3D.new()
-		_lamp_glass.albedo_color = Color("f6e7cc")
-		_lamp_glass.roughness = 0.6
-		_lamp_glass.emission_enabled = true
-		_lamp_glass.emission = Color("ffd9a0")
-		_lamp_glass.emission_energy_multiplier = 1.5
-	var globe := MeshInstance3D.new()
-	var sphere := SphereMesh.new()
-	sphere.radius = 0.14
-	sphere.height = 0.28
-	globe.mesh = sphere
-	globe.material_override = _lamp_glass
-	globe.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
-	globe.position = at
-	parent.add_child(globe)
+	globe(parent, at)
 	var light := OmniLight3D.new()
 	light.light_color = Color("ffd8a8")
 	light.light_energy = energy
@@ -214,6 +199,28 @@ static func lamp(parent: Node3D, at: Vector3, energy := 0.9, reach := 5.5) -> Om
 	light.position = at
 	parent.add_child(light)
 	return light
+
+
+## A frosted, glowing lamp globe with no light of its own: for distant fixtures where a real
+## light would cost more than it shows.
+static func globe(parent: Node3D, at: Vector3, radius := 0.14) -> MeshInstance3D:
+	if _lamp_glass == null:
+		_lamp_glass = StandardMaterial3D.new()
+		_lamp_glass.albedo_color = Color("f6e7cc")
+		_lamp_glass.roughness = 0.6
+		_lamp_glass.emission_enabled = true
+		_lamp_glass.emission = Color("ffd9a0")
+		_lamp_glass.emission_energy_multiplier = 1.5
+	var g := MeshInstance3D.new()
+	var sphere := SphereMesh.new()
+	sphere.radius = radius
+	sphere.height = radius * 2.0
+	g.mesh = sphere
+	g.material_override = _lamp_glass
+	g.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	g.position = at
+	parent.add_child(g)
+	return g
 
 
 ## Overhead fill from the ceiling fixtures: neutral-warm pools on the floor, falling off at walls.
