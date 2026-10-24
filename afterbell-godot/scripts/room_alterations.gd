@@ -142,8 +142,20 @@ func _build_rooms() -> void:
 	Props.door_leaf(self, Vector3(DOOR_X - 0.8, 0, -5.3), 1.55, Props.DOOR_HEIGHT, 0.0, PI / 2.0 * 0.92)
 	B.put(B.box(1.8, 1.1, 0.3), plaster, Vector3(0, 3.05, 5.15), self)
 	Props.door_frame(self, Vector3(0, 0, 5.15), 1.8, 2.5)
+	Props.portal(self, Vector3(DOOR_X, 0, -5.15), 1.6, Props.DOOR_HEIGHT, 0.0, 1.0, "RECEIVING")
+	Props.portal(self, Vector3(0, 0, 5.15), 1.8, 2.5, 0.0, -1.0, "HATS  &  GLOVES")
+	Props.plaque(self, Vector3(5.0, 2.95, GATE_Z), 1.2, "ATRIUM", -PI / 2.0)
 	Props.door_frame(self, Vector3(5.15, 0, GATE_Z), 1.8, 2.4, PI / 2.0)
 	B.wainscot(self, Vector3(-4.98, 0, 0), Vector3(0, 0, 10))
+	# Finished lower walls round the rest of Alterations and Receiving, clear of every opening,
+	# the crank socket, the freight lift and the loading gate.
+	for seg in [[Vector3(4.98, 0, -5.0), Vector3(4.98, 0, -1.3)], [Vector3(4.98, 0, 1.54), Vector3(4.98, 0, 5.0)],
+			[Vector3(-5.0, 0, 4.98), Vector3(-1.34, 0, 4.98)], [Vector3(1.34, 0, 4.98), Vector3(5.0, 0, 4.98)],
+			[Vector3(-5.0, 0, -4.98), Vector3(DOOR_X - 1.24, 0, -4.98)], [Vector3(DOOR_X + 1.24, 0, -4.98), Vector3(5.0, 0, -4.98)],
+			[Vector3(-4.98, 0, -13.0), Vector3(-4.98, 0, -10.14)], [Vector3(-4.98, 0, -7.86), Vector3(-4.98, 0, -5.3)],
+			[Vector3(6.98, 0, -13.0), Vector3(6.98, 0, -10.04)], [Vector3(6.98, 0, -7.96), Vector3(6.98, 0, -5.3)],
+			[Vector3(-5.0, 0, -12.98), Vector3(7.0, 0, -12.98)]]:
+		B.wainscot_between(self, seg[0], seg[1])
 	# Receiving walls.
 	B.put(B.box(0.3, 3.6, 8), plum, Vector3(-5.15, 1.8, -9), self)
 	B.put(B.box(0.3, 3.6, 8), plum, Vector3(7.15, 1.8, -9), self)

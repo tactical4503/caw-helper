@@ -136,7 +136,6 @@ func _place_props() -> void:
 			["easel", Vector3(1.05, 0, -3.3), 0.0, 1]]:
 		Props.place(self, p[0], p[1], p[2], p[3], "SALE")
 		prop_solids.append(Props.footprint(p[0], p[1], p[2]))
-	Props.place(self, "hanging_sign", Vector3(0, 3.45, -HALF_D + 0.15), 0.0, 0, "COSMETICS  ·  FRAGRANCE")
 
 
 func _build_room() -> void:
@@ -193,11 +192,15 @@ func _build_room() -> void:
 	arrow.position = Vector3(-HALF_W + 0.05, 1.5, GATE_Z + 1.45)
 	add_child(arrow)
 	# Panelled walls, columns at the corners of the aisle, the shutter framed in brass.
-	B.wainscot(self, Vector3(0, 0, -HALF_D + 0.02), Vector3(HALF_W * 2, 0, 0))
-	B.wainscot(self, Vector3(HALF_W - 0.02, 0, 0), Vector3(0, 0, HALF_D * 2))
-	B.wainscot(self, Vector3(-HALF_W + 0.02, 0, (-HALF_D + GATE_Z - 0.9) / 2.0), Vector3(0, 0, HALF_D + GATE_Z - 0.9))
+	# Finished lower walls, stopping at the shutter's portal, the gate and the vestibule portal.
+	var n_face := -HALF_D + 0.02
+	var s_face := HALF_D - 0.02
 	for side in [-1.0, 1.0]:
-		B.wainscot(self, Vector3(side * (HALF_W + 1.2) / 2.0, 0, HALF_D - 0.02), Vector3(HALF_W - 1.2, 0, 0))
+		B.wainscot_between(self, Vector3(side * 1.92, 0, n_face), Vector3(side * HALF_W, 0, n_face))
+		B.wainscot_between(self, Vector3(side * 1.62, 0, s_face), Vector3(side * HALF_W, 0, s_face))
+	B.wainscot_between(self, Vector3(HALF_W - 0.02, 0, -HALF_D), Vector3(HALF_W - 0.02, 0, HALF_D))
+	B.wainscot_between(self, Vector3(-HALF_W + 0.02, 0, -HALF_D), Vector3(-HALF_W + 0.02, 0, GATE_Z - 1.04))
+	B.wainscot_between(self, Vector3(-HALF_W + 0.02, 0, GATE_Z + 1.04), Vector3(-HALF_W + 0.02, 0, HALF_D))
 	for c in [Vector2(-2.3, -HALF_D + 0.4), Vector2(2.3, -HALF_D + 0.4), Vector2(-2.3, HALF_D - 0.4), Vector2(2.3, HALF_D - 0.4)]:
 		B.put(B.box(0.6, 4.3, 0.6), cream, Vector3(c.x, 2.15, c.y), self)
 		B.put(B.box(0.7, 0.16, 0.7), B.brass(), Vector3(c.x, 4.1, c.y), self)
@@ -208,6 +211,10 @@ func _build_room() -> void:
 	Props.door_frame(self, Vector3(-HALF_W - 0.15, 0, GATE_Z), 1.8, 2.4, PI / 2.0)
 	B.put(B.box(2.4, 1.5, 0.3), wall, Vector3(0, 3.55, HALF_D + 0.15), self)   # header over the vestibule
 	Props.door_frame(self, Vector3(0, 0, HALF_D + 0.15), 2.4, 2.8)
+	Props.portal(self, Vector3(0, 0, -HALF_D - 0.15), 3.0, 2.6, 0.0, 1.0, "ATRIUM")
+	Props.portal(self, Vector3(0, 0, HALF_D + 0.15), 2.4, 2.8, 0.0, -1.0, "VESTIBULE  ·  STREET")
+	Props.plaque(self, Vector3(-HALF_W, 3.75, GATE_Z), 1.4, "HATS  &  GLOVES", PI / 2.0)   # above the receiver
+	Props.plaque(self, Vector3(HALF_W, 2.9, -1.2), 1.6, "COSMETICS  ·  FRAGRANCE", -PI / 2.0)
 	# Two horseshoe counters, one each side of the central aisle.
 	for s in [-1.0, 1.0]:
 		var cx: float = s * 4.6

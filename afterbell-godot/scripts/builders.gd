@@ -198,7 +198,8 @@ static func build_arena(parent: Node3D) -> Arena:
 	for i in range(-2, 3):
 		put(box(0.05, 1.6, 0.05), brass(), Vector3(i * 0.45, 1.3, 9.1), root)
 	wainscot(root, Vector3(0, 0, -8.98), Vector3(3.8, 0, 0))     # bell partition
-	wainscot(root, Vector3(-7.98, 0, -1.4), Vector3(0, 0, 15.2))  # west wall
+	wainscot_between(root, Vector3(-7.98, 0, -9.0), Vector3(-7.98, 0, 5.8))   # west wall, up to the doors
+	Atrium.Props.portal(root, Vector3(-8.15, 0, 7.3), 2.2, Atrium.Props.DOOR_HEIGHT, PI / 2.0, 1.0, "COSMETICS  ·  FRAGRANCE")
 	_build_hall(root)
 	# Six low shoe plinths form the outer edge.
 	for p in [Vector2(-7.0, -3.6), Vector2(-7.0, 2.4), Vector2(7.0, -3.6), Vector2(7.0, 2.4), Vector2(-3.6, 8.0), Vector2(3.6, 8.0)]:
@@ -287,18 +288,48 @@ static func build_arena(parent: Node3D) -> Arena:
 	return a
 
 
-## Plum lower wall panelling with a brass dado rail and brass kick, along a wall from its centre.
-## `span` runs along the wall (x or z); the panel sits 2 cm proud of the wall face.
+## Finished lower wall: a dark skirting with a brass strip, a cream dado of raised panels with
+## brass inlay, and a cream rail capped in brass, along a wall from its centre. `span` runs along
+## the wall (x or z); `centre` sits on the wall face. Each run is merged into a few meshes.
 static func wainscot(root: Node3D, centre: Vector3, span: Vector3) -> void:
 	var along_x := absf(span.x) > absf(span.z)
 	var length := span.length()
-	var panel := ST.textured("laminate_plum", 1.0, mat(PLUM, 0.5))   # plum lower wall under cream plaster
-	var size := Vector3(length, 1.05, 0.04) if along_x else Vector3(0.04, 1.05, length)
-	put(box(size.x, size.y, size.z), panel, centre + Vector3(0, 0.6, 0), root)
-	var rail := Vector3(length, 0.07, 0.08) if along_x else Vector3(0.08, 0.07, length)
-	put(box(rail.x, rail.y, rail.z), brass(), centre + Vector3(0, 1.14, 0), root)
-	var kick := Vector3(length, 0.14, 0.06) if along_x else Vector3(0.06, 0.14, length)
-	put(box(kick.x, kick.y, kick.z), brass(), centre + Vector3(0, 0.07, 0), root)
+	if length < 0.3:
+		return
+	var run := Node3D.new()
+	run.name = "Wainscot"
+	run.position = centre
+	root.add_child(run)
+	# A strip along the wall: `h` tall from `y`, standing `proud` off the face.
+	var strip := func(y: float, h: float, proud: float, m: Material, len := length, at := 0.0) -> void:
+		var size := Vector3(len, h, proud * 2.0) if along_x else Vector3(proud * 2.0, h, len)
+		var off := Vector3(at, y + h * 0.5, 0) if along_x else Vector3(0, y + h * 0.5, at)
+		put(box(size.x, size.y, size.z), m, off, run)
+	var paint := mat(Color("e6d8ba"), 0.6)
+	var raised := mat(Color("efe4cc"), 0.55)
+	var skirting := mat(Color("3a1a2f"), 0.6)
+	strip.call(0.0, 0.16, 0.035, skirting)
+	strip.call(0.16, 0.022, 0.04, brass())
+	strip.call(0.18, 0.84, 0.018, paint)                 # dado field
+	strip.call(1.02, 0.07, 0.045, raised)                # rail
+	strip.call(1.09, 0.02, 0.05, brass())                # rail cap
+	# Raised panels, evenly spaced, each with a brass inlay line inside its edge.
+	var count := maxi(1, int(length / 0.95))
+	var pitch := length / count
+	for i in count:
+		var at := -length * 0.5 + pitch * (i + 0.5)
+		var pw := pitch - 0.16
+		strip.call(0.3, 0.6, 0.03, raised, pw, at)
+		for y in [0.335, 0.865]:
+			strip.call(y, 0.012, 0.034, brass(), pw - 0.08, at)
+		for e in [-1.0, 1.0]:
+			strip.call(0.335, 0.542, 0.034, brass(), 0.012, at + e * (pw * 0.5 - 0.04))
+	Atrium.merge(run)
+
+
+## Wainscot between two points on a wall face (same x or same z).
+static func wainscot_between(root: Node3D, from: Vector3, to: Vector3) -> void:
+	wainscot(root, (from + to) * 0.5, to - from)
 
 
 ## Interior dressing: full-height columns with plum banners and brass lamps, chandeliers on long

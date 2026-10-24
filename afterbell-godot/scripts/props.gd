@@ -397,6 +397,50 @@ static func door_frame(parent: Node3D, at: Vector3, width: float, height: float,
 	return f
 
 
+## A recessed doorway: cream pilasters and a heading stand forward of the wall on the `side`
+## the room is on (+1 = local +z), so the door and its casing sit back in a deep reveal.
+## The heading carries an enamel name plaque. Same placement as door_frame.
+static func portal(parent: Node3D, at: Vector3, width: float, height: float, yaw := 0.0, side := 1.0, text := "", depth := 0.26, wall := 0.3) -> Node3D:
+	var p := Node3D.new()
+	p.position = at
+	p.rotation.y = yaw
+	parent.add_child(p)
+	var pw := 0.28                                     # pilaster width
+	var inner := width * 0.5 + 0.14                    # outside edge of the casing
+	var z := side * (wall * 0.5 + depth * 0.5)
+	var top := height + 0.3
+	for s in [-1.0, 1.0]:
+		var x: float = s * (inner + pw * 0.5)
+		_put(_box(pw, top, depth), _m("cream"), Vector3(x, top * 0.5, z), p)
+		_put(_box(pw + 0.04, 0.18, depth + 0.04), _m("plinth"), Vector3(x, 0.09, z), p)   # base block
+		_put(_box(pw + 0.05, 0.025, depth + 0.05), _m("brass"), Vector3(x, 0.19, z), p)
+		_put(_box(pw + 0.06, 0.08, depth + 0.06), _m("cream"), Vector3(x, top - 0.12, z), p)   # capital
+		_put(_box(pw + 0.065, 0.02, depth + 0.065), _m("brass"), Vector3(x, top - 0.17, z), p)
+		# The reveal's return: wall from the pilaster back to the casing.
+		_put(_box(0.02, top, depth), _m("cream"), Vector3(s * inner, top * 0.5, z), p)
+	var span := (inner + pw) * 2.0
+	_put(_box(span, 0.55, depth), _m("cream"), Vector3(0, top + 0.275, z), p)                    # heading
+	_put(_box(span + 0.12, 0.07, depth + 0.08), _m("cream"), Vector3(0, top + 0.585, z + side * 0.04), p)   # cornice
+	_put(_box(span + 0.13, 0.022, depth + 0.09), _m("brass"), Vector3(0, top + 0.54, z + side * 0.045), p)
+	_put(_box(width + 0.28, 0.3, depth - 0.02), _m("cream"), Vector3(0, height + 0.15, z), p)     # soffit over the casing
+	if text != "":
+		plaque(p, Vector3(0, top + 0.27, z + side * (depth * 0.5)), minf(span - 0.3, 2.2), text, PI if side < 0.0 else 0.0)
+	return p
+
+
+## A brass-framed plum enamel plaque with cream lettering scaled to fit, its face toward
+## local +z (turned by `yaw`). `at` is the centre of its back.
+static func plaque(parent: Node3D, at: Vector3, width: float, text: String, yaw := 0.0) -> Node3D:
+	var q := Node3D.new()
+	q.position = at
+	q.rotation.y = yaw
+	parent.add_child(q)
+	_put(_box(width + 0.06, 0.36, 0.03), _m("brass"), Vector3(0, 0, 0.015), q)
+	_put(_box(width, 0.3, 0.04), _m("plum"), Vector3(0, 0, 0.02), q)
+	_label(q, text, Vector3(0, 0, 0.042), minf(0.0042, (width - 0.12) / (maxf(text.length(), 1) * 0.55 * 64.0)), Color("efe3c8"), 64)
+	return q
+
+
 ## A panelled walnut door hinged at `hinge` (the leaf runs along local +x), opened `open`
 ## radians: raised panels, brass lever handles both sides, a brass kick plate, optional window.
 static func door_leaf(parent: Node3D, hinge: Vector3, width: float, height: float, yaw := 0.0, open := 0.0, window := false) -> Node3D:

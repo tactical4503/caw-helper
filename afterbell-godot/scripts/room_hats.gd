@@ -170,15 +170,15 @@ func _build_room() -> void:
 	# The way in from Cosmetics: a header and casing round the east opening.
 	B.put(B.box(0.3, 1.5, 1.8), wall, Vector3(HALF_W + 0.15, 3.25, 5.0), self)
 	Props.door_frame(self, Vector3(HALF_W + 0.15, 0, 5.0), 1.8, 2.5, PI / 2.0)
-	var sign := Label3D.new()
-	sign.text = "STAFF  ·  ALTERATIONS"
-	sign.font_size = 48
-	sign.pixel_size = 0.004
-	sign.modulate = B.CREAM
-	sign.position = Vector3(0, 2.75, -HALF_D + 0.02)
-	add_child(sign)
+	# Finished lower walls on all four sides, stopping at the two portals.
 	B.wainscot(self, Vector3(-HALF_W + 0.02, 0, 0), Vector3(0, 0, HALF_D * 2))
 	B.wainscot(self, Vector3(0, 0, HALF_D - 0.02), Vector3(HALF_W * 2, 0, 0))
+	for side in [-1.0, 1.0]:
+		B.wainscot_between(self, Vector3(side * (EXIT_X + 0.44), 0, -HALF_D + 0.02), Vector3(side * HALF_W, 0, -HALF_D + 0.02))
+	B.wainscot_between(self, Vector3(HALF_W - 0.02, 0, -HALF_D), Vector3(HALF_W - 0.02, 0, 3.66))
+	B.wainscot_between(self, Vector3(HALF_W - 0.02, 0, 6.34), Vector3(HALF_W - 0.02, 0, HALF_D))
+	Props.portal(self, Vector3(0, 0, -HALF_D - 0.15), EXIT_X * 2.0, 2.4, 0.0, 1.0, "STAFF  ·  ALTERATIONS")
+	Props.portal(self, Vector3(HALF_W + 0.15, 0, 5.0), 1.8, 2.5, PI / 2.0, -1.0, "COSMETICS")
 	# Hat shelving across the room, with the aisle gap (x -1..1) and the alcove (x 1..3.4).
 	var shelf := ST.plastic(Color("6e4326"), 0.35, 0.0)   # lacquered walnut
 	for part in [[-3.0, 4.0], [4.2, 1.6]]:
