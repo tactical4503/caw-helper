@@ -23,6 +23,7 @@ Open this folder from the Godot project manager (**Import** → select `project.
 
 ## Characters
 - **Ren:** `assets/characters/ren/ren_rigged.glb`, made with Meshy from `assets/ren_ref/ren_sheet.png` (cleaned A-pose concept → image-to-3D → remeshed to 20k triangles → auto-rigged, 24 bones). `scripts/ren_skin.gd` retargets all of Ren's greybox clips onto this skeleton every frame, so re-baking or swapping the model keeps the animation. Meshy's rig has no finger bones, so his hands stay open.
+- **Knock (sword):** `assets/props/knock/knock.glb`, made with Meshy from the sheet (concept → image-to-3D → 20k triangles). `ren_skin.gd` scales it to 1.05 m and puts the grip in Ren's right hand, oriented by the clips. Frame sheets are in `docs/models/`.
 
 ## Visual style
 `scripts/style.gd` sets the look of the whole game: mid-90s ray-traced CGI, in the spirit of the era's promo renders.

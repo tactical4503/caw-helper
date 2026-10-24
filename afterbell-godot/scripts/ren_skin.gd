@@ -29,6 +29,11 @@ const HIP_REST_Y := 0.92  # greybox pelvis rest height (metres)
 
 @export var skin_path: NodePath = ^"../Skin"
 @export var sword_bone := "RightHand"
+## Knock, made with Meshy. Its handle is at +x, the blade runs toward -x, the flat face points
+## along z, and it is 1.9 m long; this maps it onto the greybox sword frame (grip at the origin,
+## blade along -y, flat face on z) at 1.05 m.
+@export var sword_model := "res://assets/props/knock/knock.glb"
+const SWORD_FIT := Transform3D(Basis(Vector3(0, 0.55, 0), Vector3(0.55, 0, 0), Vector3(0, 0, -0.55)), Vector3(0, -0.41, 0))
 
 var _rig: Node3D
 var _skel: Skeleton3D
@@ -77,12 +82,20 @@ func _ready() -> void:
 	_hand = _skel.find_bone(sword_bone)
 	_sword_src = _rig.get_node_or_null("Pelvis/Torso/ArmR/ForearmR/Sword")
 	if _sword_src and _hand >= 0:
-		_sword_view = _sword_src.duplicate() as Node3D
+		_sword_view = Node3D.new()
 		_sword_view.name = "SwordView"
 		_sword_view.top_level = true
 		add_child(_sword_view)
-		for mi in _sword_view.find_children("*", "MeshInstance3D", true, false):
-			mi.visible = true
+		if ResourceLoader.exists(sword_model):
+			var knock: Node3D = load(sword_model).instantiate()
+			knock.transform = SWORD_FIT
+			_sword_view.add_child(knock)
+		else:  # fall back to the greybox blade
+			var copy := _sword_src.duplicate() as Node3D
+			copy.transform = Transform3D()
+			_sword_view.add_child(copy)
+			for mi in copy.find_children("*", "MeshInstance3D", true, false):
+				mi.visible = true
 
 
 func _process(_delta: float) -> void:

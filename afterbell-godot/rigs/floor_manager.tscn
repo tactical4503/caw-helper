@@ -1,468 +1,468 @@
 [gd_scene load_steps=111 format=3]
 
-[ext_resource type="Script" path="res://scripts/rig_boss.gd" id="1_7rsej"]
+[ext_resource type="Script" path="res://scripts/rig_boss.gd" id="1_ovg7a"]
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_qp8ge"]
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_0akgt"]
 albedo_color = Color(0.176471, 0.163765, 0.172235, 1)
 metallic = 0.6
 roughness = 0.17
 
-[sub_resource type="BoxMesh" id="BoxMesh_akwxo"]
+[sub_resource type="BoxMesh" id="BoxMesh_ber75"]
 size = Vector3(0.06, 0.05, 0.36)
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_gafge"]
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_r116f"]
 albedo_color = Color(0.0889412, 0.0847059, 0.105882, 1)
 roughness = 0.2
 clearcoat_enabled = true
 clearcoat = 0.35
 clearcoat_roughness = 0.05
 
-[sub_resource type="SphereMesh" id="SphereMesh_puqb3"]
+[sub_resource type="SphereMesh" id="SphereMesh_wecfj"]
 radius = 0.055
 height = 0.11
 radial_segments = 10
 rings = 5
 
-[sub_resource type="BoxMesh" id="BoxMesh_gtrwm"]
+[sub_resource type="BoxMesh" id="BoxMesh_brlmo"]
 size = Vector3(0.06, 0.05, 0.36)
 
-[sub_resource type="SphereMesh" id="SphereMesh_74wo3"]
+[sub_resource type="SphereMesh" id="SphereMesh_mawfr"]
 radius = 0.055
 height = 0.11
 radial_segments = 10
 rings = 5
 
-[sub_resource type="BoxMesh" id="BoxMesh_ks2c7"]
+[sub_resource type="BoxMesh" id="BoxMesh_gkmh1"]
 size = Vector3(0.06, 0.05, 0.36)
 
-[sub_resource type="SphereMesh" id="SphereMesh_vci0x"]
+[sub_resource type="SphereMesh" id="SphereMesh_fktui"]
 radius = 0.055
 height = 0.11
 radial_segments = 10
 rings = 5
 
-[sub_resource type="BoxMesh" id="BoxMesh_6m6o8"]
+[sub_resource type="BoxMesh" id="BoxMesh_sialc"]
 size = Vector3(0.06, 0.05, 0.36)
 
-[sub_resource type="SphereMesh" id="SphereMesh_8r27k"]
+[sub_resource type="SphereMesh" id="SphereMesh_l1o0n"]
 radius = 0.055
 height = 0.11
 radial_segments = 10
 rings = 5
 
-[sub_resource type="BoxMesh" id="BoxMesh_hiyua"]
+[sub_resource type="BoxMesh" id="BoxMesh_rucde"]
 size = Vector3(0.06, 0.05, 0.36)
 
-[sub_resource type="SphereMesh" id="SphereMesh_vvipj"]
+[sub_resource type="SphereMesh" id="SphereMesh_xtgsp"]
 radius = 0.055
 height = 0.11
 radial_segments = 10
 rings = 5
 
-[sub_resource type="CylinderMesh" id="CylinderMesh_cy2qn"]
+[sub_resource type="CylinderMesh" id="CylinderMesh_hlsen"]
 top_radius = 0.05
 bottom_radius = 0.05
 height = 0.32
 radial_segments = 32
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_r1p38"]
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_25jol"]
 albedo_color = Color(0.54902, 0.510902, 0.464314, 1)
 roughness = 0.335
 clearcoat_enabled = true
 clearcoat = 0.35
 clearcoat_roughness = 0.05
 
-[sub_resource type="CylinderMesh" id="CylinderMesh_f2k3l"]
+[sub_resource type="CylinderMesh" id="CylinderMesh_ubl01"]
 top_radius = 0.34
 bottom_radius = 0.32
 height = 0.12
 radial_segments = 20
 
-[sub_resource type="BoxMesh" id="BoxMesh_pgqvq"]
+[sub_resource type="BoxMesh" id="BoxMesh_cwnnb"]
 size = Vector3(0.05, 0.16, 0.05)
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_2dwve"]
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_hmjr1"]
 albedo_color = Color(0.0889412, 0.0847059, 0.105882, 1)
 roughness = 0.23
 clearcoat_enabled = true
 clearcoat = 0.35
 clearcoat_roughness = 0.05
 
-[sub_resource type="BoxMesh" id="BoxMesh_kjs3e"]
+[sub_resource type="BoxMesh" id="BoxMesh_x8mwp"]
 size = Vector3(0.07, 0.04, 0.3)
 
-[sub_resource type="BoxMesh" id="BoxMesh_dlm5y"]
+[sub_resource type="BoxMesh" id="BoxMesh_n10pv"]
 size = Vector3(0.05, 0.16, 0.05)
 
-[sub_resource type="BoxMesh" id="BoxMesh_8oolw"]
+[sub_resource type="BoxMesh" id="BoxMesh_6q8jt"]
 size = Vector3(0.07, 0.04, 0.3)
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_m5hmc"]
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_6xsp4"]
 albedo_color = Color(0.419608, 0.127373, 0.101961, 1)
 roughness = 0.305
 clearcoat_enabled = true
 clearcoat = 0.35
 clearcoat_roughness = 0.05
 
-[sub_resource type="BoxMesh" id="BoxMesh_u3npq"]
+[sub_resource type="BoxMesh" id="BoxMesh_j51f0"]
 size = Vector3(0.52, 0.16, 0.08)
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_6i0pd"]
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_bdqwf"]
 albedo_color = Color(0.690196, 0.188235, 0.164706, 1)
 roughness = 0.5
 emission_enabled = true
 emission = Color(1, 0.188235, 0.12549, 1)
 emission_energy_multiplier = 0.0
 
-[sub_resource type="BoxMesh" id="BoxMesh_5o83v"]
+[sub_resource type="BoxMesh" id="BoxMesh_3iq1w"]
 size = Vector3(0.3, 0.18, 0.04)
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_mr13a"]
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_1yood"]
 albedo_color = Color(0.709804, 0.540392, 0.210039, 1)
 metallic = 0.85
 roughness = 0.155
 
-[sub_resource type="CylinderMesh" id="CylinderMesh_ak6rp"]
+[sub_resource type="CylinderMesh" id="CylinderMesh_02j6p"]
 top_radius = 0.065
 bottom_radius = 0.065
 height = 0.95
 radial_segments = 12
 
-[sub_resource type="CylinderMesh" id="CylinderMesh_0ve3k"]
+[sub_resource type="CylinderMesh" id="CylinderMesh_nvjur"]
 top_radius = 0.16
 bottom_radius = 0.2
 height = 0.08
 radial_segments = 32
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_fctxe"]
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ghbxj"]
 albedo_color = Color(0.937255, 0.886431, 0.772078, 1)
 roughness = 0.23
 clearcoat_enabled = true
 clearcoat = 0.35
 clearcoat_roughness = 0.05
 
-[sub_resource type="BoxMesh" id="BoxMesh_ocgxm"]
+[sub_resource type="BoxMesh" id="BoxMesh_ag8et"]
 size = Vector3(0.62, 0.95, 0.34)
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_mx7f5"]
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_kjhb6"]
 albedo_color = Color(0.356863, 0.149333, 0.284863, 1)
 roughness = 0.23
 clearcoat_enabled = true
 clearcoat = 0.35
 clearcoat_roughness = 0.05
 
-[sub_resource type="BoxMesh" id="BoxMesh_gm1d0"]
+[sub_resource type="BoxMesh" id="BoxMesh_3fiiw"]
 size = Vector3(0.025, 0.95, 0.36)
 
-[sub_resource type="BoxMesh" id="BoxMesh_c3cfd"]
+[sub_resource type="BoxMesh" id="BoxMesh_ye81r"]
 size = Vector3(0.06, 0.9, 0.08)
 
-[sub_resource type="BoxMesh" id="BoxMesh_0cbim"]
+[sub_resource type="BoxMesh" id="BoxMesh_yobfc"]
 size = Vector3(0.025, 0.95, 0.36)
 
-[sub_resource type="BoxMesh" id="BoxMesh_uf1v1"]
+[sub_resource type="BoxMesh" id="BoxMesh_vt540"]
 size = Vector3(0.06, 0.9, 0.08)
 
-[sub_resource type="BoxMesh" id="BoxMesh_i4u23"]
+[sub_resource type="BoxMesh" id="BoxMesh_ja76e"]
 size = Vector3(0.64, 0.025, 0.36)
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_xi6pj"]
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_hw5hy"]
 albedo_color = Color(0.901961, 0.859608, 0.787608, 1)
 roughness = 0.185
 clearcoat_enabled = true
 clearcoat = 0.35
 clearcoat_roughness = 0.05
 
-[sub_resource type="CylinderMesh" id="CylinderMesh_fymfu"]
+[sub_resource type="CylinderMesh" id="CylinderMesh_4l7ho"]
 top_radius = 0.07
 bottom_radius = 0.08
 height = 0.16
 radial_segments = 10
 
-[sub_resource type="SphereMesh" id="SphereMesh_mkast"]
+[sub_resource type="SphereMesh" id="SphereMesh_01sje"]
 radius = 1.0
 height = 2.0
 radial_segments = 24
 rings = 12
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_2tlc3"]
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_anlbq"]
 albedo_color = Color(0.0467451, 0.0382745, 0.0509804, 1)
 roughness = 0.32
 clearcoat_enabled = true
 clearcoat = 0.35
 clearcoat_roughness = 0.05
 
-[sub_resource type="BoxMesh" id="BoxMesh_rfwew"]
+[sub_resource type="BoxMesh" id="BoxMesh_4mcsk"]
 size = Vector3(0.07, 0.025, 0.02)
 
-[sub_resource type="BoxMesh" id="BoxMesh_dg4kt"]
+[sub_resource type="BoxMesh" id="BoxMesh_a1ejk"]
 size = Vector3(0.07, 0.025, 0.02)
 
-[sub_resource type="BoxMesh" id="BoxMesh_hhcfn"]
+[sub_resource type="BoxMesh" id="BoxMesh_bqcfs"]
 size = Vector3(0.1, 0.008, 0.02)
 
-[sub_resource type="CylinderMesh" id="CylinderMesh_h4bvw"]
+[sub_resource type="CylinderMesh" id="CylinderMesh_wnrls"]
 top_radius = 0.15
 bottom_radius = 0.16
 height = 0.06
 radial_segments = 20
 
-[sub_resource type="BoxMesh" id="BoxMesh_0c45n"]
+[sub_resource type="BoxMesh" id="BoxMesh_kqviu"]
 size = Vector3(0.012, 0.09, 0.012)
 
-[sub_resource type="BoxMesh" id="BoxMesh_64tua"]
+[sub_resource type="BoxMesh" id="BoxMesh_vlspu"]
 size = Vector3(0.012, 0.09, 0.012)
 
-[sub_resource type="BoxMesh" id="BoxMesh_y8lbb"]
+[sub_resource type="BoxMesh" id="BoxMesh_agwkw"]
 size = Vector3(0.012, 0.09, 0.012)
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_0osfr"]
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_o6c7t"]
 albedo_color = Color(0.937255, 0.886431, 0.772078, 1)
 roughness = 0.26
 clearcoat_enabled = true
 clearcoat = 0.35
 clearcoat_roughness = 0.05
 
-[sub_resource type="BoxMesh" id="BoxMesh_3iaow"]
+[sub_resource type="BoxMesh" id="BoxMesh_g6xcn"]
 size = Vector3(0.09, 0.12, 0.01)
 
-[sub_resource type="BoxMesh" id="BoxMesh_d8gbj"]
+[sub_resource type="BoxMesh" id="BoxMesh_q0ej8"]
 size = Vector3(0.09, 0.12, 0.01)
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_x8xed"]
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_htykq"]
 albedo_color = Color(0.690196, 0.148078, 0.122667, 1)
 roughness = 0.26
 clearcoat_enabled = true
 clearcoat = 0.35
 clearcoat_roughness = 0.05
 
-[sub_resource type="BoxMesh" id="BoxMesh_ghcdy"]
+[sub_resource type="BoxMesh" id="BoxMesh_ywblw"]
 size = Vector3(0.06, 0.006, 0.006)
 
-[sub_resource type="BoxMesh" id="BoxMesh_1yq5q"]
+[sub_resource type="BoxMesh" id="BoxMesh_cmft8"]
 size = Vector3(0.09, 0.12, 0.01)
 
-[sub_resource type="BoxMesh" id="BoxMesh_e2ymq"]
+[sub_resource type="BoxMesh" id="BoxMesh_ipj4m"]
 size = Vector3(0.06, 0.006, 0.006)
 
-[sub_resource type="BoxMesh" id="BoxMesh_bs3mh"]
+[sub_resource type="BoxMesh" id="BoxMesh_qn3bx"]
 size = Vector3(0.09, 0.12, 0.01)
 
-[sub_resource type="BoxMesh" id="BoxMesh_pjgtn"]
+[sub_resource type="BoxMesh" id="BoxMesh_lqgxu"]
 size = Vector3(0.06, 0.006, 0.006)
 
-[sub_resource type="BoxMesh" id="BoxMesh_3nfs0"]
+[sub_resource type="BoxMesh" id="BoxMesh_at467"]
 size = Vector3(0.09, 0.12, 0.01)
 
-[sub_resource type="BoxMesh" id="BoxMesh_pn1ba"]
+[sub_resource type="BoxMesh" id="BoxMesh_k4yvi"]
 size = Vector3(0.06, 0.006, 0.006)
 
-[sub_resource type="BoxMesh" id="BoxMesh_dvuan"]
+[sub_resource type="BoxMesh" id="BoxMesh_gydgn"]
 size = Vector3(0.09, 0.12, 0.01)
 
-[sub_resource type="BoxMesh" id="BoxMesh_1bm88"]
+[sub_resource type="BoxMesh" id="BoxMesh_8qsqw"]
 size = Vector3(0.06, 0.006, 0.006)
 
-[sub_resource type="SphereMesh" id="SphereMesh_2cla3"]
+[sub_resource type="SphereMesh" id="SphereMesh_jabrh"]
 radius = 0.055
 height = 0.11
 radial_segments = 10
 rings = 5
 
-[sub_resource type="CylinderMesh" id="CylinderMesh_wb2pf"]
+[sub_resource type="CylinderMesh" id="CylinderMesh_8jfns"]
 top_radius = 0.035
 bottom_radius = 0.03
 height = 0.5
 radial_segments = 10
 
-[sub_resource type="SphereMesh" id="SphereMesh_tn3ur"]
+[sub_resource type="SphereMesh" id="SphereMesh_0t0if"]
 radius = 0.04
 height = 0.08
 radial_segments = 8
 rings = 4
 
-[sub_resource type="CylinderMesh" id="CylinderMesh_u657w"]
+[sub_resource type="CylinderMesh" id="CylinderMesh_ta36f"]
 top_radius = 0.03
 bottom_radius = 0.026
 height = 0.46
 radial_segments = 10
 
-[sub_resource type="SphereMesh" id="SphereMesh_rw5ep"]
+[sub_resource type="SphereMesh" id="SphereMesh_jfrhv"]
 radius = 0.05
 height = 0.1
 radial_segments = 10
 rings = 5
 
-[sub_resource type="SphereMesh" id="SphereMesh_38esh"]
+[sub_resource type="SphereMesh" id="SphereMesh_jarug"]
 radius = 0.055
 height = 0.11
 radial_segments = 10
 rings = 5
 
-[sub_resource type="CylinderMesh" id="CylinderMesh_su4tg"]
+[sub_resource type="CylinderMesh" id="CylinderMesh_56yvd"]
 top_radius = 0.035
 bottom_radius = 0.03
 height = 0.5
 radial_segments = 10
 
-[sub_resource type="SphereMesh" id="SphereMesh_mpgfi"]
+[sub_resource type="SphereMesh" id="SphereMesh_p5dy5"]
 radius = 0.04
 height = 0.08
 radial_segments = 8
 rings = 4
 
-[sub_resource type="CylinderMesh" id="CylinderMesh_1rwxm"]
+[sub_resource type="CylinderMesh" id="CylinderMesh_sxeso"]
 top_radius = 0.03
 bottom_radius = 0.026
 height = 0.46
 radial_segments = 10
 
-[sub_resource type="SphereMesh" id="SphereMesh_jfi1p"]
+[sub_resource type="SphereMesh" id="SphereMesh_cyg1b"]
 radius = 0.05
 height = 0.1
 radial_segments = 10
 rings = 5
 
-[sub_resource type="SphereMesh" id="SphereMesh_g3nbc"]
+[sub_resource type="SphereMesh" id="SphereMesh_kt684"]
 radius = 0.055
 height = 0.11
 radial_segments = 10
 rings = 5
 
-[sub_resource type="CylinderMesh" id="CylinderMesh_4ag7l"]
+[sub_resource type="CylinderMesh" id="CylinderMesh_pe785"]
 top_radius = 0.035
 bottom_radius = 0.03
 height = 0.5
 radial_segments = 10
 
-[sub_resource type="SphereMesh" id="SphereMesh_xvqcy"]
+[sub_resource type="SphereMesh" id="SphereMesh_0fexp"]
 radius = 0.04
 height = 0.08
 radial_segments = 8
 rings = 4
 
-[sub_resource type="CylinderMesh" id="CylinderMesh_d1y8x"]
+[sub_resource type="CylinderMesh" id="CylinderMesh_aypal"]
 top_radius = 0.03
 bottom_radius = 0.026
 height = 0.46
 radial_segments = 10
 
-[sub_resource type="SphereMesh" id="SphereMesh_k2lyl"]
+[sub_resource type="SphereMesh" id="SphereMesh_bb814"]
 radius = 0.05
 height = 0.1
 radial_segments = 10
 rings = 5
 
-[sub_resource type="SphereMesh" id="SphereMesh_8u30e"]
+[sub_resource type="SphereMesh" id="SphereMesh_xy2tl"]
 radius = 0.055
 height = 0.11
 radial_segments = 10
 rings = 5
 
-[sub_resource type="CylinderMesh" id="CylinderMesh_5d2oi"]
+[sub_resource type="CylinderMesh" id="CylinderMesh_laqht"]
 top_radius = 0.035
 bottom_radius = 0.03
 height = 0.5
 radial_segments = 10
 
-[sub_resource type="SphereMesh" id="SphereMesh_jbcrg"]
+[sub_resource type="SphereMesh" id="SphereMesh_6kocc"]
 radius = 0.04
 height = 0.08
 radial_segments = 8
 rings = 4
 
-[sub_resource type="CylinderMesh" id="CylinderMesh_jv4o3"]
+[sub_resource type="CylinderMesh" id="CylinderMesh_mo1wo"]
 top_radius = 0.03
 bottom_radius = 0.026
 height = 0.46
 radial_segments = 10
 
-[sub_resource type="SphereMesh" id="SphereMesh_o1ygm"]
+[sub_resource type="SphereMesh" id="SphereMesh_agod3"]
 radius = 0.05
 height = 0.1
 radial_segments = 10
 rings = 5
 
-[sub_resource type="SphereMesh" id="SphereMesh_0ucxg"]
+[sub_resource type="SphereMesh" id="SphereMesh_n2xwe"]
 radius = 0.055
 height = 0.11
 radial_segments = 10
 rings = 5
 
-[sub_resource type="CylinderMesh" id="CylinderMesh_fsmpi"]
+[sub_resource type="CylinderMesh" id="CylinderMesh_ghwjo"]
 top_radius = 0.035
 bottom_radius = 0.03
 height = 0.5
 radial_segments = 10
 
-[sub_resource type="SphereMesh" id="SphereMesh_evnhn"]
+[sub_resource type="SphereMesh" id="SphereMesh_ygt5x"]
 radius = 0.04
 height = 0.08
 radial_segments = 8
 rings = 4
 
-[sub_resource type="CylinderMesh" id="CylinderMesh_30t40"]
+[sub_resource type="CylinderMesh" id="CylinderMesh_0r47t"]
 top_radius = 0.03
 bottom_radius = 0.026
 height = 0.46
 radial_segments = 10
 
-[sub_resource type="SphereMesh" id="SphereMesh_nto7x"]
+[sub_resource type="SphereMesh" id="SphereMesh_gq8kh"]
 radius = 0.05
 height = 0.1
 radial_segments = 10
 rings = 5
 
-[sub_resource type="SphereMesh" id="SphereMesh_cyybu"]
+[sub_resource type="SphereMesh" id="SphereMesh_ym7la"]
 radius = 0.055
 height = 0.11
 radial_segments = 10
 rings = 5
 
-[sub_resource type="CylinderMesh" id="CylinderMesh_01joy"]
+[sub_resource type="CylinderMesh" id="CylinderMesh_jq3db"]
 top_radius = 0.035
 bottom_radius = 0.03
 height = 0.5
 radial_segments = 10
 
-[sub_resource type="SphereMesh" id="SphereMesh_bh3nd"]
+[sub_resource type="SphereMesh" id="SphereMesh_o7y0u"]
 radius = 0.04
 height = 0.08
 radial_segments = 8
 rings = 4
 
-[sub_resource type="CylinderMesh" id="CylinderMesh_cvyi0"]
+[sub_resource type="CylinderMesh" id="CylinderMesh_omfa2"]
 top_radius = 0.03
 bottom_radius = 0.026
 height = 0.46
 radial_segments = 10
 
-[sub_resource type="SphereMesh" id="SphereMesh_rb5pf"]
+[sub_resource type="SphereMesh" id="SphereMesh_88eqh"]
 radius = 0.05
 height = 0.1
 radial_segments = 10
 rings = 5
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_l2w3m"]
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_dap5b"]
 albedo_color = Color(0.690196, 0.148078, 0.122667, 1)
 roughness = 0.23
 clearcoat_enabled = true
 clearcoat = 0.35
 clearcoat_roughness = 0.05
 
-[sub_resource type="BoxMesh" id="BoxMesh_y6ksc"]
+[sub_resource type="BoxMesh" id="BoxMesh_7ahrf"]
 size = Vector3(0.92, 0.62, 0.035)
 
-[sub_resource type="BoxMesh" id="BoxMesh_cgb4w"]
+[sub_resource type="BoxMesh" id="BoxMesh_n12uk"]
 size = Vector3(0.78, 0.48, 0.04)
 
-[sub_resource type="BoxMesh" id="BoxMesh_gk7qf"]
+[sub_resource type="BoxMesh" id="BoxMesh_wdpci"]
 size = Vector3(0.5, 0.07, 0.042)
 
-[sub_resource type="BoxMesh" id="BoxMesh_i1u5m"]
+[sub_resource type="BoxMesh" id="BoxMesh_ogwgb"]
 size = Vector3(0.36, 0.05, 0.042)
 
-[sub_resource type="Animation" id="Animation_iqfw2"]
+[sub_resource type="Animation" id="Animation_slr1i"]
 length = 2.0
 loop_mode = 1
 tracks/0/type = "value"
@@ -682,7 +682,7 @@ tracks/17/keys = {
 "values": [Vector3(-0.15, 0, 0), Vector3(-0.15, 0, 0), Vector3(-0.15, 0, 0)]
 }
 
-[sub_resource type="Animation" id="Animation_k2t8g"]
+[sub_resource type="Animation" id="Animation_3t63x"]
 loop_mode = 1
 tracks/0/type = "value"
 tracks/0/imported = false
@@ -901,7 +901,7 @@ tracks/17/keys = {
 "values": [Vector3(-0.15, 0, 0), Vector3(-0.15, 0, 0), Vector3(-0.15, 0, 0), Vector3(-0.15, 0, 0), Vector3(-0.15, 0, 0)]
 }
 
-[sub_resource type="Animation" id="Animation_msx27"]
+[sub_resource type="Animation" id="Animation_scedo"]
 tracks/0/type = "value"
 tracks/0/imported = false
 tracks/0/enabled = true
@@ -1119,7 +1119,7 @@ tracks/17/keys = {
 "values": [Vector3(-0.15, 0, 0), Vector3(-0.15, 0, 0), Vector3(-0.15, 0, 0), Vector3(-0.15, 0, 0), Vector3(-0.15, 0, 0), Vector3(-0.15, 0, 0)]
 }
 
-[sub_resource type="Animation" id="Animation_04ekh"]
+[sub_resource type="Animation" id="Animation_437or"]
 length = 0.6
 tracks/0/type = "value"
 tracks/0/imported = false
@@ -1338,7 +1338,7 @@ tracks/17/keys = {
 "values": [Vector3(-0.15, 0, 0), Vector3(-0.15, 0, 0), Vector3(-0.15, 0, 0), Vector3(-0.15, 0, 0)]
 }
 
-[sub_resource type="Animation" id="Animation_vjmmy"]
+[sub_resource type="Animation" id="Animation_nev7m"]
 length = 1.1
 tracks/0/type = "value"
 tracks/0/imported = false
@@ -1557,7 +1557,7 @@ tracks/17/keys = {
 "values": [Vector3(-0.15, 0, 0), Vector3(-0.35, 0, 0), Vector3(-0.35, 0, 0), Vector3(-0.35, 0, 0), Vector3(-0.35, 0, 0)]
 }
 
-[sub_resource type="Animation" id="Animation_k7r6q"]
+[sub_resource type="Animation" id="Animation_jc60k"]
 length = 1.6
 tracks/0/type = "value"
 tracks/0/imported = false
@@ -1776,7 +1776,7 @@ tracks/17/keys = {
 "values": [Vector3(-0.35, 0, 0), Vector3(-0.35, 0, 0), Vector3(-0.35, 0, 0), Vector3(-0.35, 0, 0), Vector3(-0.15, 0, 0)]
 }
 
-[sub_resource type="Animation" id="Animation_3b0lc"]
+[sub_resource type="Animation" id="Animation_4dapc"]
 length = 2.4
 tracks/0/type = "value"
 tracks/0/imported = false
@@ -1995,7 +1995,7 @@ tracks/17/keys = {
 "values": [Vector3(-0.15, 0, 0), Vector3(-0.15, 0, 0), Vector3(-0.15, 0, 0), Vector3(-0.15, 0, 0), Vector3(-0.15, 0, 0), Vector3(-0.15, 0, 0), Vector3(-0.15, 0, 0), Vector3(-0.15, 0, 0)]
 }
 
-[sub_resource type="Animation" id="Animation_rtd6j"]
+[sub_resource type="Animation" id="Animation_hom0g"]
 length = 0.5
 tracks/0/type = "value"
 tracks/0/imported = false
@@ -2214,7 +2214,7 @@ tracks/17/keys = {
 "values": [Vector3(-0.15, 0, 0), Vector3(-0.2, 0, 0), Vector3(-0.5, 0, 0), Vector3(-0.4, 0, 0)]
 }
 
-[sub_resource type="Animation" id="Animation_vccff"]
+[sub_resource type="Animation" id="Animation_vuoc4"]
 length = 1.2
 loop_mode = 1
 tracks/0/type = "value"
@@ -2434,7 +2434,7 @@ tracks/17/keys = {
 "values": [Vector3(-0.4, 0, 0), Vector3(-0.4, 0, 0), Vector3(-0.45, 0, 0), Vector3(-0.45, 0, 0), Vector3(-0.4, 0, 0)]
 }
 
-[sub_resource type="Animation" id="Animation_u46ne"]
+[sub_resource type="Animation" id="Animation_gvr4o"]
 length = 0.5
 tracks/0/type = "value"
 tracks/0/imported = false
@@ -2653,7 +2653,7 @@ tracks/17/keys = {
 "values": [Vector3(-0.4, 0, 0), Vector3(0, 0, 0), Vector3(-0.1, 0, 0)]
 }
 
-[sub_resource type="Animation" id="Animation_aiqc5"]
+[sub_resource type="Animation" id="Animation_l27ct"]
 length = 0.9
 tracks/0/type = "value"
 tracks/0/imported = false
@@ -2872,7 +2872,7 @@ tracks/17/keys = {
 "values": [Vector3(-0.1, 0, 0), Vector3(0, 0, 0), Vector3(0, 0, 0), Vector3(-0.4, 0, 0), Vector3(-0.15, 0, 0)]
 }
 
-[sub_resource type="Animation" id="Animation_3akbe"]
+[sub_resource type="Animation" id="Animation_5s5fj"]
 length = 1.6
 tracks/0/type = "value"
 tracks/0/imported = false
@@ -3091,7 +3091,7 @@ tracks/17/keys = {
 "values": [Vector3(-0.15, 0, 0), Vector3(-0.15, 0, 0), Vector3(-0.15, 0, 0), Vector3(-0.15, 0, 0), Vector3(-0.15, 0, 0), Vector3(-0.15, 0, 0), Vector3(-0.15, 0, 0)]
 }
 
-[sub_resource type="Animation" id="Animation_5fqdq"]
+[sub_resource type="Animation" id="Animation_axpbh"]
 length = 3.0
 tracks/0/type = "value"
 tracks/0/imported = false
@@ -3310,7 +3310,7 @@ tracks/17/keys = {
 "values": [Vector3(-0.15, 0, 0), Vector3(-0.15, 0, 0), Vector3(-0.15, 0, 0), Vector3(-0.15, 0, 0), Vector3(-0.15, 0, 0), Vector3(-0.15, 0, 0), Vector3(-0.15, 0, 0), Vector3(-2.5, 0, 0), Vector3(-2.5, 0, 0), Vector3(-2.5, 0, 0)]
 }
 
-[sub_resource type="Animation" id="Animation_jd3ap"]
+[sub_resource type="Animation" id="Animation_ukba1"]
 length = 3.0
 loop_mode = 1
 tracks/0/type = "value"
@@ -3530,26 +3530,26 @@ tracks/17/keys = {
 "values": [Vector3(-2.5, 0, 0), Vector3(-2.5, 0, 0), Vector3(-2.5, 0, 0), Vector3(-2.5, 0, 0)]
 }
 
-[sub_resource type="AnimationLibrary" id="AnimationLibrary_i6qi3"]
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_rtnqv"]
 _data = {
-"bell_collision": SubResource("Animation_aiqc5"),
-"chair_launch": SubResource("Animation_u46ne"),
-"counter_idle": SubResource("Animation_jd3ap"),
-"defeat_settle": SubResource("Animation_5fqdq"),
-"exposed": SubResource("Animation_vccff"),
-"idle": SubResource("Animation_iqfw2"),
-"phase_recovery": SubResource("Animation_3akbe"),
-"present": SubResource("Animation_msx27"),
-"rack_push": SubResource("Animation_3b0lc"),
-"reflected_impact": SubResource("Animation_rtd6j"),
-"roll": SubResource("Animation_k2t8g"),
-"sweep": SubResource("Animation_k7r6q"),
-"sweep_tell": SubResource("Animation_vjmmy"),
-"throw": SubResource("Animation_04ekh")
+"bell_collision": SubResource("Animation_l27ct"),
+"chair_launch": SubResource("Animation_gvr4o"),
+"counter_idle": SubResource("Animation_ukba1"),
+"defeat_settle": SubResource("Animation_axpbh"),
+"exposed": SubResource("Animation_vuoc4"),
+"idle": SubResource("Animation_slr1i"),
+"phase_recovery": SubResource("Animation_5s5fj"),
+"present": SubResource("Animation_scedo"),
+"rack_push": SubResource("Animation_4dapc"),
+"reflected_impact": SubResource("Animation_hom0g"),
+"roll": SubResource("Animation_3t63x"),
+"sweep": SubResource("Animation_jc60k"),
+"sweep_tell": SubResource("Animation_nev7m"),
+"throw": SubResource("Animation_437or")
 }
 
 [node name="FloorManager" type="Node3D"]
-script = ExtResource("1_7rsej")
+script = ExtResource("1_ovg7a")
 sign_follows_hands = true
 
 [node name="Chair" type="Node3D" parent="."]
@@ -3558,105 +3558,105 @@ sign_follows_hands = true
 
 [node name="@MeshInstance3D@2" type="MeshInstance3D" parent="Chair/Leg0"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.12, 0.18)
-material_override = SubResource("StandardMaterial3D_qp8ge")
-mesh = SubResource("BoxMesh_akwxo")
+material_override = SubResource("StandardMaterial3D_0akgt")
+mesh = SubResource("BoxMesh_ber75")
 
 [node name="@MeshInstance3D@3" type="MeshInstance3D" parent="Chair/Leg0"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.055, 0.36)
-material_override = SubResource("StandardMaterial3D_gafge")
-mesh = SubResource("SphereMesh_puqb3")
+material_override = SubResource("StandardMaterial3D_r116f")
+mesh = SubResource("SphereMesh_wecfj")
 
 [node name="Leg1" type="Node3D" parent="Chair"]
 transform = Transform3D(0.309017, 0, 0.951057, 0, 1, 0, -0.951057, 0, 0.309017, 0, 0, 0)
 
 [node name="@MeshInstance3D@4" type="MeshInstance3D" parent="Chair/Leg1"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.12, 0.18)
-material_override = SubResource("StandardMaterial3D_qp8ge")
-mesh = SubResource("BoxMesh_gtrwm")
+material_override = SubResource("StandardMaterial3D_0akgt")
+mesh = SubResource("BoxMesh_brlmo")
 
 [node name="@MeshInstance3D@5" type="MeshInstance3D" parent="Chair/Leg1"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.055, 0.36)
-material_override = SubResource("StandardMaterial3D_gafge")
-mesh = SubResource("SphereMesh_74wo3")
+material_override = SubResource("StandardMaterial3D_r116f")
+mesh = SubResource("SphereMesh_mawfr")
 
 [node name="Leg2" type="Node3D" parent="Chair"]
 transform = Transform3D(-0.809017, 0, 0.587785, 0, 1, 0, -0.587785, 0, -0.809017, 0, 0, 0)
 
 [node name="@MeshInstance3D@6" type="MeshInstance3D" parent="Chair/Leg2"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.12, 0.18)
-material_override = SubResource("StandardMaterial3D_qp8ge")
-mesh = SubResource("BoxMesh_ks2c7")
+material_override = SubResource("StandardMaterial3D_0akgt")
+mesh = SubResource("BoxMesh_gkmh1")
 
 [node name="@MeshInstance3D@7" type="MeshInstance3D" parent="Chair/Leg2"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.055, 0.36)
-material_override = SubResource("StandardMaterial3D_gafge")
-mesh = SubResource("SphereMesh_vci0x")
+material_override = SubResource("StandardMaterial3D_r116f")
+mesh = SubResource("SphereMesh_fktui")
 
 [node name="Leg3" type="Node3D" parent="Chair"]
 transform = Transform3D(-0.809017, 0, -0.587785, 0, 1, 0, 0.587785, 0, -0.809017, 0, 0, 0)
 
 [node name="@MeshInstance3D@8" type="MeshInstance3D" parent="Chair/Leg3"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.12, 0.18)
-material_override = SubResource("StandardMaterial3D_qp8ge")
-mesh = SubResource("BoxMesh_6m6o8")
+material_override = SubResource("StandardMaterial3D_0akgt")
+mesh = SubResource("BoxMesh_sialc")
 
 [node name="@MeshInstance3D@9" type="MeshInstance3D" parent="Chair/Leg3"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.055, 0.36)
-material_override = SubResource("StandardMaterial3D_gafge")
-mesh = SubResource("SphereMesh_8r27k")
+material_override = SubResource("StandardMaterial3D_r116f")
+mesh = SubResource("SphereMesh_l1o0n")
 
 [node name="Leg4" type="Node3D" parent="Chair"]
 transform = Transform3D(0.309017, 0, -0.951056, 0, 1, 0, 0.951056, 0, 0.309017, 0, 0, 0)
 
 [node name="@MeshInstance3D@10" type="MeshInstance3D" parent="Chair/Leg4"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.12, 0.18)
-material_override = SubResource("StandardMaterial3D_qp8ge")
-mesh = SubResource("BoxMesh_hiyua")
+material_override = SubResource("StandardMaterial3D_0akgt")
+mesh = SubResource("BoxMesh_rucde")
 
 [node name="@MeshInstance3D@11" type="MeshInstance3D" parent="Chair/Leg4"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.055, 0.36)
-material_override = SubResource("StandardMaterial3D_gafge")
-mesh = SubResource("SphereMesh_vvipj")
+material_override = SubResource("StandardMaterial3D_r116f")
+mesh = SubResource("SphereMesh_xtgsp")
 
 [node name="@MeshInstance3D@12" type="MeshInstance3D" parent="Chair"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.28, 0)
-material_override = SubResource("StandardMaterial3D_qp8ge")
-mesh = SubResource("CylinderMesh_cy2qn")
+material_override = SubResource("StandardMaterial3D_0akgt")
+mesh = SubResource("CylinderMesh_hlsen")
 
 [node name="@MeshInstance3D@13" type="MeshInstance3D" parent="Chair"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
-material_override = SubResource("StandardMaterial3D_r1p38")
-mesh = SubResource("CylinderMesh_f2k3l")
+material_override = SubResource("StandardMaterial3D_25jol")
+mesh = SubResource("CylinderMesh_ubl01")
 
 [node name="@MeshInstance3D@14" type="MeshInstance3D" parent="Chair"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.3, 0.62, 0)
-material_override = SubResource("StandardMaterial3D_qp8ge")
-mesh = SubResource("BoxMesh_pgqvq")
+material_override = SubResource("StandardMaterial3D_0akgt")
+mesh = SubResource("BoxMesh_cwnnb")
 
 [node name="@MeshInstance3D@15" type="MeshInstance3D" parent="Chair"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.3, 0.71, 0)
-material_override = SubResource("StandardMaterial3D_2dwve")
-mesh = SubResource("BoxMesh_kjs3e")
+material_override = SubResource("StandardMaterial3D_hmjr1")
+mesh = SubResource("BoxMesh_x8mwp")
 
 [node name="@MeshInstance3D@16" type="MeshInstance3D" parent="Chair"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.3, 0.62, 0)
-material_override = SubResource("StandardMaterial3D_qp8ge")
-mesh = SubResource("BoxMesh_dlm5y")
+material_override = SubResource("StandardMaterial3D_0akgt")
+mesh = SubResource("BoxMesh_n10pv")
 
 [node name="@MeshInstance3D@17" type="MeshInstance3D" parent="Chair"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.3, 0.71, 0)
-material_override = SubResource("StandardMaterial3D_2dwve")
-mesh = SubResource("BoxMesh_8oolw")
+material_override = SubResource("StandardMaterial3D_hmjr1")
+mesh = SubResource("BoxMesh_6q8jt")
 
 [node name="@MeshInstance3D@18" type="MeshInstance3D" parent="Chair"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.22, 0.38)
-material_override = SubResource("StandardMaterial3D_m5hmc")
-mesh = SubResource("BoxMesh_u3npq")
+material_override = SubResource("StandardMaterial3D_6xsp4")
+mesh = SubResource("BoxMesh_j51f0")
 
 [node name="Paddle" type="MeshInstance3D" parent="Chair"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.44, -0.18)
-material_override = SubResource("StandardMaterial3D_6i0pd")
-mesh = SubResource("BoxMesh_5o83v")
+material_override = SubResource("StandardMaterial3D_bdqwf")
+mesh = SubResource("BoxMesh_3iq1w")
 
 [node name="Upper" type="Node3D" parent="."]
 
@@ -3669,178 +3669,178 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.45, 0)
 
 [node name="@MeshInstance3D@20" type="MeshInstance3D" parent="Upper/Lift/Flinch/Body"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.42, 0)
-material_override = SubResource("StandardMaterial3D_mr13a")
-mesh = SubResource("CylinderMesh_ak6rp")
+material_override = SubResource("StandardMaterial3D_1yood")
+mesh = SubResource("CylinderMesh_02j6p")
 
 [node name="@MeshInstance3D@21" type="MeshInstance3D" parent="Upper/Lift/Flinch/Body"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.05, 0)
-material_override = SubResource("StandardMaterial3D_mr13a")
-mesh = SubResource("CylinderMesh_0ve3k")
+material_override = SubResource("StandardMaterial3D_1yood")
+mesh = SubResource("CylinderMesh_nvjur")
 
 [node name="@MeshInstance3D@22" type="MeshInstance3D" parent="Upper/Lift/Flinch/Body"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.55, 0)
-material_override = SubResource("StandardMaterial3D_fctxe")
-mesh = SubResource("BoxMesh_ocgxm")
+material_override = SubResource("StandardMaterial3D_ghbxj")
+mesh = SubResource("BoxMesh_ag8et")
 
 [node name="@MeshInstance3D@23" type="MeshInstance3D" parent="Upper/Lift/Flinch/Body"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.17, 0.55, 0.005)
-material_override = SubResource("StandardMaterial3D_mx7f5")
-mesh = SubResource("BoxMesh_gm1d0")
+material_override = SubResource("StandardMaterial3D_kjhb6")
+mesh = SubResource("BoxMesh_3fiiw")
 
 [node name="@MeshInstance3D@24" type="MeshInstance3D" parent="Upper/Lift/Flinch/Body"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.42, 0.57, 0)
-material_override = SubResource("StandardMaterial3D_mr13a")
-mesh = SubResource("BoxMesh_c3cfd")
+material_override = SubResource("StandardMaterial3D_1yood")
+mesh = SubResource("BoxMesh_ye81r")
 
 [node name="@MeshInstance3D@25" type="MeshInstance3D" parent="Upper/Lift/Flinch/Body"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.17, 0.55, 0.005)
-material_override = SubResource("StandardMaterial3D_mx7f5")
-mesh = SubResource("BoxMesh_0cbim")
+material_override = SubResource("StandardMaterial3D_kjhb6")
+mesh = SubResource("BoxMesh_yobfc")
 
 [node name="@MeshInstance3D@26" type="MeshInstance3D" parent="Upper/Lift/Flinch/Body"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.42, 0.57, 0)
-material_override = SubResource("StandardMaterial3D_mr13a")
-mesh = SubResource("BoxMesh_uf1v1")
+material_override = SubResource("StandardMaterial3D_1yood")
+mesh = SubResource("BoxMesh_vt540")
 
 [node name="@MeshInstance3D@27" type="MeshInstance3D" parent="Upper/Lift/Flinch/Body"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.08, 0)
-material_override = SubResource("StandardMaterial3D_mx7f5")
-mesh = SubResource("BoxMesh_i4u23")
+material_override = SubResource("StandardMaterial3D_kjhb6")
+mesh = SubResource("BoxMesh_ja76e")
 
 [node name="@MeshInstance3D@28" type="MeshInstance3D" parent="Upper/Lift/Flinch/Body"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.08, 0)
-material_override = SubResource("StandardMaterial3D_xi6pj")
-mesh = SubResource("CylinderMesh_fymfu")
+material_override = SubResource("StandardMaterial3D_hw5hy")
+mesh = SubResource("CylinderMesh_4l7ho")
 
 [node name="Head" type="Node3D" parent="Upper/Lift/Flinch/Body"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.15, 0)
 
 [node name="@MeshInstance3D@29" type="MeshInstance3D" parent="Upper/Lift/Flinch/Body/Head"]
 transform = Transform3D(0.18, 0, 0, 0, 0.29, 0, 0, 0, 0.2, 0, 0.22, 0)
-material_override = SubResource("StandardMaterial3D_xi6pj")
-mesh = SubResource("SphereMesh_mkast")
+material_override = SubResource("StandardMaterial3D_hw5hy")
+mesh = SubResource("SphereMesh_01sje")
 
 [node name="@MeshInstance3D@30" type="MeshInstance3D" parent="Upper/Lift/Flinch/Body/Head"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.07, 0.27, 0.185)
-material_override = SubResource("StandardMaterial3D_2tlc3")
-mesh = SubResource("BoxMesh_rfwew")
+material_override = SubResource("StandardMaterial3D_anlbq")
+mesh = SubResource("BoxMesh_4mcsk")
 
 [node name="@MeshInstance3D@31" type="MeshInstance3D" parent="Upper/Lift/Flinch/Body/Head"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.07, 0.27, 0.185)
-material_override = SubResource("StandardMaterial3D_2tlc3")
-mesh = SubResource("BoxMesh_dg4kt")
+material_override = SubResource("StandardMaterial3D_anlbq")
+mesh = SubResource("BoxMesh_a1ejk")
 
 [node name="@MeshInstance3D@32" type="MeshInstance3D" parent="Upper/Lift/Flinch/Body/Head"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.09, 0.17)
-material_override = SubResource("StandardMaterial3D_2tlc3")
-mesh = SubResource("BoxMesh_hhcfn")
+material_override = SubResource("StandardMaterial3D_anlbq")
+mesh = SubResource("BoxMesh_bqcfs")
 
 [node name="@MeshInstance3D@33" type="MeshInstance3D" parent="Upper/Lift/Flinch/Body/Head"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.43, 0)
-material_override = SubResource("StandardMaterial3D_mr13a")
-mesh = SubResource("CylinderMesh_h4bvw")
+material_override = SubResource("StandardMaterial3D_1yood")
+mesh = SubResource("CylinderMesh_wnrls")
 
 [node name="@MeshInstance3D@34" type="MeshInstance3D" parent="Upper/Lift/Flinch/Body/Head"]
 transform = Transform3D(0.955337, -0.29552, 0, 0.29552, 0.955337, 0, 0, 0, 1, -0.08, 0.5, 0)
-material_override = SubResource("StandardMaterial3D_mr13a")
-mesh = SubResource("BoxMesh_0c45n")
+material_override = SubResource("StandardMaterial3D_1yood")
+mesh = SubResource("BoxMesh_kqviu")
 
 [node name="@MeshInstance3D@35" type="MeshInstance3D" parent="Upper/Lift/Flinch/Body/Head"]
 transform = Transform3D(0.955337, -0.29552, 0, 0.29552, 0.955337, 0, 0, 0, 1, 0, 0.5, 0)
-material_override = SubResource("StandardMaterial3D_mr13a")
-mesh = SubResource("BoxMesh_64tua")
+material_override = SubResource("StandardMaterial3D_1yood")
+mesh = SubResource("BoxMesh_vlspu")
 
 [node name="@MeshInstance3D@36" type="MeshInstance3D" parent="Upper/Lift/Flinch/Body/Head"]
 transform = Transform3D(0.955337, -0.29552, 0, 0.29552, 0.955337, 0, 0, 0, 1, 0.08, 0.5, 0)
-material_override = SubResource("StandardMaterial3D_mr13a")
-mesh = SubResource("BoxMesh_y8lbb")
+material_override = SubResource("StandardMaterial3D_1yood")
+mesh = SubResource("BoxMesh_agwkw")
 
 [node name="Sash" type="Node3D" parent="Upper/Lift/Flinch/Body"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.26, 0.95, 0.185)
 
 [node name="@MeshInstance3D@37" type="MeshInstance3D" parent="Upper/Lift/Flinch/Body/Sash"]
 transform = Transform3D(0.852525, 0.522687, 0, -0.522687, 0.852525, 0, 0, 0, 1, 0.02, -0.08, 0)
-material_override = SubResource("StandardMaterial3D_0osfr")
-mesh = SubResource("BoxMesh_3iaow")
+material_override = SubResource("StandardMaterial3D_o6c7t")
+mesh = SubResource("BoxMesh_g6xcn")
 
 [node name="@MeshInstance3D@38" type="MeshInstance3D" parent="Upper/Lift/Flinch/Body/Sash"]
 transform = Transform3D(0.852525, 0.522687, 0, -0.522687, 0.852525, 0, 0, 0, 1, 0.12, -0.22, 0)
-material_override = SubResource("StandardMaterial3D_0osfr")
-mesh = SubResource("BoxMesh_d8gbj")
+material_override = SubResource("StandardMaterial3D_o6c7t")
+mesh = SubResource("BoxMesh_q0ej8")
 
 [node name="@MeshInstance3D@39" type="MeshInstance3D" parent="Upper/Lift/Flinch/Body/Sash"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.07, -0.15, 0.005)
-material_override = SubResource("StandardMaterial3D_x8xed")
-mesh = SubResource("BoxMesh_ghcdy")
+material_override = SubResource("StandardMaterial3D_htykq")
+mesh = SubResource("BoxMesh_ywblw")
 
 [node name="@MeshInstance3D@40" type="MeshInstance3D" parent="Upper/Lift/Flinch/Body/Sash"]
 transform = Transform3D(0.852525, 0.522687, 0, -0.522687, 0.852525, 0, 0, 0, 1, 0.22, -0.36, 0)
-material_override = SubResource("StandardMaterial3D_0osfr")
-mesh = SubResource("BoxMesh_1yq5q")
+material_override = SubResource("StandardMaterial3D_o6c7t")
+mesh = SubResource("BoxMesh_cmft8")
 
 [node name="@MeshInstance3D@41" type="MeshInstance3D" parent="Upper/Lift/Flinch/Body/Sash"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.17, -0.29, 0.005)
-material_override = SubResource("StandardMaterial3D_x8xed")
-mesh = SubResource("BoxMesh_e2ymq")
+material_override = SubResource("StandardMaterial3D_htykq")
+mesh = SubResource("BoxMesh_ipj4m")
 
 [node name="@MeshInstance3D@42" type="MeshInstance3D" parent="Upper/Lift/Flinch/Body/Sash"]
 transform = Transform3D(0.852525, 0.522687, 0, -0.522687, 0.852525, 0, 0, 0, 1, 0.32, -0.5, 0)
-material_override = SubResource("StandardMaterial3D_0osfr")
-mesh = SubResource("BoxMesh_bs3mh")
+material_override = SubResource("StandardMaterial3D_o6c7t")
+mesh = SubResource("BoxMesh_qn3bx")
 
 [node name="@MeshInstance3D@43" type="MeshInstance3D" parent="Upper/Lift/Flinch/Body/Sash"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.27, -0.43, 0.005)
-material_override = SubResource("StandardMaterial3D_x8xed")
-mesh = SubResource("BoxMesh_pjgtn")
+material_override = SubResource("StandardMaterial3D_htykq")
+mesh = SubResource("BoxMesh_lqgxu")
 
 [node name="@MeshInstance3D@44" type="MeshInstance3D" parent="Upper/Lift/Flinch/Body/Sash"]
 transform = Transform3D(0.852525, 0.522687, 0, -0.522687, 0.852525, 0, 0, 0, 1, 0.42, -0.64, 0)
-material_override = SubResource("StandardMaterial3D_0osfr")
-mesh = SubResource("BoxMesh_3nfs0")
+material_override = SubResource("StandardMaterial3D_o6c7t")
+mesh = SubResource("BoxMesh_at467")
 
 [node name="@MeshInstance3D@45" type="MeshInstance3D" parent="Upper/Lift/Flinch/Body/Sash"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.37, -0.57, 0.005)
-material_override = SubResource("StandardMaterial3D_x8xed")
-mesh = SubResource("BoxMesh_pn1ba")
+material_override = SubResource("StandardMaterial3D_htykq")
+mesh = SubResource("BoxMesh_k4yvi")
 
 [node name="@MeshInstance3D@46" type="MeshInstance3D" parent="Upper/Lift/Flinch/Body/Sash"]
 transform = Transform3D(0.852525, 0.522687, 0, -0.522687, 0.852525, 0, 0, 0, 1, 0.52, -0.78, 0)
-material_override = SubResource("StandardMaterial3D_0osfr")
-mesh = SubResource("BoxMesh_dvuan")
+material_override = SubResource("StandardMaterial3D_o6c7t")
+mesh = SubResource("BoxMesh_gydgn")
 
 [node name="@MeshInstance3D@47" type="MeshInstance3D" parent="Upper/Lift/Flinch/Body/Sash"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.47, -0.71, 0.005)
-material_override = SubResource("StandardMaterial3D_x8xed")
-mesh = SubResource("BoxMesh_1bm88")
+material_override = SubResource("StandardMaterial3D_htykq")
+mesh = SubResource("BoxMesh_8qsqw")
 
 [node name="Arm1L" type="Node3D" parent="Upper/Lift/Flinch/Body"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.47, 0.93, 0)
 
 [node name="@MeshInstance3D@48" type="MeshInstance3D" parent="Upper/Lift/Flinch/Body/Arm1L"]
-material_override = SubResource("StandardMaterial3D_mr13a")
-mesh = SubResource("SphereMesh_2cla3")
+material_override = SubResource("StandardMaterial3D_1yood")
+mesh = SubResource("SphereMesh_jabrh")
 
 [node name="@MeshInstance3D@49" type="MeshInstance3D" parent="Upper/Lift/Flinch/Body/Arm1L"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.25, 0)
-material_override = SubResource("StandardMaterial3D_xi6pj")
-mesh = SubResource("CylinderMesh_wb2pf")
+material_override = SubResource("StandardMaterial3D_hw5hy")
+mesh = SubResource("CylinderMesh_8jfns")
 
 [node name="Elbow" type="Node3D" parent="Upper/Lift/Flinch/Body/Arm1L"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, 0)
 
 [node name="@MeshInstance3D@50" type="MeshInstance3D" parent="Upper/Lift/Flinch/Body/Arm1L/Elbow"]
-material_override = SubResource("StandardMaterial3D_mr13a")
-mesh = SubResource("SphereMesh_tn3ur")
+material_override = SubResource("StandardMaterial3D_1yood")
+mesh = SubResource("SphereMesh_0t0if")
 
 [node name="@MeshInstance3D@51" type="MeshInstance3D" parent="Upper/Lift/Flinch/Body/Arm1L/Elbow"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.23, 0)
-material_override = SubResource("StandardMaterial3D_xi6pj")
-mesh = SubResource("CylinderMesh_u657w")
+material_override = SubResource("StandardMaterial3D_hw5hy")
+mesh = SubResource("CylinderMesh_ta36f")
 
 [node name="@MeshInstance3D@52" type="MeshInstance3D" parent="Upper/Lift/Flinch/Body/Arm1L/Elbow"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, 0)
-material_override = SubResource("StandardMaterial3D_xi6pj")
-mesh = SubResource("SphereMesh_rw5ep")
+material_override = SubResource("StandardMaterial3D_hw5hy")
+mesh = SubResource("SphereMesh_jfrhv")
 
 [node name="Hand" type="Node3D" parent="Upper/Lift/Flinch/Body/Arm1L/Elbow"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, 0)
@@ -3849,30 +3849,30 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, 0)
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.47, 0.61, 0)
 
 [node name="@MeshInstance3D@53" type="MeshInstance3D" parent="Upper/Lift/Flinch/Body/Arm2L"]
-material_override = SubResource("StandardMaterial3D_mr13a")
-mesh = SubResource("SphereMesh_38esh")
+material_override = SubResource("StandardMaterial3D_1yood")
+mesh = SubResource("SphereMesh_jarug")
 
 [node name="@MeshInstance3D@54" type="MeshInstance3D" parent="Upper/Lift/Flinch/Body/Arm2L"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.25, 0)
-material_override = SubResource("StandardMaterial3D_xi6pj")
-mesh = SubResource("CylinderMesh_su4tg")
+material_override = SubResource("StandardMaterial3D_hw5hy")
+mesh = SubResource("CylinderMesh_56yvd")
 
 [node name="Elbow" type="Node3D" parent="Upper/Lift/Flinch/Body/Arm2L"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, 0)
 
 [node name="@MeshInstance3D@55" type="MeshInstance3D" parent="Upper/Lift/Flinch/Body/Arm2L/Elbow"]
-material_override = SubResource("StandardMaterial3D_mr13a")
-mesh = SubResource("SphereMesh_mpgfi")
+material_override = SubResource("StandardMaterial3D_1yood")
+mesh = SubResource("SphereMesh_p5dy5")
 
 [node name="@MeshInstance3D@56" type="MeshInstance3D" parent="Upper/Lift/Flinch/Body/Arm2L/Elbow"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.23, 0)
-material_override = SubResource("StandardMaterial3D_xi6pj")
-mesh = SubResource("CylinderMesh_1rwxm")
+material_override = SubResource("StandardMaterial3D_hw5hy")
+mesh = SubResource("CylinderMesh_sxeso")
 
 [node name="@MeshInstance3D@57" type="MeshInstance3D" parent="Upper/Lift/Flinch/Body/Arm2L/Elbow"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, 0)
-material_override = SubResource("StandardMaterial3D_xi6pj")
-mesh = SubResource("SphereMesh_jfi1p")
+material_override = SubResource("StandardMaterial3D_hw5hy")
+mesh = SubResource("SphereMesh_cyg1b")
 
 [node name="Hand" type="Node3D" parent="Upper/Lift/Flinch/Body/Arm2L/Elbow"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, 0)
@@ -3881,30 +3881,30 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, 0)
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.47, 0.29, 0)
 
 [node name="@MeshInstance3D@58" type="MeshInstance3D" parent="Upper/Lift/Flinch/Body/Arm3L"]
-material_override = SubResource("StandardMaterial3D_mr13a")
-mesh = SubResource("SphereMesh_g3nbc")
+material_override = SubResource("StandardMaterial3D_1yood")
+mesh = SubResource("SphereMesh_kt684")
 
 [node name="@MeshInstance3D@59" type="MeshInstance3D" parent="Upper/Lift/Flinch/Body/Arm3L"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.25, 0)
-material_override = SubResource("StandardMaterial3D_xi6pj")
-mesh = SubResource("CylinderMesh_4ag7l")
+material_override = SubResource("StandardMaterial3D_hw5hy")
+mesh = SubResource("CylinderMesh_pe785")
 
 [node name="Elbow" type="Node3D" parent="Upper/Lift/Flinch/Body/Arm3L"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, 0)
 
 [node name="@MeshInstance3D@60" type="MeshInstance3D" parent="Upper/Lift/Flinch/Body/Arm3L/Elbow"]
-material_override = SubResource("StandardMaterial3D_mr13a")
-mesh = SubResource("SphereMesh_xvqcy")
+material_override = SubResource("StandardMaterial3D_1yood")
+mesh = SubResource("SphereMesh_0fexp")
 
 [node name="@MeshInstance3D@61" type="MeshInstance3D" parent="Upper/Lift/Flinch/Body/Arm3L/Elbow"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.23, 0)
-material_override = SubResource("StandardMaterial3D_xi6pj")
-mesh = SubResource("CylinderMesh_d1y8x")
+material_override = SubResource("StandardMaterial3D_hw5hy")
+mesh = SubResource("CylinderMesh_aypal")
 
 [node name="@MeshInstance3D@62" type="MeshInstance3D" parent="Upper/Lift/Flinch/Body/Arm3L/Elbow"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, 0)
-material_override = SubResource("StandardMaterial3D_xi6pj")
-mesh = SubResource("SphereMesh_k2lyl")
+material_override = SubResource("StandardMaterial3D_hw5hy")
+mesh = SubResource("SphereMesh_bb814")
 
 [node name="Hand" type="Node3D" parent="Upper/Lift/Flinch/Body/Arm3L/Elbow"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, 0)
@@ -3913,30 +3913,30 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, 0)
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.47, 0.93, 0)
 
 [node name="@MeshInstance3D@63" type="MeshInstance3D" parent="Upper/Lift/Flinch/Body/Arm1R"]
-material_override = SubResource("StandardMaterial3D_mr13a")
-mesh = SubResource("SphereMesh_8u30e")
+material_override = SubResource("StandardMaterial3D_1yood")
+mesh = SubResource("SphereMesh_xy2tl")
 
 [node name="@MeshInstance3D@64" type="MeshInstance3D" parent="Upper/Lift/Flinch/Body/Arm1R"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.25, 0)
-material_override = SubResource("StandardMaterial3D_xi6pj")
-mesh = SubResource("CylinderMesh_5d2oi")
+material_override = SubResource("StandardMaterial3D_hw5hy")
+mesh = SubResource("CylinderMesh_laqht")
 
 [node name="Elbow" type="Node3D" parent="Upper/Lift/Flinch/Body/Arm1R"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, 0)
 
 [node name="@MeshInstance3D@65" type="MeshInstance3D" parent="Upper/Lift/Flinch/Body/Arm1R/Elbow"]
-material_override = SubResource("StandardMaterial3D_mr13a")
-mesh = SubResource("SphereMesh_jbcrg")
+material_override = SubResource("StandardMaterial3D_1yood")
+mesh = SubResource("SphereMesh_6kocc")
 
 [node name="@MeshInstance3D@66" type="MeshInstance3D" parent="Upper/Lift/Flinch/Body/Arm1R/Elbow"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.23, 0)
-material_override = SubResource("StandardMaterial3D_xi6pj")
-mesh = SubResource("CylinderMesh_jv4o3")
+material_override = SubResource("StandardMaterial3D_hw5hy")
+mesh = SubResource("CylinderMesh_mo1wo")
 
 [node name="@MeshInstance3D@67" type="MeshInstance3D" parent="Upper/Lift/Flinch/Body/Arm1R/Elbow"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, 0)
-material_override = SubResource("StandardMaterial3D_xi6pj")
-mesh = SubResource("SphereMesh_o1ygm")
+material_override = SubResource("StandardMaterial3D_hw5hy")
+mesh = SubResource("SphereMesh_agod3")
 
 [node name="Hand" type="Node3D" parent="Upper/Lift/Flinch/Body/Arm1R/Elbow"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, 0)
@@ -3945,30 +3945,30 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, 0)
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.47, 0.61, 0)
 
 [node name="@MeshInstance3D@68" type="MeshInstance3D" parent="Upper/Lift/Flinch/Body/Arm2R"]
-material_override = SubResource("StandardMaterial3D_mr13a")
-mesh = SubResource("SphereMesh_0ucxg")
+material_override = SubResource("StandardMaterial3D_1yood")
+mesh = SubResource("SphereMesh_n2xwe")
 
 [node name="@MeshInstance3D@69" type="MeshInstance3D" parent="Upper/Lift/Flinch/Body/Arm2R"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.25, 0)
-material_override = SubResource("StandardMaterial3D_xi6pj")
-mesh = SubResource("CylinderMesh_fsmpi")
+material_override = SubResource("StandardMaterial3D_hw5hy")
+mesh = SubResource("CylinderMesh_ghwjo")
 
 [node name="Elbow" type="Node3D" parent="Upper/Lift/Flinch/Body/Arm2R"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, 0)
 
 [node name="@MeshInstance3D@70" type="MeshInstance3D" parent="Upper/Lift/Flinch/Body/Arm2R/Elbow"]
-material_override = SubResource("StandardMaterial3D_mr13a")
-mesh = SubResource("SphereMesh_evnhn")
+material_override = SubResource("StandardMaterial3D_1yood")
+mesh = SubResource("SphereMesh_ygt5x")
 
 [node name="@MeshInstance3D@71" type="MeshInstance3D" parent="Upper/Lift/Flinch/Body/Arm2R/Elbow"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.23, 0)
-material_override = SubResource("StandardMaterial3D_xi6pj")
-mesh = SubResource("CylinderMesh_30t40")
+material_override = SubResource("StandardMaterial3D_hw5hy")
+mesh = SubResource("CylinderMesh_0r47t")
 
 [node name="@MeshInstance3D@72" type="MeshInstance3D" parent="Upper/Lift/Flinch/Body/Arm2R/Elbow"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, 0)
-material_override = SubResource("StandardMaterial3D_xi6pj")
-mesh = SubResource("SphereMesh_nto7x")
+material_override = SubResource("StandardMaterial3D_hw5hy")
+mesh = SubResource("SphereMesh_gq8kh")
 
 [node name="Hand" type="Node3D" parent="Upper/Lift/Flinch/Body/Arm2R/Elbow"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, 0)
@@ -3977,30 +3977,30 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, 0)
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.47, 0.29, 0)
 
 [node name="@MeshInstance3D@73" type="MeshInstance3D" parent="Upper/Lift/Flinch/Body/Arm3R"]
-material_override = SubResource("StandardMaterial3D_mr13a")
-mesh = SubResource("SphereMesh_cyybu")
+material_override = SubResource("StandardMaterial3D_1yood")
+mesh = SubResource("SphereMesh_ym7la")
 
 [node name="@MeshInstance3D@74" type="MeshInstance3D" parent="Upper/Lift/Flinch/Body/Arm3R"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.25, 0)
-material_override = SubResource("StandardMaterial3D_xi6pj")
-mesh = SubResource("CylinderMesh_01joy")
+material_override = SubResource("StandardMaterial3D_hw5hy")
+mesh = SubResource("CylinderMesh_jq3db")
 
 [node name="Elbow" type="Node3D" parent="Upper/Lift/Flinch/Body/Arm3R"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, 0)
 
 [node name="@MeshInstance3D@75" type="MeshInstance3D" parent="Upper/Lift/Flinch/Body/Arm3R/Elbow"]
-material_override = SubResource("StandardMaterial3D_mr13a")
-mesh = SubResource("SphereMesh_bh3nd")
+material_override = SubResource("StandardMaterial3D_1yood")
+mesh = SubResource("SphereMesh_o7y0u")
 
 [node name="@MeshInstance3D@76" type="MeshInstance3D" parent="Upper/Lift/Flinch/Body/Arm3R/Elbow"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.23, 0)
-material_override = SubResource("StandardMaterial3D_xi6pj")
-mesh = SubResource("CylinderMesh_cvyi0")
+material_override = SubResource("StandardMaterial3D_hw5hy")
+mesh = SubResource("CylinderMesh_omfa2")
 
 [node name="@MeshInstance3D@77" type="MeshInstance3D" parent="Upper/Lift/Flinch/Body/Arm3R/Elbow"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, 0)
-material_override = SubResource("StandardMaterial3D_xi6pj")
-mesh = SubResource("SphereMesh_rb5pf")
+material_override = SubResource("StandardMaterial3D_hw5hy")
+mesh = SubResource("SphereMesh_88eqh")
 
 [node name="Hand" type="Node3D" parent="Upper/Lift/Flinch/Body/Arm3R/Elbow"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, 0)
@@ -4009,25 +4009,25 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, 0)
 
 [node name="@MeshInstance3D@78" type="MeshInstance3D" parent="Upper/Lift/Flinch/Body/Placard"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.005)
-material_override = SubResource("StandardMaterial3D_l2w3m")
-mesh = SubResource("BoxMesh_y6ksc")
+material_override = SubResource("StandardMaterial3D_dap5b")
+mesh = SubResource("BoxMesh_7ahrf")
 
 [node name="@MeshInstance3D@79" type="MeshInstance3D" parent="Upper/Lift/Flinch/Body/Placard"]
-material_override = SubResource("StandardMaterial3D_fctxe")
-mesh = SubResource("BoxMesh_cgb4w")
+material_override = SubResource("StandardMaterial3D_ghbxj")
+mesh = SubResource("BoxMesh_n12uk")
 
 [node name="@MeshInstance3D@80" type="MeshInstance3D" parent="Upper/Lift/Flinch/Body/Placard"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.08, 0)
-material_override = SubResource("StandardMaterial3D_l2w3m")
-mesh = SubResource("BoxMesh_gk7qf")
+material_override = SubResource("StandardMaterial3D_dap5b")
+mesh = SubResource("BoxMesh_wdpci")
 
 [node name="@MeshInstance3D@81" type="MeshInstance3D" parent="Upper/Lift/Flinch/Body/Placard"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.08, 0)
-material_override = SubResource("StandardMaterial3D_mx7f5")
-mesh = SubResource("BoxMesh_i1u5m")
+material_override = SubResource("StandardMaterial3D_kjhb6")
+mesh = SubResource("BoxMesh_ogwgb")
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="."]
 libraries = {
-"": SubResource("AnimationLibrary_i6qi3")
+"": SubResource("AnimationLibrary_rtnqv")
 }
 autoplay = "idle"
