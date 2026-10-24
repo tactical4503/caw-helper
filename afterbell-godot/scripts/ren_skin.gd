@@ -85,6 +85,20 @@ var _sword_view: Node3D
 var _hand := -1
 var _left_hand := -1
 const HAND_SCALE := 0.8
+## Meshy's rig has no finger bones, so the modelled fingers stay flat and splayed. At load we
+## add knuckle, mid-finger and thumb bones to each hand, move the finger and thumb vertices'
+## weights onto them, and curl them every frame into a fist round the grip. Measurements are in
+## the hand bone's local space (centimetres; +y runs out along the fingers, the palm faces the
+## thumb side: -x on the right hand, +x on the left).
+const KNUCKLE_Y := 12.0      # where the fingers leave the palm
+const MID_Y := 17.0          # the middle finger joint
+const THUMB_BASE := Vector3(3.0, 6.5, 3.5)   # x is mirrored per hand
+const CURL_KNUCKLE := 1.35   # radians: fingers fold across the grip...
+const CURL_MID := 1.25       # ...and wrap round it
+const CURL_THUMB := 0.75
+## Where the grip sits in the closed fist, in hand-local centimetres (x mirrored per hand).
+const GRIP_LOCAL := Vector3(3.0, 9.5, 0.0)
+var _finger_curl := {}       # bone -> Basis applied on top of its rest every frame
 
 var _grey_anim: AnimationPlayer
 var _src_skel: Skeleton3D
@@ -116,6 +130,7 @@ func _ready() -> void:
 	if found.is_empty():
 		return
 	_skel = found[0]
+	_add_finger_bones(skin)
 	# The skeleton may sit under a scaled/rotated Armature node (Meshy exports centimetres).
 	var rel := _relative_transform(_skel, _rig)
 	_unit = 1.0 / rel.basis.get_scale().y
@@ -338,6 +353,8 @@ func _process(dt: float) -> void:
 			if MAP[_path_of(joint)][0] == "Hips":
 				var offset := joint.position - Vector3(0, HIP_REST_Y, 0)
 				local.origin = rest_local.origin + _to_skel * offset * _unit
+		if _finger_curl.has(i):
+			local.basis = rest_local.basis * (_finger_curl[i] as Basis)
 		var q := local.basis.get_rotation_quaternion()
 		if _mix < 1.0 and i < _snapshot.size() and _snapshot[i] != null:
 			q = (_snapshot[i] as Quaternion).slerp(q, _mix)   # blend across a mocap/keyframe switch
@@ -350,11 +367,108 @@ func _process(dt: float) -> void:
 			_skel.set_bone_pose_scale(i, Vector3.ONE * HAND_SCALE)
 	if _sword_view and _hand >= 0:
 		var forearm := _sword_src.get_parent() as Node3D
-		var hand_world := _skel.global_transform * globals[_hand].origin
+		var grip := GRIP_LOCAL * Vector3(-1.0 if sword_bone == "RightHand" else 1.0, 1.0, 1.0) * HAND_SCALE
+		var hand_world := _skel.global_transform * (globals[_hand] * grip)
 		var basis := forearm.global_basis.orthonormalized() * _sword_src.basis
 		if _mocap and _src_hand >= 0:
 			basis = _rig.global_basis.orthonormalized() * _src_skel.get_bone_global_pose(_src_hand).basis.orthonormalized() * _mocap_sword
 		_sword_view.global_transform = Transform3D(basis, hand_world)
+
+
+## Adds knuckle, mid and thumb bones to both hands of the skinned mesh and re-weights the
+## finger and thumb vertices onto them (smoothly across each joint, so there's no crease).
+func _add_finger_bones(skin_root: Node) -> void:
+	var mi: MeshInstance3D = null
+	for m in skin_root.find_children("*", "MeshInstance3D", true, false):
+		if (m as MeshInstance3D).skin != null:
+			mi = m
+			break
+	if mi == null or mi.mesh == null or mi.mesh.get_surface_count() != 1:
+		return
+	var skin: Skin = mi.skin.duplicate()
+	var arrays: Array = mi.mesh.surface_get_arrays(0)
+	var verts: PackedVector3Array = arrays[Mesh.ARRAY_VERTEX]
+	var bones: PackedInt32Array = arrays[Mesh.ARRAY_BONES]
+	var weights: PackedFloat32Array = arrays[Mesh.ARRAY_WEIGHTS]
+	if bones.size() != verts.size() * 4:
+		return
+	for side in ["Right", "Left"]:
+		var hand := _skel.find_bone(side + "Hand")
+		var hand_bind := -1
+		for b in skin.get_bind_count():
+			if skin.get_bind_name(b) == side + "Hand" or skin.get_bind_bone(b) == hand:
+				hand_bind = b
+		if hand < 0 or hand_bind < 0:
+			continue
+		var sx := -1.0 if side == "Right" else 1.0      # palm / thumb side along local x
+		var tb := Vector3(sx * THUMB_BASE.x, THUMB_BASE.y, THUMB_BASE.z)
+		var made := {}
+		for spec in [["Knuckles", hand, Vector3(0, KNUCKLE_Y, 0)], ["Fingertips", -1, Vector3(0, MID_Y - KNUCKLE_Y, 0)], ["Thumb", hand, tb]]:
+			var bone := _skel.add_bone(side + str(spec[0]))
+			var parent: int = spec[1] if spec[1] >= 0 else made["Knuckles"]
+			_skel.set_bone_parent(bone, parent)
+			_skel.set_bone_rest(bone, Transform3D(Basis(), spec[2]))
+			_skel.set_bone_pose_position(bone, spec[2])
+			made[spec[0]] = bone
+		# Bind poses: the new bone's frame relative to the hand's bind.
+		var hand_pose := skin.get_bind_pose(hand_bind)
+		var knuckle_local := Transform3D(Basis(), Vector3(0, KNUCKLE_Y, 0))
+		var binds := {
+			"Knuckles": knuckle_local.affine_inverse() * hand_pose,
+			"Fingertips": Transform3D(Basis(), Vector3(0, MID_Y, 0)).affine_inverse() * hand_pose,
+			"Thumb": Transform3D(Basis(), tb).affine_inverse() * hand_pose,
+		}
+		var bind_of := {}
+		for key in binds:
+			skin.add_named_bind(side + key, binds[key])
+			bind_of[key] = skin.get_bind_count() - 1
+		# Curl: fingers fold toward the palm about the hand's width axis (z); the thumb closes
+		# over them about the finger axis.
+		_finger_curl[made["Knuckles"]] = Basis(Vector3(0, 0, 1), -sx * CURL_KNUCKLE)
+		_finger_curl[made["Fingertips"]] = Basis(Vector3(0, 0, 1), -sx * CURL_MID)
+		_finger_curl[made["Thumb"]] = Basis(Vector3(0, 1, 0), sx * CURL_THUMB) * Basis(Vector3(0, 0, 1), -sx * 0.35)
+		# Re-weight: anything mostly on the hand that lies past the knuckles moves to the finger
+		# bones; the thumb (out on the palm side, below the knuckles) moves to the thumb bone.
+		for i in verts.size():
+			var slot := -1
+			for k in 4:
+				if bones[i * 4 + k] == hand_bind and weights[i * 4 + k] > 0.0:
+					slot = k
+			if slot < 0:
+				continue
+			var w := weights[i * 4 + slot]
+			var l: Vector3 = hand_pose * verts[i]
+			var thumb := _smooth(2.5, 4.5, l.x * sx) * _smooth(4.0, 6.0, l.y) * (1.0 - _smooth(KNUCKLE_Y + 3.0, KNUCKLE_Y + 5.0, l.y))
+			var f1 := _smooth(KNUCKLE_Y - 1.5, KNUCKLE_Y + 1.0, l.y) * (1.0 - thumb)
+			var f2 := _smooth(MID_Y - 1.0, MID_Y + 1.0, l.y) * f1
+			var shares := [[hand_bind, w * (1.0 - f1 - thumb)], [bind_of["Knuckles"], w * (f1 - f2)],
+					[bind_of["Fingertips"], w * f2], [bind_of["Thumb"], w * thumb]]
+			var all := []
+			for k in 4:
+				if k != slot and weights[i * 4 + k] > 0.0:
+					all.append([bones[i * 4 + k], weights[i * 4 + k]])
+			for sh in shares:
+				if sh[1] > 0.0001:
+					all.append(sh)
+			all.sort_custom(func(a, b): return a[1] > b[1])
+			var total := 0.0
+			for k in mini(4, all.size()):
+				total += all[k][1]
+			for k in 4:
+				bones[i * 4 + k] = all[k][0] if k < all.size() else 0
+				weights[i * 4 + k] = (all[k][1] / total) if k < all.size() and total > 0.0 else 0.0
+	arrays[Mesh.ARRAY_BONES] = bones
+	arrays[Mesh.ARRAY_WEIGHTS] = weights
+	var mesh := ArrayMesh.new()
+	mesh.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES, arrays)
+	mesh.surface_set_material(0, mi.mesh.surface_get_material(0))
+	mi.mesh = mesh
+	mi.skin = skin
+
+
+static func _smooth(e0: float, e1: float, v: float) -> float:
+	var t := clampf((v - e0) / (e1 - e0), 0.0, 1.0)
+	return t * t * (3.0 - 2.0 * t)
 
 
 func _path_of(joint: Node3D) -> String:
