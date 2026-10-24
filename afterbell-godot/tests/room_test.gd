@@ -82,6 +82,26 @@ func _run() -> void:
 		d.update(1.0 / 60.0)
 	check(d.blips_played == after_speech, "narration adds no blips")
 
+	print("Dynamic HUD:")
+	var g = room.gauge
+	check(g.objective == "Head west through Hats" or g.objective_next == "Head west through Hats", "objective advances when the gate opens")
+	g.set_health(4, 6)
+	check(g.hurt_t > 0.0 and g.ghost_delay > 0.0, "losing health flashes and leaves a draining ghost")
+	g.set_health(6, 6)
+	check(g.heal_t > 0.0, "healing glows in")
+	g.show_prompt("interact", "Look in the mirror")
+	for i in 30:
+		g._process(1.0 / 60.0)
+	check(g.prompt_amount > 0.9, "prompt pops in")
+	g.hide_prompt()
+	for i in 30:
+		g._process(1.0 / 60.0)
+	check(g.prompt_amount < 0.1, "prompt pops out")
+	g.set_combat(false)
+	for i in 400:
+		g._process(1.0 / 60.0)
+	check(g.panel_alpha < 0.5, "health panel fades back in a quiet safe room")
+
 	print("Help route (three misses):")
 	room = fresh()
 	room.p_pos = Vector2(0.0, -1.4)

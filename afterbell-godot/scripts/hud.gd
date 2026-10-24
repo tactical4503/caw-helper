@@ -60,7 +60,6 @@ var _font: Font
 
 
 func _ready() -> void:
-	layer = 5
 	_c = Control.new()
 	_c.set_anchors_preset(Control.PRESET_FULL_RECT)
 	_c.mouse_filter = Control.MOUSE_FILTER_IGNORE

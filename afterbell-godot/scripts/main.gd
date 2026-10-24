@@ -149,6 +149,8 @@ var hud: B.Hud
 var sfx: B.Sfx
 
 const Dialogue := preload("res://scripts/dialogue.gd")
+const GaugeHud := preload("res://scripts/hud.gd")
+var gauge
 var dialogue
 
 
@@ -183,7 +185,13 @@ func _ready() -> void:
 	camera.look_at(Vector3(0, 1, 0), Vector3.UP)
 	sfx = B.Sfx.new()
 	add_child(sfx)
+	gauge = GaugeHud.new()   # added before the menu layer so title/end panels draw over it
+	add_child(gauge)
+	gauge.visible = false
 	hud = B.build_hud(self)
+	hud.health.get_parent().visible = false   # replaced by the dynamic HUD
+	hud.tabs.get_parent().visible = false
+	hud.prompt.visible = false
 	dialogue = Dialogue.new(sfx, hud.subtitle_who, hud.subtitle)
 	hud.start_button.pressed.connect(_on_start)
 	hud.again_button.pressed.connect(_on_again)
@@ -237,6 +245,9 @@ func was_pressed(a: String) -> bool:
 func _on_start() -> void:
 	hud.title.visible = false
 	hud.root.visible = true
+	gauge.visible = true
+	gauge.set_combat(true)
+	gauge.set_objective("Reach the service bell")
 	if mode == "title":
 		reset_attempt(false)
 	mode = "play"
@@ -315,6 +326,10 @@ func _update_subs(dt: float) -> void:
 func _update_hud() -> void:
 	hud.set_health(hp, biscuits)
 	hud.set_tabs(bells)
+	gauge.set_health(hp, 6)
+	gauge.set_biscuits(biscuits)
+	if m_state != "defeated":
+		gauge.set_boss("THE FLOOR MANAGER", 3 - bells)
 
 
 func _process(delta: float) -> void:
@@ -379,6 +394,8 @@ func _defeat() -> void:
 
 func _victory() -> void:
 	m_state = "defeated"
+	gauge.clear_boss()
+	gauge.set_objective("Recover the store governor")
 	victory_t = 0.0
 	_clear_sign()
 	sfx.squeak()
@@ -912,14 +929,14 @@ func _update_player(dt: float) -> void:
 	# Retreat: the west door is available whenever the boss is not committed.
 	var near_door := p_pos.x < -6.6 and p_pos.y > 6.2
 	if near_door and not committed() and m_state != "defeated":
-		hud.prompt.text = "R — Retreat to the service passage (resets this attempt, keeps the shortcut)"
+		gauge.show_prompt("retreat", "Retreat to the service passage")
 		if was_pressed("retreat"):
 			reset_attempt(settings.keep_progress)
 			say("", "Retreated to the service passage.", 1.8)
 	elif charging and charge_t >= HEAVY_CHARGE:
-		hud.prompt.text = "Wound — release"
+		gauge.show_prompt("attack", "Wound — release")
 	else:
-		hud.prompt.text = ""
+		gauge.hide_prompt()
 
 
 func _face_target(dt: float) -> void:

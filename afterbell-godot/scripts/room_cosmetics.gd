@@ -70,6 +70,8 @@ var subtitle: Label
 var who: Label
 var prompt: Label
 const Dialogue := preload("res://scripts/dialogue.gd")
+const GaugeHud := preload("res://scripts/hud.gd")
+var gauge
 var dialogue
 var settings := {"reflect_assist": false}
 
@@ -100,6 +102,12 @@ func _ready() -> void:
 	camera.current = true
 	sfx = B.Sfx.new()
 	add_child(sfx)
+	gauge = GaugeHud.new()
+	add_child(gauge)
+	gauge.set_combat(false)          # safe room: the health panel fades back when quiet
+	gauge.set_health(6, 6)
+	gauge.set_biscuits(2)
+	gauge.set_objective("Return the sale sign to the receiver")
 	_build_hud()
 	say("NELL", "It keeps doing that. Over and over.", 2.6)
 	say("MIKA", "It's feeding the gate release. Catch the sign with the flat of Knock — send it to the receiver over the west door.", 4.2)
@@ -360,17 +368,17 @@ func _update_player(dt: float) -> void:
 		if p_pos.distance_to(it[0]) < 1.1:
 			near = it[1]
 	if gate_open and p_pos.x < -HALF_W + 0.9 and absf(p_pos.y - GATE_Z) < 0.9:
-		prompt.text = "West — to Hats, Alterations and the court"
+		gauge.show_prompt("go", "West — to Hats and the court")
 		if p_pos.x < -HALF_W - 0.6 and not leaving:
 			_leave()
 	elif near != "":
-		prompt.text = "E — %s" % {"mirror": "Look in the mirror", "atomizer": "Try the atomizer", "price": "Read the price card"}[near]
+		gauge.show_prompt("interact", {"mirror": "Look in the mirror", "atomizer": "Try the atomizer", "price": "Read the price card"}[near])
 		if pressed.get("eat", false):
 			_interact(near)
 	elif hinted and not gate_open:
-		prompt.text = "T — reflection assist     H — ask Mika to hold the catch"
+		gauge.show_prompt("assist", "Reflection assist   ·   H: ask Mika")
 	else:
-		prompt.text = ""
+		gauge.hide_prompt()
 
 
 func _interact(what: String) -> void:
@@ -488,6 +496,7 @@ func _open_gate() -> void:
 	if gate_open:
 		return
 	gate_open = true
+	gauge.set_objective("Head west through Hats")
 	sfx.spring()
 	sfx.pip()
 	say("", "The receiver tilts. Its linkage rises. The hats gate rolls into the wall.", 2.6)
