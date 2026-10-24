@@ -46,6 +46,9 @@ func fresh(reflect_assist := false) -> void:
 
 
 func _run() -> void:
+	check(main.has_method("step"), "main scene script loaded")
+	if not main.has_method("step"):
+		return
 	print("Timed reflection, no assist, three bells to victory:")
 	fresh(false)
 	for bell in range(1, 4):
@@ -129,3 +132,40 @@ func _run() -> void:
 	main.p_pos = Vector2(0, 3.6)
 	main.racks[0].hit = false
 	check(until(func(): return main.mode == "end", 3000), "losing the last segment ends the attempt")
+
+	print("Animation clips:")
+	var boss_anim: AnimationPlayer = main.boss_anim
+	var ren_anim: AnimationPlayer = main.ren_anim
+	# Gameplay tells must last exactly as long as the timing table says.
+	check(is_equal_approx(boss_anim.get_animation("present").length, main.SIGN_TELL), "present clip = 1.0 s sign tell")
+	check(is_equal_approx(boss_anim.get_animation("sweep_tell").length, main.SWEEP_TELL), "sweep_tell clip = 1.1 s")
+	check(_has_key_at(boss_anim.get_animation("rack_push"), main.RACK_TELL), "rack_push shoves at the 1.2 s tell mark")
+	check(is_equal_approx(ren_anim.get_animation("wind").length, main.HEAVY_CHARGE), "wind clip = 0.8 s heavy charge")
+	var missing := []
+	for state in main.BOSS_CLIPS:
+		for clip in main.BOSS_CLIPS[state]:
+			if not boss_anim.has_animation(clip):
+				missing.append(clip)
+	for clip in ["idle", "run", "guard", "reflect", "wind", "heavy", "light", "dodge", "hurt", "eat"]:
+		if not ren_anim.has_animation(clip):
+			missing.append(clip)
+	check(missing.is_empty(), "every state's clips exist %s" % [missing])
+	check(_tracks_resolve(main.boss, boss_anim) and _tracks_resolve(main.ren, ren_anim), "every animated track targets a real joint")
+
+
+func _has_key_at(anim: Animation, t: float) -> bool:
+	for tr in anim.get_track_count():
+		if anim.track_find_key(tr, t, Animation.FIND_MODE_APPROX) != -1:
+			return true
+	return false
+
+
+func _tracks_resolve(rig: Node, player: AnimationPlayer) -> bool:
+	for clip in player.get_animation_list():
+		var anim := player.get_animation(clip)
+		for tr in anim.get_track_count():
+			var path := anim.track_get_path(tr)
+			if rig.get_node_or_null(NodePath(path.get_concatenated_names())) == null:
+				print("    unresolved: %s in %s" % [path, clip])
+				return false
+	return true

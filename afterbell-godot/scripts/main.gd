@@ -91,12 +91,10 @@ var m_state := "enter"
 var m_t := 1.6
 var m_close := 0.0
 var m_next := "sign"
-var m_pose := "idle"
 var m_dir := Vector2.ZERO
 var m_travel := 0.0
 var sweep_hit := false
 var flinch := 0.0
-var lower := 0.0
 var steer_to := PI
 var lever_kick := 0.0
 
@@ -116,8 +114,33 @@ var _prev := {}
 var virtual := {}
 
 var arena: B.Arena
-var boss: B.Boss
-var ren: B.Ren
+const BOSS_RIG := preload("res://rigs/floor_manager.tscn")
+const REN_RIG := preload("res://rigs/ren.tscn")
+# Which clips each Floor Manager state plays, in order; the last one holds or loops.
+const BOSS_CLIPS := {
+	"enter": ["idle"], "idle": ["idle"], "recover": ["idle"], "rack_recover": ["idle"],
+	"roll": ["roll"], "present": ["present"], "wait_sign": ["throw", "idle"],
+	"sweep_tell": ["sweep_tell"], "sweep_active": ["sweep", "idle"], "sweep_recover": ["sweep", "idle"],
+	"rack_tell": ["rack_push", "idle"], "rack_active": ["rack_push", "idle"],
+	"exposed": ["reflected_impact", "exposed"], "launch": ["chair_launch"], "wrong_roll": ["chair_launch"],
+	"stop_stun": ["bell_collision", "idle"], "bell_scene": ["bell_collision", "phase_recovery", "idle"],
+	"defeated": ["defeat_settle", "counter_idle"],
+}
+
+var boss: Node3D
+var boss_anim: AnimationPlayer
+var boss_chain: Array = []
+var boss_chain_i := 0
+var paddle_mat: StandardMaterial3D
+var ren: Node3D
+var ren_anim: AnimationPlayer
+var ren_ring_mat: StandardMaterial3D
+var ren_clip := ""
+var ren_serial := 0       # bumps whenever a one-shot action starts, so repeats restart the clip
+var _ren_serial_played := -1
+var _last_act := "none"
+var hurt_t := 0.0
+var reflect_t := 0.0
 var camera: Camera3D
 var hud: B.Hud
 var sfx: B.Sfx
@@ -131,10 +154,22 @@ func _ready() -> void:
 	randomize()
 	_setup_input()
 	arena = B.build_arena(self)
-	boss = B.build_boss()
-	add_child(boss.root)
-	ren = B.build_ren()
-	add_child(ren.root)
+	boss = BOSS_RIG.instantiate()
+	add_child(boss)
+	boss_anim = boss.get_node("AnimationPlayer")
+	paddle_mat = (boss.get_node("Chair/Paddle") as MeshInstance3D).material_override
+	ren = REN_RIG.instantiate()
+	add_child(ren)
+	ren_anim = ren.get_node("AnimationPlayer")
+	ren_ring_mat = StandardMaterial3D.new()
+	ren_ring_mat.albedo_color = Color(B.CREAM, 0.0)
+	ren_ring_mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	ren_ring_mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	var ring := TorusMesh.new()
+	ring.inner_radius = 0.55
+	ring.outer_radius = 0.62
+	var ring_mi := B.put(ring, ren_ring_mat, Vector3(0, 0.04, 0), ren, false)
+	ring_mi.scale.y = 0.05
 	for i in 2:
 		var r := B.build_rack(i)
 		add_child(r.node)
@@ -233,9 +268,7 @@ func reset_attempt(keep: bool) -> void:
 	m_t = 1.2
 	m_close = 0.0
 	m_next = "sign"
-	m_pose = "idle"
 	flinch = 0.0
-	lower = 0.0
 	locked_hits = 0
 	first_exposure = bells == 0
 	victory_t = 0.0
@@ -384,6 +417,8 @@ func hurt_player(n: int, from: Vector2) -> bool:
 	charging = false
 	act = "none"
 	sfx.hurt()
+	hurt_t = 0.45
+	ren_serial += 1
 	_add_shake(0.12)
 	_update_hud()
 	if hp <= 0:
@@ -403,7 +438,6 @@ func committed() -> bool:
 func _start_exposure() -> void:
 	m_state = "exposed"
 	m_t = EXPOSED_EASY if settings.easy else EXPOSED
-	m_pose = "exposed"
 	steer_to = yaw_to(m_pos, LEVER)
 	sfx.thud()
 	sfx.squeak()
@@ -443,7 +477,6 @@ func _light_strike() -> void:
 		sfx.knock()
 		m_state = "recover"
 		m_t = 0.9
-		m_pose = "idle"
 		flinch = 1.0
 		return
 	if m_state == "exposed":
@@ -492,7 +525,6 @@ func _sign_resolved(reflected: bool) -> void:
 	if not reflected and m_state == "wait_sign":
 		m_state = "recover"
 		m_t = MISS_RECOVER
-		m_pose = "idle"
 
 
 func _note_failed_reflect() -> void:
@@ -514,6 +546,8 @@ func _update_sign(dt: float) -> void:
 			var timed := time - guard_press_t <= REFLECT_WINDOW
 			if guard and (timed or settings.reflect_assist):
 				s.state = "back"
+				reflect_t = 0.3
+				ren_serial += 1
 				sfx.reflect()
 				freeze = HIT_FREEZE
 				failed_reflects = 0
@@ -565,14 +599,12 @@ func _update_manager(dt: float) -> void:
 
 	match st:
 		"enter":
-			m_pose = "idle"
 			if m_t <= 0.0:
 				m_state = "roll"
 				if not seen.has("valued"):
 					seen["valued"] = true
 					say("FLOOR MANAGER", "Valued— … Valued customers. The court is closed for fitting.", 3.0)
 		"roll":
-			m_pose = "idle"
 			var d := m_pos.distance_to(MARK)
 			if d < 0.08:
 				m_state = "idle"
@@ -583,7 +615,6 @@ func _update_manager(dt: float) -> void:
 				if randf() < dt * 1.2:
 					sfx.squeak()
 		"idle", "recover":
-			m_pose = "idle"
 			steer_to = face_p
 			if d_p < 3.0:
 				m_close += dt
@@ -615,20 +646,15 @@ func _update_manager(dt: float) -> void:
 						say("FLOOR MANAGER", "Please read.", 1.1)
 					signs_said += 1
 		"present":
-			m_pose = "present"
 			steer_to = face_p
 			if m_t <= 0.0:
 				_throw_sign()
 				m_state = "wait_sign"
-				m_pose = "throw"
 				m_t = 4.0
 				sfx.swing()
 		"wait_sign":
 			steer_to = face_p
-			if m_t < 3.6:
-				m_pose = "idle"
 		"sweep_tell":
-			m_pose = "sweep_tell"
 			if m_t <= 0.0:
 				m_state = "sweep_active"
 				m_t = 0.2
@@ -636,7 +662,6 @@ func _update_manager(dt: float) -> void:
 			else:
 				steer_to = face_p
 		"sweep_active":
-			m_pose = "sweep_active"
 			if not sweep_hit and d_p < SWEEP_REACH + 0.4 and absf(wrapf(face_p - m_yaw, -PI, PI)) < SWEEP_ARC / 2.0:
 				sweep_hit = true
 				hurt_player(1, m_pos)
@@ -644,39 +669,32 @@ func _update_manager(dt: float) -> void:
 				m_state = "sweep_recover"
 				m_t = SWEEP_RECOVER
 		"sweep_recover":
-			m_pose = "idle"
 			if m_t <= 0.0:
 				m_state = "idle"
 				m_t = _idle_duration() * 0.6
 		"rack_tell":
-			m_pose = "rack"
 			steer_to = yaw_to(m_pos, rack0.pos)
 			if m_t <= 0.0:
 				m_state = "rack_active"
 				rack0.state = "move"
 				rack0.hit = false
 		"rack_active":
-			m_pose = "idle"
 			steer_to = face_p
 			if rack0.state == "park":
 				m_state = "rack_recover"
 				m_t = RACK_RECOVER
 		"rack_recover":
-			m_pose = "idle"
 			steer_to = face_p
 			if m_t <= 0.0:
 				m_state = "idle"
 				m_t = _idle_duration() * 0.5
 		"exposed":
-			m_pose = "exposed"
 			steer_to = yaw_to(m_pos, LEVER)
 			if m_t <= 0.0:
 				m_state = "recover"
 				m_t = 1.0
-				m_pose = "idle"
 				sfx.squeak()
 		"launch":
-			m_pose = "exposed"
 			var d := m_pos.distance_to(LEVER)
 			# Steer the travel vector toward the lever over a few tenths of a second.
 			var to_lever := (LEVER - m_pos).normalized()
@@ -696,11 +714,9 @@ func _update_manager(dt: float) -> void:
 				sfx.thud()
 				say("", "Wrong side — he hit the padded display stop.", 1.8)
 		"stop_stun":
-			m_pose = "idle"
 			if m_t <= 0.0:
 				m_state = "roll"
 		"bell_scene":
-			m_pose = "idle"
 			steer_to = face_p
 			if m_t <= 0.0:
 				if bells >= 3:
@@ -708,8 +724,7 @@ func _update_manager(dt: float) -> void:
 					return
 				m_state = "roll"
 		"defeated":
-			m_pose = "parked"
-			lower = damp(lower, 1.0, 1.5, dt)
+			pass  # the defeat_settle clip lowers and folds him
 
 	chair_yaw = damp_angle(chair_yaw, steer_to, 14.0 if st == "launch" else 5.0, dt)
 	var upper_target := face_p
@@ -727,7 +742,6 @@ func _bell_collision() -> void:
 	sfx.bell()
 	_add_shake(0.12)
 	m_state = "bell_scene"
-	m_pose = "idle"
 	m_pos -= m_dir * 0.4
 	lever_kick = 1.0
 	tab_falls.append([arena.tabs[bells - 1], 0.0])
@@ -902,32 +916,68 @@ func _face_target(dt: float) -> void:
 	p_yaw = damp_angle(p_yaw, y, 16.0, dt) if dt > 0.0 else y
 
 
+# ---------------------------------------------------------------- animation
+
+## Plays the clip chain for the Manager's current state. A new chain starts with a short blend;
+## when a one-shot clip in the chain finishes, the next one takes over.
+func _update_boss_clips() -> void:
+	var chain: Array = BOSS_CLIPS.get(m_state, ["idle"])
+	if boss_chain != chain:
+		var same_start: bool = not boss_chain.is_empty() and boss_chain[0] == chain[0]
+		boss_chain = chain
+		if not same_start:
+			boss_chain_i = 0
+			boss_anim.play(chain[0], 0.12)
+		return
+	if boss_chain_i < chain.size() - 1 and not boss_anim.is_playing():
+		boss_chain_i += 1
+		boss_anim.play(chain[boss_chain_i], 0.2)
+
+
+func _ren_wanted_clip() -> String:
+	if hurt_t > 0.0:
+		return "hurt"
+	if act in ["dodge", "light", "heavy", "eat"]:
+		return act
+	if charging:
+		return "wind"
+	if reflect_t > 0.0:
+		return "reflect"
+	if guard:
+		return "guard"
+	return "run" if speed > 0.5 else "idle"
+
+
+func _update_ren_clips() -> void:
+	if act != _last_act:
+		if act != "none":
+			ren_serial += 1
+		_last_act = act
+	var clip := _ren_wanted_clip()
+	var one_shot := clip in ["hurt", "dodge", "light", "heavy", "eat", "reflect"]
+	if clip != ren_clip or (one_shot and ren_serial != _ren_serial_played):
+		var blend := 0.06 if one_shot or clip in ["guard", "wind"] else 0.15
+		ren_anim.play(clip, blend)
+		if one_shot:
+			ren_anim.seek(0.0, true)
+		ren_clip = clip
+		_ren_serial_played = ren_serial
+	ren_anim.speed_scale = clampf(speed / 5.0, 0.6, 1.25) if clip == "run" else 1.0
+
+
 # ---------------------------------------------------------------- presentation
 
 func _render(dt: float) -> void:
-	# Floor Manager
-	boss.root.position = Vector3(m_pos.x, 0, m_pos.y)
-	boss.chair.rotation.y = chair_yaw
-	boss.upper.rotation.y = m_yaw
-	boss.upper.position.y = -0.55 * lower  # the telescoping column lowers him
-	boss.body.rotation.x = -flinch * 0.12 + (-0.06 if m_state == "exposed" else 0.0)
-	var pose: Array = B.POSES.get(m_pose, B.POSES["idle"])
-	for a in boss.arms:
-		var arm: B.Arm = a
-		var target: Array = pose[arm.level]
-		arm.rx = damp(arm.rx, target[0], 9.0, dt)
-		arm.rz = damp(arm.rz, target[1], 9.0, dt)
-		arm.ex = damp(arm.ex, target[2], 9.0, dt)
-		arm.shoulder.rotation = Vector3(arm.rx, 0, arm.side * arm.rz)
-		arm.elbow.rotation.x = arm.ex
+	# Floor Manager: code places and turns him; the clips do the acting.
+	boss.position = Vector3(m_pos.x, 0, m_pos.y)
+	boss.get_node("Chair").rotation.y = chair_yaw
+	boss.get_node("Upper").rotation.y = m_yaw
+	boss.get_node("Upper/Lift/Flinch").rotation.x = -flinch * 0.12
+	_update_boss_clips()
 	var exp_on: bool = m_state in ["exposed", "launch"]
-	boss.paddle.position.z = damp(boss.paddle.position.z, -0.44 if exp_on else -0.18, 10.0, dt)
-	boss.paddle.position.y = damp(boss.paddle.position.y, 0.34 if exp_on else 0.44, 10.0, dt)
-	boss.paddle_mat.emission_energy_multiplier = 1.2 if exp_on else 0.0
-	var presenting := m_state == "present"
-	boss.held.visible = presenting or m_state == "roll" or (sign_data == null and m_state in ["idle", "recover"])
-	boss.held.position = Vector3(0, 3.35 if presenting else 2.05, 0.3 if presenting else 0.55)
-	boss.held.rotation.x = -0.15 if presenting else 0.1
+	paddle_mat.emission_energy_multiplier = 1.2 if exp_on else 0.0
+	boss.get_node("Upper/Lift/Flinch/Body/Placard").visible = m_state in ["present", "roll", "enter"] \
+		or (sign_data == null and m_state in ["idle", "recover"])
 
 	arena.aim_arrow.visible = settings.aim_help and m_state == "exposed"
 	if arena.aim_arrow.visible:
@@ -956,34 +1006,14 @@ func _render(dt: float) -> void:
 		rack.cloth.rotation.z = damp(rack.cloth.rotation.z, -rack.dir * 0.12 if rack.state == "move" else 0.0, 6.0, dt)
 
 	# Ren
-	ren.root.position = Vector3(p_pos.x, 0, p_pos.y)
-	ren.root.rotation.y = p_yaw
-	stride = damp(stride, 1.0 if speed > 0.5 else 0.0, 10.0, dt)
-	ren.legs[0].rotation.x = sin(walk) * 0.6 * stride
-	ren.legs[1].rotation.x = -sin(walk) * 0.6 * stride
-	ren.arm_l.rotation.x = -sin(walk) * 0.4 * stride
-	var arm := Vector3(-0.35, 0, 0.15)
-	if guard:
-		arm = Vector3(-1.45, -0.9, 0)
-	elif charging:
-		var k := minf(1.0, charge_t / HEAVY_CHARGE)
-		arm = Vector3(lerpf(-0.6, -2.7, k), 0, -0.35)
-	elif act == "light":
-		var k := 1.0 - act_t / 0.32
-		arm = Vector3(lerpf(-2.2, -0.5, k), 0, lerpf(-0.7, 0.8, k))
-	elif act == "heavy":
-		var k := clampf(1.0 - act_t / 0.65, 0.0, 1.0)
-		arm = Vector3(lerpf(-2.7, -0.3, minf(1.0, k * 2.5)), 0, 0.9)
-	elif act == "eat":
-		arm = Vector3(-2.2, 0, 0.4)
-	var rate := 14.0 if act == "none" else 40.0
-	ren.arm_r.rotation = Vector3(damp(ren.arm_r.rotation.x, arm.x, rate, dt),
-		damp(ren.arm_r.rotation.y, arm.y, 14.0, dt), damp(ren.arm_r.rotation.z, arm.z, 14.0, dt))
-	ren.root.position.y = absf(sin(walk)) * stride * 0.03
-	ren.root.rotation.z = 0.2 if act == "dodge" else 0.0
-	ren.root.visible = not (inv > 0.0 and int(time * 20.0) % 2 == 0)
+	ren.position = Vector3(p_pos.x, 0, p_pos.y)
+	ren.rotation.y = p_yaw
+	hurt_t = maxf(0.0, hurt_t - dt)
+	reflect_t = maxf(0.0, reflect_t - dt)
+	_update_ren_clips()
+	ren.visible = not (inv > 0.0 and int(time * 20.0) % 2 == 0)
 	var wound := charging and charge_t >= HEAVY_CHARGE
-	ren.ring_mat.albedo_color.a = damp(ren.ring_mat.albedo_color.a, 0.85 if wound else (0.3 if charging else 0.0), 12.0, dt)
+	ren_ring_mat.albedo_color.a = damp(ren_ring_mat.albedo_color.a, 0.85 if wound else (0.3 if charging else 0.0), 12.0, dt)
 
 	# Camera: high three-quarter view; pulls back during the opening to show chair and bell together.
 	var vp := get_viewport().get_visible_rect().size

@@ -20,19 +20,6 @@ const DARK := Color("0c0a0d")
 const RACK_HOME := [Vector2(-4.9, 0.6), Vector2(4.9, 0.6)]
 const BELL_POS := Vector3(0, 0, -7.0)
 
-## Arm poses [raise, spread, elbow] for [upper, middle, lower]; mirrored per rail.
-const POSES := {
-	"idle": [[-1.0, 0.15, -1.1], [-0.3, 0.35, -0.8], [-0.2, 0.25, -1.3]],
-	"present": [[-2.75, 0.12, -0.2], [-0.4, 0.4, -0.9], [-0.2, 0.25, -1.3]],
-	"throw": [[-1.2, 0.1, 0.0], [-0.4, 0.4, -0.9], [-0.2, 0.25, -1.3]],
-	"sweep_tell": [[-1.0, 0.15, -1.1], [-0.1, 1.5, 0.0], [-0.2, 0.25, -1.3]],
-	"sweep_active": [[-1.0, 0.15, -1.1], [-1.5, 0.3, 0.0], [-0.2, 0.25, -1.3]],
-	"rack": [[-1.0, 0.15, -1.1], [-1.35, 0.5, -0.2], [-0.2, 0.25, -1.3]],
-	"exposed": [[-2.9, 0.6, -0.5], [-2.6, 0.9, -0.6], [-2.3, 1.0, -0.4]],
-	"parked": [[0.05, 0.06, -2.5], [0.05, 0.06, -2.5], [0.05, 0.06, -2.5]],
-}
-
-
 class SignData:
 	var node: Node3D
 	var pos := Vector2.ZERO
@@ -52,16 +39,6 @@ class Rack:
 	var hit := false
 
 
-class Arm:
-	var shoulder: Node3D
-	var elbow: Node3D
-	var side := 1.0
-	var level := 0
-	var rx := 0.0
-	var rz := 0.0
-	var ex := 0.0
-
-
 class Arena:
 	var plinths: Array = []  # Rect2 footprints in (x, z)
 	var tabs: Array = []
@@ -70,25 +47,6 @@ class Arena:
 	var bell_dome: MeshInstance3D
 	var lane_marks: Node3D
 	var aim_arrow: Node3D
-
-
-class Boss:
-	var root: Node3D
-	var chair: Node3D
-	var upper: Node3D
-	var body: Node3D
-	var paddle: MeshInstance3D
-	var paddle_mat: StandardMaterial3D
-	var held: Node3D
-	var arms: Array = []
-
-
-class Ren:
-	var root: Node3D
-	var legs: Array = []
-	var arm_l: Node3D
-	var arm_r: Node3D
-	var ring_mat: StandardMaterial3D
 
 
 class Hud:
@@ -349,10 +307,11 @@ static func build_rack(index: int) -> Rack:
 	return r
 
 
-# ---------------------------------------------------------------- the Floor Manager
+# ---------------------------------------------------------------- the Floor Manager rig
 
 static func build_placard() -> Node3D:
 	var g := Node3D.new()
+	g.name = "Placard"
 	put(box(0.92, 0.62, 0.035), mat(RED, 0.6), Vector3(0, 0, -0.005), g)
 	put(box(0.78, 0.48, 0.04), mat(CREAM, 0.6), Vector3.ZERO, g)
 	put(box(0.5, 0.07, 0.042), mat(RED, 0.6), Vector3(0, 0.08, 0), g)
@@ -360,146 +319,141 @@ static func build_placard() -> Node3D:
 	return g
 
 
-static func build_boss() -> Boss:
-	var b := Boss.new()
-	b.root = Node3D.new()
-	b.root.name = "FloorManager"
-	b.chair = Node3D.new()
-	b.root.add_child(b.chair)
+static func _joint(name: String, pos: Vector3, parent: Node3D) -> Node3D:
+	var n := Node3D.new()
+	n.name = name
+	n.position = pos
+	parent.add_child(n)
+	return n
+
+
+## Hierarchy (animated nodes in caps):
+## FloorManager / Chair / Paddle
+##              / Upper (yaw, code) / LIFT (telescoping) / Flinch (code) / BODY / HEAD, SASH, PLACARD,
+##                                                                         Arm{1,2,3}{L,R} / ELBOW
+## Arm 1 = upper rail (signs), 2 = middle (hangers/displays), 3 = lower (chair). L = his left (+x).
+static func build_boss_rig() -> Node3D:
+	var root := Node3D.new()
+	root.name = "FloorManager"
+	var chair := _joint("Chair", Vector3.ZERO, root)
 	var metal := mat(Color("2d2a2c"), 0.4, 0.6)
 	for i in 5:  # five-star base, five casters
-		var leg := Node3D.new()
+		var leg := _joint("Leg%d" % i, Vector3.ZERO, chair)
 		leg.rotation.y = i * TAU / 5.0
-		b.chair.add_child(leg)
 		put(box(0.06, 0.05, 0.36), metal, Vector3(0, 0.12, 0.18), leg)
 		put(sphere(0.055, 10), mat(BLACK, 0.5), Vector3(0, 0.055, 0.36), leg)
-	put(cyl(0.05, 0.05, 0.32), metal, Vector3(0, 0.28, 0), b.chair)
-	put(cyl(0.34, 0.32, 0.12, 20), mat(GRAY, 0.95), Vector3(0, 0.5, 0), b.chair)
+	put(cyl(0.05, 0.05, 0.32), metal, Vector3(0, 0.28, 0), chair)
+	put(cyl(0.34, 0.32, 0.12, 20), mat(GRAY, 0.95), Vector3(0, 0.5, 0), chair)
 	for s in [-1.0, 1.0]:
-		put(box(0.05, 0.16, 0.05), metal, Vector3(s * 0.3, 0.62, 0), b.chair)
-		put(box(0.07, 0.04, 0.3), mat(BLACK, 0.6), Vector3(s * 0.3, 0.71, 0), b.chair)
-	put(box(0.52, 0.16, 0.08), mat(Color("6b2620"), 0.85), Vector3(0, 0.22, 0.38), b.chair)  # padded front bumper
-	b.paddle_mat = StandardMaterial3D.new()
-	b.paddle_mat.albedo_color = RED
-	b.paddle_mat.roughness = 0.5
-	b.paddle_mat.emission_enabled = true
-	b.paddle_mat.emission = Color("ff3020")
-	b.paddle_mat.emission_energy_multiplier = 0.0
-	b.paddle = put(box(0.3, 0.18, 0.04), b.paddle_mat, Vector3(0, 0.44, -0.18), b.chair)
+		put(box(0.05, 0.16, 0.05), metal, Vector3(s * 0.3, 0.62, 0), chair)
+		put(box(0.07, 0.04, 0.3), mat(BLACK, 0.6), Vector3(s * 0.3, 0.71, 0), chair)
+	put(box(0.52, 0.16, 0.08), mat(Color("6b2620"), 0.85), Vector3(0, 0.22, 0.38), chair)  # padded front bumper
+	var paddle_mat := StandardMaterial3D.new()
+	paddle_mat.albedo_color = RED
+	paddle_mat.roughness = 0.5
+	paddle_mat.emission_enabled = true
+	paddle_mat.emission = Color("ff3020")
+	paddle_mat.emission_energy_multiplier = 0.0
+	var paddle := put(box(0.3, 0.18, 0.04), paddle_mat, Vector3(0, 0.44, -0.18), chair)
+	paddle.name = "Paddle"
 
-	b.upper = Node3D.new()
-	b.root.add_child(b.upper)
-	b.body = Node3D.new()
-	b.upper.add_child(b.body)
+	var upper := _joint("Upper", Vector3.ZERO, root)
+	var lift := _joint("Lift", Vector3.ZERO, upper)
+	var flinch := _joint("Flinch", Vector3(0, 1.45, 0), lift)  # pivot at the waist disc
+	var body := _joint("Body", Vector3.ZERO, flinch)
 	var ivory := mat(IVORY, 0.45)
-	put(cyl(0.065, 0.065, 0.95, 12), brass(), Vector3(0, 1.03, 0), b.body)
-	put(cyl(0.16, 0.2, 0.08), brass(), Vector3(0, 1.5, 0), b.body)
-	put(box(0.62, 0.95, 0.34), mat(CREAM, 0.6), Vector3(0, 2.0, 0), b.body)
+	var y0 := -1.45  # body-local offset: geometry authored in standing heights
+	put(cyl(0.065, 0.065, 0.95, 12), brass(), Vector3(0, 1.03 + y0, 0), body)
+	put(cyl(0.16, 0.2, 0.08), brass(), Vector3(0, 1.5 + y0, 0), body)
+	put(box(0.62, 0.95, 0.34), mat(CREAM, 0.6), Vector3(0, 2.0 + y0, 0), body)
 	for s in [-1.0, 1.0]:
-		put(box(0.025, 0.95, 0.36), mat(PLUM, 0.6), Vector3(s * 0.17, 2.0, 0.005), b.body)
-		put(box(0.06, 0.9, 0.08), brass(), Vector3(s * 0.42, 2.02, 0), b.body)  # shoulder rails
-	put(box(0.64, 0.025, 0.36), mat(PLUM, 0.6), Vector3(0, 1.53, 0), b.body)
-	put(cyl(0.07, 0.08, 0.16, 10), ivory, Vector3(0, 2.53, 0), b.body)
-	var head := Node3D.new()
-	head.position.y = 2.82
-	b.body.add_child(head)
-	var skull := put(sphere(1.0, 24), ivory, Vector3.ZERO, head)
+		put(box(0.025, 0.95, 0.36), mat(PLUM, 0.6), Vector3(s * 0.17, 2.0 + y0, 0.005), body)
+		put(box(0.06, 0.9, 0.08), brass(), Vector3(s * 0.42, 2.02 + y0, 0), body)  # shoulder rails
+	put(box(0.64, 0.025, 0.36), mat(PLUM, 0.6), Vector3(0, 1.53 + y0, 0), body)
+	put(cyl(0.07, 0.08, 0.16, 10), ivory, Vector3(0, 2.53 + y0, 0), body)
+	var head := _joint("Head", Vector3(0, 2.6 + y0, 0), body)  # pivot at the neck
+	var skull := put(sphere(1.0, 24), ivory, Vector3(0, 0.22, 0), head)
 	skull.scale = Vector3(0.18, 0.29, 0.2)
 	for s in [-1.0, 1.0]:
-		put(box(0.07, 0.025, 0.02), mat(DARK, 0.9), Vector3(s * 0.07, 0.05, 0.185), head)
-	put(box(0.1, 0.008, 0.02), mat(DARK, 0.9), Vector3(0, -0.13, 0.17), head)
-	put(cyl(0.15, 0.16, 0.06, 20), brass(), Vector3(0, 0.21, 0), head)  # crown band
+		put(box(0.07, 0.025, 0.02), mat(DARK, 0.9), Vector3(s * 0.07, 0.27, 0.185), head)
+	put(box(0.1, 0.008, 0.02), mat(DARK, 0.9), Vector3(0, 0.09, 0.17), head)
+	put(cyl(0.15, 0.16, 0.06, 20), brass(), Vector3(0, 0.43, 0), head)  # crown band
 	for x in [-0.08, 0.0, 0.08]:  # three nested hanger hooks
-		var hook := put(box(0.012, 0.09, 0.012), brass(), Vector3(x, 0.28, 0), head)
+		var hook := put(box(0.012, 0.09, 0.012), brass(), Vector3(x, 0.5, 0), head)
 		hook.rotation.z = 0.3
-	# Price-tag sash: a short rigid chain.
+	# Price-tag sash: a short rigid chain hung from his left shoulder.
+	var sash := _joint("Sash", Vector3(-0.26, 2.4 + y0, 0.185), body)
 	for i in 6:
-		var tag := put(box(0.09, 0.12, 0.01), mat(CREAM, 0.7), Vector3(-0.24 + i * 0.1, 2.32 - i * 0.14, 0.185), b.body)
+		var tag := put(box(0.09, 0.12, 0.01), mat(CREAM, 0.7), Vector3(0.02 + i * 0.1, -0.08 - i * 0.14, 0), sash)
 		tag.rotation.z = -0.55
 		if i > 0:
-			put(box(0.06, 0.006, 0.006), mat(RED, 0.7), Vector3(-0.29 + i * 0.1, 2.39 - i * 0.14, 0.19), b.body)
+			put(box(0.06, 0.006, 0.006), mat(RED, 0.7), Vector3(-0.03 + i * 0.1, -0.01 - i * 0.14, 0.005), sash)
 	# Six arms: three per rail (upper signs, middle hangers/displays, lower chair).
 	for s in [1.0, -1.0]:
-		var level := 0
+		var level := 1
 		for y in [2.38, 2.06, 1.74]:
-			var arm := Arm.new()
-			arm.side = s
-			arm.level = level
-			arm.shoulder = Node3D.new()
-			arm.shoulder.position = Vector3(s * 0.47, y, 0)
-			b.body.add_child(arm.shoulder)
-			put(sphere(0.055, 10), brass(), Vector3.ZERO, arm.shoulder)
-			put(cyl(0.035, 0.03, 0.5, 10), ivory, Vector3(0, -0.25, 0), arm.shoulder)
-			arm.elbow = Node3D.new()
-			arm.elbow.position.y = -0.5
-			arm.shoulder.add_child(arm.elbow)
-			put(sphere(0.04, 8), brass(), Vector3.ZERO, arm.elbow)
-			put(cyl(0.03, 0.026, 0.46, 10), ivory, Vector3(0, -0.23, 0), arm.elbow)
-			put(sphere(0.05, 10), ivory, Vector3(0, -0.5, 0), arm.elbow)
-			b.arms.append(arm)
+			var sh := _joint("Arm%d%s" % [level, "L" if s > 0 else "R"], Vector3(s * 0.47, y + y0, 0), body)
+			put(sphere(0.055, 10), brass(), Vector3.ZERO, sh)
+			put(cyl(0.035, 0.03, 0.5, 10), ivory, Vector3(0, -0.25, 0), sh)
+			var el := _joint("Elbow", Vector3(0, -0.5, 0), sh)
+			put(sphere(0.04, 8), brass(), Vector3.ZERO, el)
+			put(cyl(0.03, 0.026, 0.46, 10), ivory, Vector3(0, -0.23, 0), el)
+			put(sphere(0.05, 10), ivory, Vector3(0, -0.5, 0), el)
+			_joint("Hand", Vector3(0, -0.5, 0), el)
 			level += 1
-	b.held = build_placard()
-	b.body.add_child(b.held)
-	return b
+	body.add_child(build_placard())
+	root.set_script(load("res://scripts/rig_boss.gd"))
+	return root
 
 
-# ---------------------------------------------------------------- Ren (SU-01 stand-in)
+# ---------------------------------------------------------------- Ren rig (SU-01 stand-in)
 
-static func build_ren() -> Ren:
-	var r := Ren.new()
-	r.root = Node3D.new()
-	r.root.name = "Ren"
+## Hierarchy: Ren / PELVIS / LEG{L,R} / KNEE{L,R}
+##                         / TORSO / HEAD, ARM{L,R} / FOREARM{L,R}; FOREARMR / SWORD
+## L is Ren's left (+x). Knock is in his right hand.
+static func build_ren_rig() -> Node3D:
+	var root := Node3D.new()
+	root.name = "Ren"
 	var black := mat(BLACK, 0.6)
 	var lacquer := mat(Color("111014"), 0.25, 0.3)
+	var pelvis := _joint("Pelvis", Vector3(0, 0.92, 0), root)
+	put(box(0.36, 0.07, 0.24), mat(Color("3a3a3e"), 0.4, 0.7), Vector3(0, 0.0, 0), pelvis)  # belt
+	put(box(0.1, 0.08, 0.05), brass(), Vector3(0, 0.0, 0.13), pelvis)
+	put(box(0.3, 0.14, 0.2), black, Vector3(0, -0.06, 0), pelvis)
+	for side in ["L", "R"]:
+		var s := 1.0 if side == "L" else -1.0
+		var hip := _joint("Leg" + side, Vector3(s * 0.11, -0.04, 0), pelvis)
+		put(capsule(0.075, 0.3), black, Vector3(0, -0.21, 0), hip)
+		var knee := _joint("Knee" + side, Vector3(0, -0.43, 0), hip)
+		put(capsule(0.065, 0.28), black, Vector3(0, -0.18, 0), knee)
+		put(box(0.15, 0.13, 0.28), mat(RED, 0.5), Vector3(0, -0.38, 0.04), knee)
+		put(box(0.16, 0.04, 0.3), mat(CREAM, 0.6), Vector3(0, -0.45, 0.04), knee)
+	var torso := _joint("Torso", Vector3(0, 0.03, 0), pelvis)
+	put(capsule(0.17, 0.3), black, Vector3(0, 0.3, 0), torso)
+	put(box(0.34, 0.3, 0.06), lacquer, Vector3(0, 0.36, 0.14), torso)
+	var head := _joint("Head", Vector3(0, 0.66, 0), torso)  # pivot at the neck
+	put(sphere(0.15, 18), lacquer, Vector3(0, 0.1, 0), head)
+	put(box(0.24, 0.07, 0.06), mat(Color("060608"), 0.08, 0.6), Vector3(0, 0.12, 0.12), head)  # visor
+	put(box(0.02, 0.1, 0.03), mat(STEEL, 0.3, 0.9), Vector3(0, 0.09, 0.15), head)            # nose divider
+	put(box(0.14, 0.06, 0.06), mat(CREAM, 0.6), Vector3(0, -0.01, 0.1), head)                # chin plate
 	for s in [-1.0, 1.0]:
-		var hip := Node3D.new()
-		hip.position = Vector3(s * 0.12, 0.85, 0)
-		r.root.add_child(hip)
-		put(capsule(0.075, 0.6), black, Vector3(0, -0.38, 0), hip)
-		put(box(0.15, 0.13, 0.28), mat(RED, 0.5), Vector3(0, -0.78, 0.04), hip)
-		put(box(0.16, 0.04, 0.3), mat(CREAM, 0.6), Vector3(0, -0.85, 0.04), hip)
-		r.legs.append(hip)
-	put(capsule(0.17, 0.42), black, Vector3(0, 1.18, 0), r.root)
-	put(box(0.34, 0.3, 0.06), lacquer, Vector3(0, 1.28, 0.14), r.root)
-	put(box(0.36, 0.07, 0.24), mat(Color("3a3a3e"), 0.4, 0.7), Vector3(0, 0.92, 0), r.root)  # belt
-	put(box(0.1, 0.08, 0.05), brass(), Vector3(0, 0.92, 0.13), r.root)
-	var head := Node3D.new()
-	head.position.y = 1.68
-	r.root.add_child(head)
-	put(sphere(0.15, 18), lacquer, Vector3.ZERO, head)
-	put(box(0.24, 0.07, 0.06), mat(Color("060608"), 0.08, 0.6), Vector3(0, 0.02, 0.12), head)  # visor
-	put(box(0.02, 0.1, 0.03), mat(STEEL, 0.3, 0.9), Vector3(0, -0.01, 0.15), head)            # nose divider
-	put(box(0.14, 0.06, 0.06), mat(CREAM, 0.6), Vector3(0, -0.11, 0.1), head)                 # chin plate
-	for s in [-1.0, 1.0]:
-		var fin := put(box(0.02, 0.07, 0.18), lacquer, Vector3(s * 0.08, 0.1, -0.13), head)
+		var fin := put(box(0.02, 0.07, 0.18), lacquer, Vector3(s * 0.08, 0.2, -0.13), head)
 		fin.rotation.x = -0.4
-	r.arm_l = Node3D.new()
-	r.arm_l.position = Vector3(-0.24, 1.42, 0)
-	r.root.add_child(r.arm_l)
-	r.arm_r = Node3D.new()
-	r.arm_r.position = Vector3(0.24, 1.42, 0)
-	r.root.add_child(r.arm_r)
-	for arm in [r.arm_l, r.arm_r]:
-		put(capsule(0.055, 0.42), black, Vector3(0, -0.25, 0), arm)
-		put(sphere(0.07, 10), mat(CREAM, 0.6), Vector3(0, -0.52, 0), arm)
-	# Knock: a broad, blunt blade with a usable flat face.
-	var sword := Node3D.new()
-	sword.position.y = -0.54
-	r.arm_r.add_child(sword)
-	put(box(0.05, 0.14, 0.05), mat(Color("3b2a20"), 0.7), Vector3.ZERO, sword)
-	put(box(0.26, 0.04, 0.06), brass(), Vector3(0, -0.08, 0), sword)
-	put(box(0.17, 0.9, 0.035), mat(STEEL, 0.35, 0.85), Vector3(0, -0.53, 0), sword)
-	put(box(0.17, 0.06, 0.036), mat(CREAM, 0.5), Vector3(0, -0.98, 0), sword)
-	r.ring_mat = StandardMaterial3D.new()
-	r.ring_mat.albedo_color = Color(CREAM, 0.0)
-	r.ring_mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
-	r.ring_mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
-	var ring := TorusMesh.new()
-	ring.inner_radius = 0.55
-	ring.outer_radius = 0.62
-	var ring_mi := put(ring, r.ring_mat, Vector3(0, 0.04, 0), r.root, false)
-	ring_mi.scale.y = 0.05
-	return r
+	for side in ["L", "R"]:
+		var s := 1.0 if side == "L" else -1.0
+		var arm := _joint("Arm" + side, Vector3(s * 0.24, 0.5, 0), torso)
+		put(capsule(0.055, 0.18), black, Vector3(0, -0.14, 0), arm)
+		var fore := _joint("Forearm" + side, Vector3(0, -0.28, 0), arm)
+		put(capsule(0.05, 0.16), black, Vector3(0, -0.13, 0), fore)
+		put(sphere(0.07, 10), mat(CREAM, 0.6), Vector3(0, -0.27, 0), fore)
+		if side == "R":
+			# Knock: a broad, blunt blade with a usable flat face. Blade runs along -y from the grip.
+			var sword := _joint("Sword", Vector3(0, -0.28, 0), fore)
+			put(box(0.05, 0.14, 0.05), mat(Color("3b2a20"), 0.7), Vector3.ZERO, sword)
+			put(box(0.26, 0.04, 0.06), brass(), Vector3(0, -0.08, 0), sword)
+			put(box(0.17, 0.9, 0.035), mat(STEEL, 0.35, 0.85), Vector3(0, -0.53, 0), sword)
+			put(box(0.17, 0.06, 0.036), mat(CREAM, 0.5), Vector3(0, -0.98, 0), sword)
+	return root
 
 
 # ---------------------------------------------------------------- HUD and menus

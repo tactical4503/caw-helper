@@ -5,20 +5,32 @@ A Godot 4 port of the Installment 002 boss fight: **BS-01, the Floor Manager**, 
 Open this folder from the Godot project manager (**Import** → select `project.godot`), then press F5. Built and tested on **Godot 4.3**; other 4.x versions should work.
 
 ## Layout
-- `scripts/main.gd`: the fight. Contains the state machine, the timing table constants (Section 11), input, camera and flow.
-- `scripts/builders.gd`: primitive stand-in geometry, the HUD and synthesized sound cues. Replace these nodes with real art later without touching `main.gd`.
-- `tests/sim_test.gd`: headless fight checks (the "bot playtester").
-- `tests/capture.gd`: renders staged moments of the fight to PNG for visual review.
+- `scripts/main.gd`: the fight. Contains the state machine, the timing table constants (Section 11), input, camera, and which clip plays when.
+- `scripts/anim_data.gd`: **the keyframe source for every clip** (14 for the Floor Manager, 10 for Ren).
+- `rigs/floor_manager.tscn`, `rigs/ren.tscn`: baked rigs with an AnimationPlayer. Open them in Godot to watch or edit the clips in the animation editor.
+- `scripts/builders.gd`: stand-in geometry for the rigs and arena, plus the HUD and synthesized sound.
+- `scripts/rig_boss.gd`: keeps the held sign between the Manager's two upper hands (it also works in the editor).
+- `tests/sim_test.gd`: 30 headless checks (the "bot playtester"), including animation timing.
+- `tests/capture.gd`: screenshots of staged moments in the fight.
+- `tools/build_rigs.gd`: bakes `anim_data.gd` into the rig scenes.
+- `tools/filmstrip.gd`: renders each clip as a contact sheet (front three-quarter and side views) for review.
+- `docs/sheets/`: sample contact sheets.
 
-## Tools
+## Animation
+| Floor Manager | Ren |
+|---|---|
+| idle, roll, present (1.0 s tell), throw, sweep_tell (1.1 s), sweep, rack_push (1.2 s tell), reflected_impact, exposed, chair_launch, bell_collision, phase_recovery, defeat_settle, counter_idle | idle, run, guard, reflect, wind (0.8 s, three ratchet steps), heavy, light, dodge, hurt, eat |
+
+The clips are keyed poses with eased transitions. They use anticipation (dips before the sign raise and the throw), overshoot and settle (guard snap, sweep, bell collision), overlap (the sash and head trail the body, the arms fold in sequence) and inertia (the body drags behind the launching chair and pitches forward when it hits the lever). The tests require the gameplay-critical clips to stay exactly as long as the timing table says.
+
+**Workflow:** edit `scripts/anim_data.gd`, re-bake, then render sheets and look at them:
 ```sh
-# 23 automated checks: timed reflect, three bells, victory, wrong side, locked chair, sweep, rack shove, defeat
-godot --headless --path afterbell-godot -s res://tests/sim_test.gd
-
-# screenshots of approach / present / exposed / launch / victory (needs a renderer, not --headless)
-godot --path afterbell-godot -s res://tests/capture.gd -- --out=/tmp/shots [--size=390x844]
+godot --headless --path afterbell-godot -s res://tools/build_rigs.gd
+godot --path afterbell-godot -s res://tools/filmstrip.gd -- --rig=boss --clips=present --out=/tmp/sheets
 ```
-In headless mode Godot prints `Parameter "m" is null` from its dummy renderer. This is harmless.
+Re-baking overwrites edits made to the rig scenes in the editor. Pick one source of truth: either keep using `anim_data.gd` and re-bake, or switch to editing the clips in the editor and stop re-baking.
+
+**Swapping in real animation later:** keep the joint names, or retarget to them. `main.gd` only refers to clips by name (see `BOSS_CLIPS` and `_ren_wanted_clip`), so a Mixamo or Blender clip with the same name drops in as a replacement.
 
 ## Status
 - Every value is an untested design target, and nothing has been playtested in real time.
