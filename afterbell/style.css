@@ -1,0 +1,61 @@
+:root {
+  --cream: #efe3c8;
+  --ivory: #e9e0cf;
+  --plum: #5b2a4a;
+  --plum-deep: #2a1322;
+  --brass: #c19a4b;
+  --red: #b0302a;
+  --ink: #17121a;
+  --serif: Georgia, "Times New Roman", serif;
+}
+
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; overflow: hidden; background: var(--ink); color: var(--cream); font-family: var(--serif); }
+canvas#view { display: block; width: 100vw; height: 100vh; touch-action: none; }
+
+.label { font-size: 11px; letter-spacing: .22em; color: var(--brass); margin-bottom: 6px; }
+
+#hud { position: fixed; inset: 0; pointer-events: none; }
+.hud-left { position: absolute; top: 16px; left: 16px; }
+.hud-right { position: absolute; top: 16px; right: 16px; text-align: right; }
+.segments { display: flex; gap: 4px; }
+.segments i { width: 22px; height: 12px; background: var(--red); border: 1px solid var(--cream); transform: skewX(-12deg); }
+.segments i.empty { background: transparent; opacity: .45; }
+.biscuits { margin-top: 8px; display: flex; gap: 6px; }
+.biscuits i { width: 16px; height: 11px; background: var(--red); border-top: 4px solid var(--cream); border-radius: 2px; }
+.tabs { display: flex; gap: 6px; justify-content: flex-end; }
+.tabs i { width: 18px; height: 26px; background: linear-gradient(#e2bf6e, #8a6526); border: 1px solid #f3dca0; border-radius: 2px 2px 6px 6px; }
+.tabs i.gone { background: transparent; border-style: dashed; opacity: .4; }
+
+.prompt { position: absolute; left: 50%; bottom: 120px; transform: translateX(-50%); font-size: 14px; letter-spacing: .08em; color: var(--ivory); text-shadow: 0 1px 3px #000; white-space: nowrap; }
+.subtitle { position: absolute; left: 50%; bottom: 40px; transform: translateX(-50%); max-width: min(720px, calc(100vw - 32px)); font-size: 19px; text-align: center; line-height: 1.35; text-shadow: 0 2px 4px #000, 0 0 12px #000; }
+.subtitle b { color: var(--brass); font-weight: normal; letter-spacing: .14em; font-size: 13px; display: block; }
+
+.panel { position: fixed; inset: 0; display: grid; place-items: center; background: radial-gradient(ellipse at 50% 30%, rgba(91,42,74,.55), rgba(23,18,26,.94) 70%); padding: 16px; overflow-y: auto; }
+.panel[hidden], #hud[hidden], #touch[hidden] { display: none; }
+.card { max-width: 560px; width: 100%; border: 1px solid rgba(193,154,75,.6); outline: 1px solid rgba(193,154,75,.25); outline-offset: 5px; background: rgba(42,19,34,.88); padding: 28px; }
+.eyebrow { font-size: 11px; letter-spacing: .24em; color: var(--brass); margin: 0 0 8px; text-transform: uppercase; }
+h1 { font-size: clamp(34px, 7vw, 56px); margin: 0; font-weight: normal; letter-spacing: .02em; }
+.sub { margin: 6px 0 14px; color: var(--ivory); opacity: .85; }
+.note { font-size: 13px; opacity: .7; border-left: 2px solid var(--red); padding-left: 10px; }
+.settings { display: grid; gap: 8px; margin: 16px 0; font-size: 14px; }
+.settings span { opacity: .55; font-size: 12px; margin-left: 4px; }
+.settings input { accent-color: var(--red); }
+.btn { font-family: var(--serif); font-size: 17px; letter-spacing: .12em; background: var(--red); color: var(--cream); border: 1px solid var(--cream); padding: 12px 26px; cursor: pointer; text-transform: uppercase; }
+.btn:hover { background: #c63c34; }
+.controls { display: grid; grid-template-columns: auto 1fr; gap: 4px 14px; font-size: 13px; margin: 18px 0 0; opacity: .8; }
+.controls dt { color: var(--brass); }
+.controls dd { margin: 0; }
+
+#touch { position: fixed; inset: auto 0 0 0; height: 200px; pointer-events: none; }
+#stick { position: absolute; left: 24px; bottom: 28px; width: 130px; height: 130px; border-radius: 50%; border: 2px solid rgba(239,227,200,.4); pointer-events: auto; touch-action: none; }
+#knob { position: absolute; left: 40px; top: 40px; width: 50px; height: 50px; border-radius: 50%; background: rgba(239,227,200,.35); }
+.tbtns { position: absolute; right: 16px; bottom: 24px; display: grid; grid-template-columns: repeat(2, 64px); gap: 10px; pointer-events: auto; }
+.tbtns button { height: 64px; border-radius: 50%; border: 2px solid var(--cream); background: rgba(176,48,42,.7); color: var(--cream); font-family: var(--serif); letter-spacing: .08em; touch-action: none; }
+
+@media (max-width: 640px) {
+  .card { padding: 20px; }
+  .prompt { bottom: 220px; font-size: 13px; white-space: normal; text-align: center; width: calc(100vw - 32px); }
+  .subtitle { bottom: 196px; font-size: 16px; }
+  .segments i { width: 16px; }
+}

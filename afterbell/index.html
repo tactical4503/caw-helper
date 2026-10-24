@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>AFTERBELL — Closing Time (greybox)</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<canvas id="view"></canvas>
+
+<div id="hud" hidden>
+  <div class="hud-left">
+    <div class="label">REN</div>
+    <div id="health" class="segments"></div>
+    <div id="biscuits" class="biscuits"></div>
+  </div>
+  <div class="hud-right">
+    <div class="label">SERVICE TABS</div>
+    <div id="tabs" class="tabs"><i></i><i></i><i></i></div>
+  </div>
+  <div id="prompt" class="prompt"></div>
+  <div id="subtitle" class="subtitle"></div>
+</div>
+
+<div id="title" class="panel">
+  <div class="card">
+    <p class="eyebrow">AFTERBELL · Installment 002 · BS-01</p>
+    <h1>Closing Time</h1>
+    <p class="sub">The Floor Manager, Menswear Court, Bellwether’s Department Store</p>
+    <p class="note">Greybox demonstration build. Primitive stand-in shapes, untested tuning values from the design table. Not final art, not the final layout.</p>
+    <div class="settings">
+      <label><input type="checkbox" id="opt-easy"> Easy assist <span>8 s opening, wider steering</span></label>
+      <label><input type="checkbox" id="opt-reflect"> Reflection assist <span>held guard always reflects</span></label>
+      <label><input type="checkbox" id="opt-aim"> Contextual aiming help <span>floor arrow during the opening</span></label>
+      <label><input type="checkbox" id="opt-keep"> Keep boss progress after defeat</label>
+      <label><input type="checkbox" id="opt-shake" checked> Camera shake <span>small</span></label>
+    </div>
+    <button id="start" class="btn">Enter the court</button>
+    <dl class="controls">
+      <dt>Move</dt><dd>WASD / arrows</dd>
+      <dt>Attack</dt><dd>J or left click · hold 0.8 s to wind a heavy strike</dd>
+      <dt>Guard</dt><dd>K or right click · tap as the sign arrives to reflect it</dd>
+      <dt>Dodge</dt><dd>Space</dd>
+      <dt>Biscuit</dt><dd>E · restores two segments</dd>
+      <dt>Retreat</dt><dd>R by the west door · Esc pauses</dd>
+    </dl>
+  </div>
+</div>
+
+<div id="end" class="panel" hidden>
+  <div class="card">
+    <p class="eyebrow" id="end-eyebrow"></p>
+    <h1 id="end-title"></h1>
+    <p class="sub" id="end-body"></p>
+    <button id="again" class="btn">Again</button>
+  </div>
+</div>
+
+<div id="touch" hidden>
+  <div id="stick"><div id="knob"></div></div>
+  <div class="tbtns">
+    <button data-key="attack">ATK</button>
+    <button data-key="guard">GRD</button>
+    <button data-key="dodge">DGE</button>
+    <button data-key="eat">EAT</button>
+  </div>
+</div>
+
+<script src="vendor/three.min.js"></script>
+<script src="game.js"></script>
+</body>
+</html>
