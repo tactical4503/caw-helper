@@ -137,6 +137,12 @@ func _build_rooms() -> void:
 	B.put(B.box(DOOR_X + 5 - 0.8, 3.6, 0.3), plaster, Vector3((-5 + DOOR_X - 0.8) / 2.0, 1.8, -5.15), self)
 	B.put(B.box(5 - DOOR_X - 0.8 + 2, 3.6, 0.3), plaster, Vector3((DOOR_X + 0.8 + 7) / 2.0, 1.8, -5.15), self)
 	B.put(B.box(1.6, 1.2, 0.3), plaster, Vector3(DOOR_X, 3.0, -5.15), self)
+	# Doorways: Receiving door (cased, its door swung back into Receiving), the south entrance.
+	Props.door_frame(self, Vector3(DOOR_X, 0, -5.15), 1.6, 2.4)
+	Props.door_leaf(self, Vector3(DOOR_X - 0.8, 0, -5.3), 1.55, 2.4, 0.0, PI / 2.0 * 0.92)
+	B.put(B.box(1.8, 1.1, 0.3), plaster, Vector3(0, 3.05, 5.15), self)
+	Props.door_frame(self, Vector3(0, 0, 5.15), 1.8, 2.5)
+	Props.door_frame(self, Vector3(5.15, 0, GATE_Z), 1.8, 2.4, PI / 2.0)
 	B.wainscot(self, Vector3(-4.98, 0, 0), Vector3(0, 0, 10))
 	# Receiving walls.
 	B.put(B.box(0.3, 3.6, 8), plum, Vector3(-5.15, 1.8, -9), self)
@@ -150,6 +156,7 @@ func _build_rooms() -> void:
 	B.put(B.box(0.1, 2.4, 1.8), metal, Vector3(0, 1.2, 0), gate)
 	for i in 6:
 		B.put(B.box(0.12, 0.04, 1.8), B.brass(), Vector3(0, 0.25 + i * 0.4, 0), gate)
+	Props.pull_handle(gate, Vector3(-0.06, 0.38, 0), 0.7, -PI / 2.0)   # rises with the gate
 	B.put(B.box(0.04, 0.5, 0.5), B.brass(), Vector3(4.98, 1.15, SOCKET.y), self)          # socket plate
 	socket_disc = Node3D.new()
 	socket_disc.position = Vector3(4.95, 1.15, SOCKET.y)
@@ -174,8 +181,7 @@ func _build_rooms() -> void:
 		var m := B.put(B.box(0.04, 1.6, 0.6), ST.plastic(Color("c8d8e0"), 0.02, 0.9), Vector3(-4.85, 0.95, 0.9 + k * 0.62), self)
 		m.rotation.y = (k - 1) * 0.25
 	# Sewing counter, pincushion in a saucer, a fan that turns its head but doesn't spin.
-	B.put(B.box(0.8, 0.95, 2.6), cream, Vector3(-4.5, 0.48, -2.2), self)
-	B.put(B.box(0.84, 0.04, 2.64), B.brass(), Vector3(-4.5, 0.97, -2.2), self)
+	Props.counter(self, Vector3(-4.5, 0, -2.2), Vector3(0.8, 0.98, 2.6), "walnut")
 	solids.append(Rect2(Vector2(-4.9, -3.5), Vector2(0.8, 2.6)))
 	B.put(B.cyl(0.1, 0.08, 0.02), B.mat(B.CREAM, 0.3), Vector3(-4.5, 1.0, -1.4), self)
 	B.put(B.sphere(0.07), B.mat(B.RED, 0.6), Vector3(-4.5, 1.06, -1.4), self)
@@ -214,25 +220,29 @@ func _build_rooms() -> void:
 			bx.rotation.y = randf_range(-0.1, 0.1)
 		solids.append(Rect2(Vector2(c.x - 0.5, c.z - 0.45), Vector2(1.0, 0.9)))
 	B.put(B.box(0.1, 2.6, 1.8), metal, Vector3(7.0, 1.3, -9.0), self)
+	Props.door_frame(self, Vector3(7.15, 0, -9.0), 1.8, 2.6, PI / 2.0)
+	Props.pull_handle(self, Vector3(6.95, 1.05, -9.0), 0.7, -PI / 2.0)
 	var lift_sign := Label3D.new()
 	lift_sign.text = "FREIGHT — LATCHED ABOVE"
 	lift_sign.font_size = 40
 	lift_sign.pixel_size = 0.004
 	lift_sign.modulate = B.CREAM
 	lift_sign.rotation.y = -PI / 2.0
-	lift_sign.position = Vector3(6.9, 2.8, -9.0)
+	lift_sign.position = Vector3(6.9, 3.15, -9.0)
 	add_child(lift_sign)
 	B.put(B.box(0.1, 2.6, 2.0), metal, Vector3(-5.0, 1.3, -9.0), self)
+	Props.door_frame(self, Vector3(-5.15, 0, -9.0), 2.0, 2.6, PI / 2.0)
+	Props.pull_handle(self, Vector3(-4.95, 0.4, -9.0), 0.9, PI / 2.0)
 	var load_sign := Label3D.new()
 	load_sign.text = "LOADING — LOCKED"
 	load_sign.font_size = 40
 	load_sign.pixel_size = 0.004
 	load_sign.modulate = B.CREAM
 	load_sign.rotation.y = PI / 2.0
-	load_sign.position = Vector3(-4.9, 2.8, -9.0)
+	load_sign.position = Vector3(-4.9, 3.15, -9.0)
 	add_child(load_sign)
 	# Biscuit table: red tins with cream sleeves, and the water jug.
-	B.put(B.box(1.4, 0.8, 0.7), wood, Vector3(0.6, 0.4, -11.9), self)
+	Props.counter(self, Vector3(0.6, 0, -11.9), Vector3(1.4, 0.81, 0.7), "walnut")
 	solids.append(Rect2(Vector2(-0.1, -12.25), Vector2(1.4, 0.7)))
 	for i in 3:
 		B.put(B.cyl(0.07, 0.07, 0.1), B.mat(B.RED, 0.3), Vector3(0.2 + i * 0.18, 0.86, -11.9), self)

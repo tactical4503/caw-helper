@@ -46,6 +46,11 @@ func _initialize() -> void:
 		Props.place(w, r[0], Vector3(x, 0, 0), 0.0, r[1], r[2])
 		x += widths[r[0]] * 0.5
 	Props.place(w, "sale_card", Vector3(x + 0.3, 0, 0.3))
+	# Doorways: a framed door pair in the back wall, and a counter run with rounded corners.
+	Props.door_frame(w, Vector3(-4.0, 0, -1.3), 2.2, 2.2, 0.0, 0.2)
+	Props.door_leaf(w, Vector3(-5.1, 0, -1.3), 1.1, 2.2)
+	Props.door_leaf(w, Vector3(-2.9, 0, -1.3), 1.1, 2.2, PI, -0.6, true)
+	Props.pull_handle(w, Vector3(3.5, 1.0, -1.5), 0.6)
 	Props.place(w, "hanging_sign", Vector3(0, 3.2, -1.4), 0.0, 0, "COSMETICS  ·  FRAGRANCE")
 	for lx in [-6.0, 0.0, 6.0]:
 		ST.ceiling_light(w, Vector3(lx, 3.8, 1.5), 1.2, 9.0)

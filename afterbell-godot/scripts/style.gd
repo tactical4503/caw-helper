@@ -97,6 +97,7 @@ static func textured(name: String, scale: float, fallback: StandardMaterial3D, m
 	m.metallic_specular = 0.5 if metal >= 0.5 else 0.35
 	m.uv1_triplanar = true
 	m.uv1_scale = Vector3.ONE * scale
+	m.texture_filter = BaseMaterial3D.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS_ANISOTROPIC   # no shimmer at grazing angles
 	return m
 
 

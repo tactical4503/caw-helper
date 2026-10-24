@@ -170,6 +170,7 @@ func _build_room() -> void:
 	B.put(B.box(0.1, 2.4, 1.8), ST.textured("metal_charcoal", 1.5, B.mat(Color("2b2b2e"), 0.4, 0.6), 0.6), Vector3(0, 1.2, 0), gate)
 	for i in 6:
 		B.put(B.box(0.12, 0.04, 1.8), B.brass(), Vector3(0, 0.25 + i * 0.4, 0), gate)
+	Props.pull_handle(gate, Vector3(0.06, 0.38, 0), 0.7, PI / 2.0)   # rises with the gate
 	# Receiver above the west exit, with the linkage down to the gate.
 	receiver = Node3D.new()
 	receiver.position = RECEIVER
@@ -201,9 +202,12 @@ func _build_room() -> void:
 		B.put(B.box(0.6, 4.3, 0.6), cream, Vector3(c.x, 2.15, c.y), self)
 		B.put(B.box(0.7, 0.16, 0.7), B.brass(), Vector3(c.x, 4.1, c.y), self)
 		B.put(B.box(0.7, 0.16, 0.7), B.brass(), Vector3(c.x, 0.08, c.y), self)
-	for x in [-1.55, 1.55]:
-		B.put(B.box(0.1, 2.7, 0.1), B.brass(), Vector3(x, 1.35, -HALF_D + 0.06), self)
-	B.put(B.box(3.2, 0.12, 0.1), B.brass(), Vector3(0, 2.66, -HALF_D + 0.06), self)
+	# Doorways: cased frames on the shutter, the hats gate and the vestibule opening.
+	Props.door_frame(self, Vector3(0, 0, -HALF_D - 0.15), 3.0, 2.6)
+	Props.pull_handle(self, Vector3(0, 0.38, -HALF_D + 0.06), 0.8)
+	Props.door_frame(self, Vector3(-HALF_W - 0.15, 0, GATE_Z), 1.8, 2.4, PI / 2.0)
+	B.put(B.box(2.4, 1.5, 0.3), wall, Vector3(0, 3.55, HALF_D + 0.15), self)   # header over the vestibule
+	Props.door_frame(self, Vector3(0, 0, HALF_D + 0.15), 2.4, 2.8)
 	# Two horseshoe counters, one each side of the central aisle.
 	for s in [-1.0, 1.0]:
 		var cx: float = s * 4.6
@@ -211,15 +215,12 @@ func _build_room() -> void:
 				[Vector3(cx + s * 1.35, 0.5, -0.85), Vector3(0.7, 1.0, 2.2)]]:
 			var pos: Vector3 = part[0]
 			var size: Vector3 = part[1]
-			B.put(B.box(size.x, size.y, size.z), cream, pos, self)
-			B.put(B.box(size.x + 0.02, 0.42, size.z + 0.02), laminate, Vector3(pos.x, 0.21, pos.z), self)  # plum display base
-			B.put(B.box(size.x + 0.04, 0.04, size.z + 0.04), B.brass(), Vector3(pos.x, 0.43, pos.z), self)  # brass band
-			B.put(B.box(size.x + 0.04, 0.04, size.z + 0.04), B.brass(), Vector3(pos.x, 1.0, pos.z), self)  # brass trim
+			Props.counter(self, Vector3(pos.x, 0, pos.z), size)   # plinth, plum base, brass trim, rounded top
 			var glass := StandardMaterial3D.new()
 			glass.albedo_color = Color(0.85, 0.95, 0.92, 0.25)
 			glass.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
 			glass.roughness = 0.03
-			B.put(B.box(size.x, 0.03, size.z), glass, Vector3(pos.x, 1.04, pos.z), self, false)
+			B.put(B.box(size.x - 0.1, 0.03, size.z - 0.1), glass, Vector3(pos.x, 1.015, pos.z), self, false)
 			# Perfume boxes and testers along the long runs.
 			if size.x > 1:
 				for k in [-0.85, 0.85]:

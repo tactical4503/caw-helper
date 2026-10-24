@@ -34,11 +34,12 @@ static func place(parent: Node3D, kind: String, at: Vector3, yaw := 0.0, variant
 	parent.add_child(node)
 	match kind:
 		"easel":
-			_label(node, text, Vector3(0, 1.12, 0.045), 0.0042 if text.length() <= 5 else 0.0026, Color("efe3c8"), 56, 0.52)
+			_label(node, text, Vector3(0, 1.12, 0.056), 0.0042 if text.length() <= 5 else 0.0026, Color("efe3c8"), 56, 0.0 if text.length() <= 5 else 0.52)
 		"sale_card":
 			_label(node, text if text != "" else "SALE", Vector3(0, 0.3, 0.012), 0.0022, Color("efe3c8"), 48)
 		"hanging_sign":
-			_label(node, text, Vector3(0, 0, 0.035), 0.0045, Color("4a2238"), 64)
+			# Scale the lettering so the whole name fits inside the 2 m panel.
+			_label(node, text, Vector3(0, 0, 0.035), minf(0.0045, 1.8 / (maxf(text.length(), 1) * 0.55 * 64.0)), Color("4a2238"), 64)
 	return node
 
 
@@ -122,7 +123,7 @@ static func _rack(n: Node3D, v: int) -> void:
 		for z in [-0.26, 0.26]:
 			_put(_sphere(0.03, 8), _m("rubber"), Vector3(s * len * 0.5, 0.03, z), n)
 		_put(_sphere(0.035, 10), _m("brass"), Vector3(s * len * 0.5, 1.66, 0), n)
-	var rail := _put(_cyl(0.018, 0.018, len + 0.04, 8), _m("brass"), Vector3(0, 1.62, 0), n)
+	var rail := _put(_cyl(0.024, 0.024, len + 0.04, 10), _m("brass"), Vector3(0, 1.62, 0), n)
 	rail.rotation.z = PI / 2.0
 	var palette := ["suit_navy", "suit_charcoal", "suit_brown", "suit_navy", "plum", "suit_charcoal"] if v == 0 \
 			else ["dress_cream", "plum", "dress_rose", "dress_cream", "dress_sage", "plum"]
@@ -196,15 +197,11 @@ static func _mannequin(n: Node3D, v: int) -> void:
 static func _perfume_counter(n: Node3D, v: int) -> void:
 	var w := 1.7
 	var d := 0.62
-	_put(_box(w, 0.42, d), _m("plum"), Vector3(0, 0.21, 0), n)
-	_put(_box(w + 0.03, 0.04, d + 0.03), _m("brass"), Vector3(0, 0.43, 0), n)
-	_put(_box(w - 0.04, 0.5, d - 0.04), _m("cream"), Vector3(0, 0.69, 0), n)
-	for s in [-1.0, 1.0]:   # inset panels on the front
-		_put(_box(w * 0.42, 0.34, 0.012), _m("plum"), Vector3(s * w * 0.24, 0.69, d * 0.5 - 0.01), n)
-		_put(_box(w * 0.42 + 0.03, 0.015, 0.016), _m("brass"), Vector3(s * w * 0.24, 0.87, d * 0.5 - 0.008), n)
-	_put(_box(w + 0.06, 0.035, d + 0.06), _m("brass"), Vector3(0, 0.955, 0), n)
-	_put(_box(w, 0.02, d), _m("velvet"), Vector3(0, 0.98, 0), n)
-	_perfume_boxes(n, Vector3(0, 0.99, 0), Vector2(w - 0.25, d - 0.18), v)
+	counter(n, Vector3.ZERO, Vector3(w, 1.0, d), "plum" if v % 2 else "cream")
+	for s in [-1.0, 1.0]:   # inset panels on the cabinet front
+		_put(_box(w * 0.4, 0.26, 0.012), _m("plum"), Vector3(s * w * 0.23, 0.68, d * 0.5 - 0.005), n)
+		_put(_box(w * 0.4 + 0.03, 0.015, 0.016), _m("brass"), Vector3(s * w * 0.23, 0.825, d * 0.5 - 0.003), n)
+	_perfume_boxes(n, Vector3(0, 1.0, 0), Vector2(w - 0.25, d - 0.18), v)
 
 
 static func _perfume_tower(n: Node3D, v: int) -> void:
@@ -316,8 +313,8 @@ static func _easel(n: Node3D, v: int) -> void:
 	back.rotation.x = -0.32
 	_put(_box(0.58, 0.02, 0.02), _m("brass"), Vector3(0, 0.66, 0.02), n)        # ledge
 	var board: String = "sale_red" if v == 1 else "plum"
-	_put(_box(0.64, 0.84, 0.025), _m("brass"), Vector3(0, 1.1, 0.02), n)
-	_put(_box(0.6, 0.8, 0.03), _m(board), Vector3(0, 1.1, 0.024), n)
+	_put(_box(0.66, 0.86, 0.045), _m("brass"), Vector3(0, 1.1, 0.012), n)
+	_put(_box(0.6, 0.8, 0.055), _m(board), Vector3(0, 1.1, 0.02), n)
 	_put(_box(0.5, 0.012, 0.004), _m("brass"), Vector3(0, 1.39, 0.041), n)
 	_put(_box(0.5, 0.012, 0.004), _m("brass"), Vector3(0, 0.81, 0.041), n)
 	_put(_sphere(0.025, 8), _m("brass"), Vector3(0, 1.56, 0.02), n)
@@ -331,12 +328,183 @@ static func _sale_card(n: Node3D) -> void:
 
 
 static func _hanging_sign(n: Node3D) -> void:
-	_put(_box(2.0, 0.42, 0.04), _m("cream"), Vector3.ZERO, n)
-	for y in [-0.22, 0.22]:
-		_put(_box(2.06, 0.03, 0.06), _m("brass"), Vector3(0, y, 0), n)
+	_put(_box(2.0, 0.42, 0.06), _m("cream"), Vector3.ZERO, n)
+	for y in [-0.23, 0.23]:
+		_put(_box(2.1, 0.05, 0.09), _m("brass"), Vector3(0, y, 0), n)
 	for x in [-1.03, 1.03]:
-		_put(_box(0.03, 0.47, 0.06), _m("brass"), Vector3(x, 0, 0), n)
+		_put(_box(0.05, 0.51, 0.09), _m("brass"), Vector3(x, 0, 0), n)
 		_put(_cyl(0.008, 0.008, 0.7, 6), _m("brass"), Vector3(x * 0.8, 0.57, 0), n)
+
+
+# ---------------------------------------------------------------- counters and doors
+
+## A counter that reads as solid furniture: a recessed dark plinth, a plum base with a brass
+## band, a cream cabinet, a brass trim line and an overhanging countertop with a softened edge.
+## Every layer has rounded corners. `at` is the floor centre; size is (width, height, depth).
+## `top` picks the countertop: "cream" (stone), "walnut" or "plum".
+static func counter(parent: Node3D, at: Vector3, size: Vector3, top := "cream", r := 0.08) -> Node3D:
+	var c := Node3D.new()
+	c.position = at
+	parent.add_child(c)
+	var w := size.x
+	var h := size.y
+	var d := size.z
+	_put(rounded_block(w - 0.1, 0.1, d - 0.1, r * 0.6), _m("plinth"), Vector3.ZERO, c)
+	_put(rounded_block(w, 0.34, d, r), _m("plum"), Vector3(0, 0.1, 0), c)
+	_put(rounded_block(w + 0.02, 0.04, d + 0.02, r + 0.01), _m("brass"), Vector3(0, 0.44, 0), c)
+	_put(rounded_block(w - 0.02, h - 0.6, d - 0.02, r), _m("cream"), Vector3(0, 0.48, 0), c)
+	_put(rounded_block(w + 0.03, 0.035, d + 0.03, r + 0.015), _m("brass"), Vector3(0, h - 0.125, 0), c)
+	var tops := {"cream": "counter_top", "walnut": "walnut", "plum": "plum"}
+	_put(rounded_block(w + 0.1, 0.09, d + 0.1, r + 0.05, 0.025), _m(tops[top]), Vector3(0, h - 0.09, 0), c)
+	return c
+
+
+## A cased doorway in a wall: lined reveal, moulded casings with plinth blocks and a capped
+## head on both faces, and a brass threshold. Local x runs along the wall, z through it;
+## `at` is the floor centre of the opening and `wall` the wall's depth.
+static func door_frame(parent: Node3D, at: Vector3, width: float, height: float, yaw := 0.0, wall := 0.3) -> Node3D:
+	var f := Node3D.new()
+	f.position = at
+	f.rotation.y = yaw
+	parent.add_child(f)
+	var cw := 0.14     # casing width
+	var proud := 0.05  # how far the casing stands off the wall
+	for s in [-1.0, 1.0]:
+		_put(_box(0.04, height, wall + 0.02), _m("walnut"), Vector3(s * (width * 0.5 + 0.02), height * 0.5, 0), f)   # reveal lining
+		for face in [-1.0, 1.0]:
+			var z: float = face * (wall * 0.5 + proud * 0.5)
+			_put(_box(cw, height + cw * 0.5, proud), _m("walnut"), Vector3(s * (width * 0.5 + cw * 0.5), (height + cw * 0.5) * 0.5, z), f)
+			_put(_box(cw * 0.35, height, proud + 0.02), _m("walnut"), Vector3(s * (width * 0.5 + cw * 0.25), height * 0.5, z + face * 0.005), f)   # bead
+			_put(_box(cw + 0.03, 0.24, proud + 0.025), _m("walnut"), Vector3(s * (width * 0.5 + cw * 0.5), 0.12, z), f)   # plinth block
+	_put(_box(width + 0.04, 0.04, wall + 0.02), _m("walnut"), Vector3(0, height + 0.02, 0), f)   # head lining
+	for face in [-1.0, 1.0]:
+		var z: float = face * (wall * 0.5 + proud * 0.5)
+		_put(_box(width + cw * 2.0, 0.2, proud), _m("walnut"), Vector3(0, height + 0.1, z), f)
+		_put(_box(width + cw * 2.0 + 0.08, 0.05, proud + 0.05), _m("walnut"), Vector3(0, height + 0.225, z + face * 0.02), f)   # cap
+		_put(_box(width + cw * 2.0 + 0.02, 0.02, proud + 0.02), _m("brass"), Vector3(0, height + 0.19, z + face * 0.005), f)
+	_put(_box(width, 0.015, wall + 0.06), _m("brass"), Vector3(0, 0.008, 0), f)   # threshold
+	return f
+
+
+## A panelled walnut door hinged at `hinge` (the leaf runs along local +x), opened `open`
+## radians: raised panels, brass lever handles both sides, a brass kick plate, optional window.
+static func door_leaf(parent: Node3D, hinge: Vector3, width: float, height: float, yaw := 0.0, open := 0.0, window := false) -> Node3D:
+	var pivot := Node3D.new()
+	pivot.position = hinge
+	pivot.rotation.y = yaw + open
+	parent.add_child(pivot)
+	var t := 0.055
+	_put(_box(width, height, t), _m("walnut"), Vector3(width * 0.5, height * 0.5, 0), pivot)
+	var panels := [[0.62, 0.95]] if window else [[0.62, 0.95], [1.65, 0.85]]
+	for face in [-1.0, 1.0]:
+		for pnl in panels:
+			var py: float = pnl[0] + pnl[1] * 0.5
+			_put(_box(width - 0.3, pnl[1], 0.012), _m("walnut_dark"), Vector3(width * 0.5, py, face * (t * 0.5 + 0.004)), pivot)
+			_put(_box(width - 0.38, pnl[1] - 0.08, 0.02), _m("walnut"), Vector3(width * 0.5, py, face * (t * 0.5 + 0.01)), pivot)
+		_put(_box(width - 0.06, 0.22, 0.006), _m("brass"), Vector3(width * 0.5, 0.13, face * (t * 0.5 + 0.003)), pivot)   # kick plate
+		var hx := width - 0.09
+		var rose := _put(_cyl(0.035, 0.035, 0.02, 16), _m("brass"), Vector3(hx, 1.0, face * (t * 0.5 + 0.01)), pivot)
+		rose.rotation.x = PI / 2.0
+		var neck := _put(_cyl(0.012, 0.012, 0.05, 8), _m("brass"), Vector3(hx, 1.0, face * (t * 0.5 + 0.04)), pivot)
+		neck.rotation.x = PI / 2.0
+		_put(_box(0.13, 0.022, 0.024), _m("brass"), Vector3(hx - 0.06, 1.0, face * (t * 0.5 + 0.065)), pivot)   # lever
+		_put(_box(0.024, 0.07, 0.008), _m("brass"), Vector3(hx, 0.92, face * (t * 0.5 + 0.004)), pivot)   # keyhole plate
+		if window:
+			for y in [1.38, 2.12]:
+				_put(_box(width - 0.3, 0.05, 0.02), _m("walnut"), Vector3(width * 0.5, y, face * (t * 0.5 + 0.01)), pivot)
+			for x in [0.15, width - 0.15]:
+				_put(_box(0.05, 0.79, 0.02), _m("walnut"), Vector3(x, 1.75, face * (t * 0.5 + 0.01)), pivot)
+	if window:
+		var glass := _put(_box(width - 0.36, 0.7, 0.012), _m("door_glass"), Vector3(width * 0.5, 1.75, 0), pivot)
+		glass.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	return pivot
+
+
+## A brass pull bar on two standoffs, for shutters and roller gates. Local x along the bar,
+## standing off toward +z.
+static func pull_handle(parent: Node3D, at: Vector3, length := 0.5, yaw := 0.0) -> Node3D:
+	var hnd := Node3D.new()
+	hnd.position = at
+	hnd.rotation.y = yaw
+	parent.add_child(hnd)
+	var bar := _put(_cyl(0.016, 0.016, length, 10), _m("brass"), Vector3(0, 0, 0.07), hnd)
+	bar.rotation.z = PI / 2.0
+	for s in [-1.0, 1.0]:
+		var post := _put(_cyl(0.012, 0.014, 0.07, 8), _m("brass"), Vector3(s * length * 0.42, 0, 0.035), hnd)
+		post.rotation.x = PI / 2.0
+		var plate := _put(_cyl(0.028, 0.028, 0.01, 12), _m("brass"), Vector3(s * length * 0.42, 0, 0.004), hnd)
+		plate.rotation.x = PI / 2.0
+	return hnd
+
+
+static var _shapes := {}
+
+
+## A block with rounded vertical corners (radius `r`) and, optionally, a softened top edge
+## (`bevel`). Sits on y = 0, centred in x and z. Cached per size.
+static func rounded_block(w: float, h: float, d: float, r: float, bevel := 0.0, seg := 5) -> ArrayMesh:
+	var key := "%.3f/%.3f/%.3f/%.3f/%.3f" % [w, h, d, r, bevel]
+	if _shapes.has(key):
+		return _shapes[key]
+	r = clampf(r, 0.002, minf(w, d) * 0.5 - 0.001)
+	bevel = clampf(bevel, 0.0, minf(r - 0.001, h * 0.5))
+	var ring := []   # [point (x, z), outward normal (x, z), corner centre]
+	for c in [[1.0, 1.0, 0.0], [-1.0, 1.0, 90.0], [-1.0, -1.0, 180.0], [1.0, -1.0, 270.0]]:
+		var centre := Vector2(c[0] * (w * 0.5 - r), c[1] * (d * 0.5 - r))
+		for i in seg + 1:
+			var a := deg_to_rad(c[2] + 90.0 * i / seg)
+			var n := Vector2(cos(a), sin(a))
+			ring.append([centre + n * r, n, centre])
+	var st := SurfaceTool.new()
+	st.begin(Mesh.PRIMITIVE_TRIANGLES)
+	var count := ring.size()
+	var side_top := h - bevel
+	var inset := r - bevel
+	for i in count:
+		var j := (i + 1) % count
+		var a0: Vector2 = ring[i][0]
+		var b0: Vector2 = ring[j][0]
+		var na: Vector2 = ring[i][1]
+		var nb: Vector2 = ring[j][1]
+		_quad(st, [Vector3(a0.x, 0, a0.y), Vector3(b0.x, 0, b0.y), Vector3(b0.x, side_top, b0.y), Vector3(a0.x, side_top, a0.y)],
+				[Vector3(na.x, 0, na.y), Vector3(nb.x, 0, nb.y), Vector3(nb.x, 0, nb.y), Vector3(na.x, 0, na.y)])
+		var a1 := a0
+		var b1 := b0
+		if bevel > 0.0:
+			a1 = ring[i][2] + na * inset
+			b1 = ring[j][2] + nb * inset
+			var ba := Vector3(na.x, 1.0, na.y).normalized()
+			var bb := Vector3(nb.x, 1.0, nb.y).normalized()
+			_quad(st, [Vector3(a0.x, side_top, a0.y), Vector3(b0.x, side_top, b0.y), Vector3(b1.x, h, b1.y), Vector3(a1.x, h, a1.y)], [ba, bb, bb, ba])
+		_tri(st, [Vector3(0, h, 0), Vector3(a1.x, h, a1.y), Vector3(b1.x, h, b1.y)], Vector3.UP)
+		_tri(st, [Vector3(0, 0, 0), Vector3(b0.x, 0, b0.y), Vector3(a0.x, 0, a0.y)], Vector3.DOWN)
+	st.index()              # same layout as Godot's primitive meshes, so bakes can mix them
+	st.generate_tangents()
+	var mesh := st.commit()
+	_shapes[key] = mesh
+	return mesh
+
+
+## Adds a triangle facing along `n` (Godot draws clockwise faces as front).
+static func _tri(st: SurfaceTool, v: Array, n: Vector3, normals := []) -> void:
+	var p0: Vector3 = v[0]
+	var p1: Vector3 = v[1]
+	var p2: Vector3 = v[2]
+	var ns: Array = normals if not normals.is_empty() else [n, n, n]
+	var order := [0, 1, 2]
+	if (p1 - p0).cross(p2 - p0).dot(n) > 0.0:
+		order = [0, 2, 1]
+	for k in order:
+		var p: Vector3 = v[k]
+		st.set_normal(ns[k])
+		st.set_uv(Vector2(p.x + p.z, p.y))
+		st.add_vertex(p)
+
+
+static func _quad(st: SurfaceTool, v: Array, ns: Array) -> void:
+	var avg: Vector3 = (ns[0] + ns[1] + ns[2] + ns[3]) * 0.25
+	_tri(st, [v[0], v[1], v[2]], avg, [ns[0], ns[1], ns[2]])
+	_tri(st, [v[0], v[2], v[3]], avg, [ns[0], ns[2], ns[3]])
 
 
 # ---------------------------------------------------------------- baking and helpers
@@ -417,6 +585,15 @@ static func _m(name: String) -> Material:
 	match name:
 		"brass": m = ST.textured("brass", 2.0, ST.plastic(Color("b58d3f"), 0.35, 0.85), 0.85)
 		"wood": m = ST.plastic(Color("8a6440"), 0.5, 0.0)
+		"walnut": m = ST.plastic(Color("5e3a22"), 0.55, 0.0)
+		"walnut_dark": m = ST.plastic(Color("40261a"), 0.6, 0.0)
+		"plinth": m = ST.plastic(Color("2a1420"), 0.7, 0.0)
+		"counter_top": m = ST.textured("marble_cream", 0.8, ST.plastic(Color("e9dcc0"), 0.45, 0.0))
+		"door_glass":
+			m = StandardMaterial3D.new()
+			m.albedo_color = Color(0.85, 0.75, 0.6, 0.35)
+			m.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+			m.roughness = 0.6
 		"rubber": m = ST.plastic(Color("17161b"), 0.6, 0.0)
 		"cream": m = ST.textured("plaster_cream", 0.6, ST.plastic(Color("efe3c8"), 0.55, 0.0))
 		"plum": m = ST.textured("laminate_plum", 1.0, ST.plastic(Color("5b2a4a"), 0.6, 0.0))

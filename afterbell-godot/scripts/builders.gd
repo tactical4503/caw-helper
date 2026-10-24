@@ -179,13 +179,17 @@ static func build_arena(parent: Node3D) -> Arena:
 	put(box(4.16, 0.06, 0.54), brass(), Vector3(0, 4.24, -9.15), root)
 	put(box(3.8, 0.18, 0.34), mat(CREAM, 0.6), Vector3(0, 0.09, -8.98), root)
 	for s in [-1.0, 1.0]:
-		put(box(4.4, 0.32, 1.6), ST.textured("laminate_plum", 1.2, mat(PLUM, 0.5)), Vector3(s * 4.6, 0.16, -8.15), root)
-		put(box(4.44, 0.04, 1.64), brass(), Vector3(s * 4.6, 0.33, -8.15), root)
+		put(Atrium.Props.rounded_block(4.3, 0.06, 1.5, 0.08), mat(Color("2a1420"), 0.7), Vector3(s * 4.6, 0, -8.15), root)
+		put(Atrium.Props.rounded_block(4.4, 0.26, 1.6, 0.12, 0.03), ST.textured("laminate_plum", 1.2, mat(PLUM, 0.5)), Vector3(s * 4.6, 0.06, -8.15), root)
+		put(Atrium.Props.rounded_block(4.44, 0.03, 1.64, 0.13), brass(), Vector3(s * 4.6, 0.2, -8.15), root)
 	# West wall with the service door; waist-high east barrier over the atrium; low south wall and gate.
 	put(box(0.3, 2.6, 15.2), wall, Vector3(-8.15, 1.3, -1.4), root)
 	put(box(0.3, 2.6, 0.6), wall, Vector3(-8.15, 1.3, 8.7), root)
-	put(box(0.08, 2.2, 1.7), mat(WOOD, 0.5), Vector3(-8.05, 1.1, 7.4), root)
-	put(box(0.06, 0.06, 0.4), brass(), Vector3(-7.98, 1.0, 7.0), root)
+	# Service doors from Cosmetics: header, cased frame, a closed pair of panelled doors.
+	put(box(0.3, 0.4, 2.2), wall, Vector3(-8.15, 2.4, 7.3), root)
+	Atrium.Props.door_frame(root, Vector3(-8.15, 0, 7.3), 2.2, 2.2, PI / 2.0)
+	Atrium.Props.door_leaf(root, Vector3(-8.15, 0, 6.2), 1.1, 2.2, -PI / 2.0)
+	Atrium.Props.door_leaf(root, Vector3(-8.15, 0, 8.4), 1.1, 2.2, PI / 2.0)
 	put(box(0.25, 1.05, 18), mat(CREAM, 0.6), Vector3(8.12, 0.52, 0), root)
 	put(box(0.3, 0.08, 18), brass(), Vector3(8.12, 1.07, 0), root)
 	put(box(16, 1.0, 0.25), mat(CREAM, 0.6), Vector3(0, 0.5, 9.1), root)
@@ -196,9 +200,10 @@ static func build_arena(parent: Node3D) -> Arena:
 	_build_hall(root)
 	# Six low shoe plinths form the outer edge.
 	for p in [Vector2(-7.0, -3.6), Vector2(-7.0, 2.4), Vector2(7.0, -3.6), Vector2(7.0, 2.4), Vector2(-3.6, 8.0), Vector2(3.6, 8.0)]:
-		put(box(1.1, 0.5, 1.1), ST.textured("laminate_plum", 1.2, mat(PLUM, 0.6)), Vector3(p.x, 0.25, p.y), root)   # plum base
-		put(box(1.16, 0.06, 1.16), mat(CREAM, 0.5), Vector3(p.x, 0.53, p.y), root)                                  # cream top
-		put(box(1.14, 0.04, 1.14), brass(), Vector3(p.x, 0.48, p.y), root)                                          # brass band
+		put(Atrium.Props.rounded_block(1.0, 0.08, 1.0, 0.06), mat(Color("2a1420"), 0.7), Vector3(p.x, 0, p.y), root)          # recessed plinth
+		put(Atrium.Props.rounded_block(1.1, 0.38, 1.1, 0.1), ST.textured("laminate_plum", 1.2, mat(PLUM, 0.6)), Vector3(p.x, 0.08, p.y), root)   # plum base
+		put(Atrium.Props.rounded_block(1.13, 0.035, 1.13, 0.11), brass(), Vector3(p.x, 0.46, p.y), root)                     # brass band
+		put(Atrium.Props.rounded_block(1.2, 0.07, 1.2, 0.13, 0.02), mat(CREAM, 0.5), Vector3(p.x, 0.49, p.y), root)          # cream top
 		put(box(0.34, 0.14, 0.14), mat(RED, 0.5), Vector3(p.x, 0.62, p.y), root)
 		a.plinths.append(Rect2(p - Vector2(0.6, 0.6), Vector2(1.2, 1.2)))
 		Atrium.Props.place(root, "sale_card", Vector3(p.x, 0.555, p.y + 0.2), 0.0 if p.y < 7.0 else PI)

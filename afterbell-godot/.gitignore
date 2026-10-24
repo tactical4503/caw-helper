@@ -7,3 +7,6 @@ assets/characters/*/*_walk_*.png
 assets/characters/*/*_run_*.png
 assets/anim/meshy/*.glb
 assets/anim/meshy/*.png
+
+# Texture import settings are shared (mipmaps on): keep these.
+!assets/textures/**/*.import

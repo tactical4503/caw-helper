@@ -163,6 +163,13 @@ func _build_room() -> void:
 	for side in [-1.0, 1.0]:
 		B.put(B.box(HALF_W - EXIT_X, 4.0, 0.3), wall, Vector3(side * (HALF_W + EXIT_X) / 2.0, 2.0, -HALF_D - 0.15), self)
 	B.put(B.box(EXIT_X * 2, 1.6, 0.3), wall, Vector3(0, 3.2, -HALF_D - 0.15), self)
+	# Staff doors: cased frame, a pair of half-glazed doors swung open into the corridor.
+	Props.door_frame(self, Vector3(0, 0, -HALF_D - 0.15), EXIT_X * 2.0, 2.4)
+	Props.door_leaf(self, Vector3(-EXIT_X, 0, -HALF_D - 0.3), EXIT_X, 2.4, 0.0, PI / 2.0 * 0.92, true)
+	Props.door_leaf(self, Vector3(EXIT_X, 0, -HALF_D - 0.3), EXIT_X, 2.4, PI, -PI / 2.0 * 0.92, true)
+	# The way in from Cosmetics: a header and casing round the east opening.
+	B.put(B.box(0.3, 1.5, 1.8), wall, Vector3(HALF_W + 0.15, 3.25, 5.0), self)
+	Props.door_frame(self, Vector3(HALF_W + 0.15, 0, 5.0), 1.8, 2.5, PI / 2.0)
 	var sign := Label3D.new()
 	sign.text = "STAFF  ·  ALTERATIONS"
 	sign.font_size = 48
@@ -177,8 +184,11 @@ func _build_room() -> void:
 	for part in [[-3.0, 4.0], [4.2, 1.6]]:
 		var cx: float = part[0]
 		var w: float = part[1]
-		B.put(B.box(w, 1.7, 0.6), shelf, Vector3(cx, 0.85, PARTITION_Z), self)
-		B.put(B.box(w + 0.04, 0.05, 0.64), B.brass(), Vector3(cx, 1.72, PARTITION_Z), self)
+		# A proper run of shelving: dark recessed plinth, rounded walnut case, brass band, cornice.
+		B.put(Props.rounded_block(w - 0.08, 0.12, 0.52, 0.04), B.mat(Color("2a1420"), 0.7), Vector3(cx, 0, PARTITION_Z), self)
+		B.put(Props.rounded_block(w, 1.54, 0.6, 0.07), shelf, Vector3(cx, 0.12, PARTITION_Z), self)
+		B.put(Props.rounded_block(w + 0.02, 0.035, 0.62, 0.08), B.brass(), Vector3(cx, 0.5, PARTITION_Z), self)
+		B.put(Props.rounded_block(w + 0.1, 0.07, 0.7, 0.1, 0.02), shelf, Vector3(cx, 1.66, PARTITION_Z), self)
 		for i in int(w / 0.6):
 			var hx: float = cx - w / 2.0 + 0.3 + i * 0.6
 			_hat(Vector3(hx, 1.75, PARTITION_Z), [B.CREAM, B.PLUM, B.RED][i % 3])
