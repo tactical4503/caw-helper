@@ -19,6 +19,8 @@ const MAIN := preload("res://scripts/main.gd")
 const REN_RIG := preload("res://rigs/ren.tscn")
 const Dialogue := preload("res://scripts/dialogue.gd")
 const GaugeHud := preload("res://scripts/hud.gd")
+const Fade := preload("res://scripts/fade.gd")
+var fade
 
 # Local coordinates: x east, -z north. DS-02 is building x0–10, y6–24 (10 m × 18 m).
 const HALF_W := 5.0
@@ -111,6 +113,8 @@ func _ready() -> void:
 				ev.physical_keycode = k
 				InputMap.action_add_event(action, ev)
 	_build_room()
+	fade = Fade.new()
+	add_child(fade)
 	ren = REN_RIG.instantiate()
 	add_child(ren)
 	ren_anim = ren.get_node("AnimationPlayer")
@@ -677,8 +681,7 @@ func _take_pin() -> void:
 func _leave() -> void:
 	leaving = true
 	Engine.set_meta("afterbell_skip_title", true)
-	if is_inside_tree() and not Engine.has_meta("afterbell_testing"):
-		get_tree().change_scene_to_file(next_scene)
+	fade.go_to(next_scene)
 
 
 # ---------------------------------------------------------------- presentation

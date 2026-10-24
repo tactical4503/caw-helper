@@ -72,6 +72,8 @@ var who: Label
 var prompt: Label
 const Dialogue := preload("res://scripts/dialogue.gd")
 const GaugeHud := preload("res://scripts/hud.gd")
+const Fade := preload("res://scripts/fade.gd")
+var fade
 var gauge
 var dialogue
 var settings := {"reflect_assist": false}
@@ -94,6 +96,8 @@ func _ready() -> void:
 			ev.physical_keycode = extra[1]
 			InputMap.action_add_event(action, ev)
 	_build_room()
+	fade = Fade.new()
+	add_child(fade)
 	ren = REN_RIG.instantiate()
 	add_child(ren)
 	ren_anim = ren.get_node("AnimationPlayer")
@@ -517,8 +521,7 @@ func _update_gate(dt: float) -> void:
 
 func _leave() -> void:
 	leaving = true
-	if not Engine.has_meta("afterbell_testing"):
-		get_tree().change_scene_to_file(next_scene)
+	fade.go_to(next_scene)
 
 
 func _update_subs(dt: float) -> void:

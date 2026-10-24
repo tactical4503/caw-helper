@@ -150,6 +150,7 @@ var sfx: B.Sfx
 
 const Dialogue := preload("res://scripts/dialogue.gd")
 const GaugeHud := preload("res://scripts/hud.gd")
+const Fade := preload("res://scripts/fade.gd")
 var gauge
 var dialogue
 
@@ -206,6 +207,7 @@ func _ready() -> void:
 	if Engine.has_meta("afterbell_skip_title"):
 		Engine.remove_meta("afterbell_skip_title")
 		_on_start.call_deferred()
+		add_child(Fade.new())   # fade in from the previous room
 
 
 func _setup_input() -> void:
@@ -1054,7 +1056,7 @@ func _render(dt: float) -> void:
 	var facing := look.normalized() if look.length() > 0.5 else Vector2(0, -1)
 	var side := Vector2(-facing.y, facing.x)
 	var back := p_pos - facing * 4.2 * wide + side * 0.9
-	back.x = clampf(back.x, MIN_X, MAX_X)
+	back.x = clampf(back.x, -6.8, 6.8)
 	back.y = clampf(back.y, MIN_Z - 1.0, MAX_Z + 0.2)
 	var cam_target := Vector3(back.x, 2.3 * wide, back.y)
 	var aim := p_pos.lerp(m_pos, 0.45)
