@@ -16,6 +16,7 @@ const MAIN := preload("res://scripts/main.gd")
 const REN_RIG := preload("res://rigs/ren.tscn")
 const Dialogue := preload("res://scripts/dialogue.gd")
 const Mover := preload("res://scripts/mover.gd")
+const ShoulderCam := preload("res://scripts/shoulder_cam.gd")
 var mover = Mover.new()
 const GaugeHud := preload("res://scripts/hud.gd")
 const Fade := preload("res://scripts/fade.gd")
@@ -519,11 +520,6 @@ func _leave() -> void:
 
 
 func _place_camera(delta: float) -> void:
-	var back := 4.4
-	var target := Vector3(p_pos.x * 0.7 + (0.6 if p_pos.y < -5.0 else 0.0), 3.1, p_pos.y + back)
-	var max_z := 4.65 if p_pos.y > -5.0 else -5.4
-	target.z = minf(target.z, max_z)
-	target.y += maxf(0.0, (p_pos.y + back) - target.z) * 0.35
-	target.y = minf(target.y, 3.2)   # stay under the 3.5 m ceiling
-	camera.position = camera.position.lerp(target, 1.0 - exp(-5.0 * delta))
-	camera.look_at(Vector3(p_pos.x * 0.8, 1.2, p_pos.y - 2.6), Vector3.UP)
+	# Alterations (south) and receiving (north) each keep the camera inside their own walls.
+	var walls := Rect2(-4.65, -4.65, 9.3, 9.3) if p_pos.y > -5.0 else Rect2(-4.65, -12.65, 11.3, 7.25)
+	ShoulderCam.place(camera, p_pos, Vector2(0, -1), delta, walls, 62.0)

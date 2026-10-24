@@ -72,6 +72,7 @@ var who: Label
 var prompt: Label
 const Dialogue := preload("res://scripts/dialogue.gd")
 const Mover := preload("res://scripts/mover.gd")
+const ShoulderCam := preload("res://scripts/shoulder_cam.gd")
 var mover = Mover.new()
 const GaugeHud := preload("res://scripts/hud.gd")
 const Fade := preload("res://scripts/fade.gd")
@@ -525,9 +526,5 @@ func _update_subs(dt: float) -> void:
 
 
 func _place_camera(delta: float) -> void:
-	# Stay inside the room: pull back as far as the south wall allows, rising a little instead.
-	var target := Vector3(p_pos.x * 0.6, 3.0, p_pos.y + 4.5)
-	target.z = minf(target.z, HALF_D - 0.35)
-	target.y += maxf(0.0, (p_pos.y + 4.5) - target.z) * 0.35
-	camera.position = camera.position.lerp(target, 1.0 - exp(-5.0 * delta))
-	camera.look_at(Vector3(p_pos.x * 0.85, 1.3, p_pos.y - 2.5), Vector3.UP)
+	var walls := Rect2(-HALF_W + 0.35, -HALF_D + 0.35, HALF_W * 2.0 - 0.7, HALF_D * 2.0 - 0.7)
+	ShoulderCam.place(camera, p_pos, Vector2(0, -1), delta, walls, 62.0)

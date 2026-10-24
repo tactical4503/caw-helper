@@ -150,6 +150,7 @@ var sfx: B.Sfx
 
 const Dialogue := preload("res://scripts/dialogue.gd")
 const Mover := preload("res://scripts/mover.gd")
+const ShoulderCam := preload("res://scripts/shoulder_cam.gd")
 var mover = Mover.new()
 const GaugeHud := preload("res://scripts/hud.gd")
 const Fade := preload("res://scripts/fade.gd")
@@ -1054,20 +1055,9 @@ func _render(dt: float) -> void:
 	# during the opening so chair and bell share the frame.
 	var vp := get_viewport().get_visible_rect().size
 	var portrait := vp.x < vp.y
-	camera.fov = 70.0 if portrait else 55.0
 	var wide := 1.35 if (exp_on or m_state == "bell_scene") else 1.0
 	var look := m_pos - p_pos
 	var facing := look.normalized() if look.length() > 0.5 else Vector2(0, -1)
-	var side := Vector2(-facing.y, facing.x)
-	var back := p_pos - facing * 4.2 * wide + side * 0.9
-	back.x = clampf(back.x, -6.8, 6.8)
-	back.y = clampf(back.y, MIN_Z - 1.0, MAX_Z + 0.2)
-	var cam_target := Vector3(back.x, 2.3 * wide, back.y)
-	var aim := p_pos.lerp(m_pos, 0.45)
-	var fx := aim.x
-	var fz := aim.y
-	var k_cam := 1.0 - exp(-4.0 * dt) if dt > 0.0 else 1.0
-	camera.position = camera.position.lerp(cam_target, k_cam)
 	shake = maxf(0.0, shake - dt)
-	var sh := shake * 0.4
-	camera.look_at(Vector3(fx + (randf() - 0.5) * sh, 1.5 + (randf() - 0.5) * sh, fz), Vector3.UP)
+	var court := Rect2(-6.8, MIN_Z - 1.0, 13.6, MAX_Z - MIN_Z + 1.2)
+	ShoulderCam.place(camera, p_pos, facing, dt, court, 66.0 if portrait else 55.0, wide, shake * 0.4)
