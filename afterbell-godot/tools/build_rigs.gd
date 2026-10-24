@@ -7,11 +7,24 @@ extends SceneTree
 
 const B := preload("res://scripts/builders.gd")
 const A := preload("res://scripts/anim_data.gd")
+## Imported character models. When present, the model is skinned onto the greybox rig
+## (scripts/ren_skin.gd retargets the clips every frame) and the greybox body is hidden.
+const REN_MODEL := "res://assets/characters/ren/ren_rigged.glb"
 
 
 func _initialize() -> void:
 	var ok := _bake(B.build_boss_rig(), A.boss_clips(), A.boss_rest(), "res://rigs/floor_manager.tscn")
-	ok = _bake(B.build_ren_rig(), A.ren_clips(), A.ren_rest(), "res://rigs/ren.tscn") and ok
+	var ren := B.build_ren_rig()
+	if ResourceLoader.exists(REN_MODEL):
+		var skin: Node3D = load(REN_MODEL).instantiate()
+		skin.name = "Skin"
+		ren.add_child(skin)
+		var driver := Node.new()
+		driver.name = "SkinDriver"
+		driver.set_script(load("res://scripts/ren_skin.gd"))
+		ren.add_child(driver)
+		print("Ren: using model ", REN_MODEL)
+	ok = _bake(ren, A.ren_clips(), A.ren_rest(), "res://rigs/ren.tscn") and ok
 	quit(0 if ok else 1)
 
 
@@ -40,4 +53,5 @@ func _bake(rig: Node3D, clips: Dictionary, rest: Dictionary, path: String) -> bo
 func _own(node: Node, owner: Node) -> void:
 	for child in node.get_children():
 		child.owner = owner
-		_own(child, owner)
+		if child.scene_file_path.is_empty():  # don't flatten an instanced model into the rig scene
+			_own(child, owner)

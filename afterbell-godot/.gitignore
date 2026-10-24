@@ -1,3 +1,5 @@
 .godot/
 *.import
 assets/meshy_output/
+assets/characters/*/*_walk.glb
+assets/characters/*/*_run.glb

@@ -16,6 +16,14 @@ Open this folder from the Godot project manager (**Import** → select `project.
 - `tools/filmstrip.gd`: renders each clip as a contact sheet (front three-quarter and side views) for review.
 - `docs/sheets/`: sample contact sheets.
 
+## Asset rules
+- **Every model is 20,000 triangles** (remesh AI output to that target before it goes in the game).
+- Characters keep the rig joint names, so the clips in `anim_data.gd` drive them.
+- Imported models live in `assets/`. The concept art they came from is in `assets/*_ref/`.
+
+## Characters
+- **Ren:** `assets/characters/ren/ren_rigged.glb`, made with Meshy from `assets/ren_ref/ren_sheet.png` (cleaned A-pose concept → image-to-3D → remeshed to 20k triangles → auto-rigged, 24 bones). `scripts/ren_skin.gd` retargets all of Ren's greybox clips onto this skeleton every frame, so re-baking or swapping the model keeps the animation. Meshy's rig has no finger bones, so his hands stay open.
+
 ## Visual style
 `scripts/style.gd` sets the look of the whole game: mid-90s ray-traced CGI, in the spirit of the era's promo renders.
 - Glossy plastic and lacquer with hard white hotspots, saturated colour and densely tessellated round shapes.
