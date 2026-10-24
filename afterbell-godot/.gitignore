@@ -3,3 +3,5 @@
 assets/meshy_output/
 assets/characters/*/*_walk.glb
 assets/characters/*/*_run.glb
+assets/characters/*/*_walk_*.png
+assets/characters/*/*_run_*.png
