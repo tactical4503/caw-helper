@@ -33,6 +33,9 @@ F5 starts in **DS-01 Cosmetics**, then **DS-02 Hats**, **DS-03 Alterations with 
 - **Ren:** `assets/characters/ren/ren_rigged.glb`, made with Meshy from `assets/ren_ref/ren_sheet.png` (cleaned A-pose concept → image-to-3D → remeshed to 20k triangles → auto-rigged, 24 bones). `scripts/ren_skin.gd` retargets all of Ren's greybox clips onto this skeleton every frame, so re-baking or swapping the model keeps the animation. Meshy's rig has no finger bones, so his hands stay open.
 - **Knock (sword):** `assets/props/knock/knock.glb`, made with Meshy from the sheet (concept → image-to-3D → 20k triangles). `ren_skin.gd` scales it to 1.05 m and puts the grip in Ren's right hand, oriented by the clips. Frame sheets are in `docs/models/`.
 
+## Motion capture
+Ren's idle, run, guard, reflect, light and heavy attacks, and hit reaction are Mixamo great-sword motion capture (`assets/anim/great_sword/`, the pack you supplied). `scripts/ren_skin.gd` retargets them onto the Meshy skeleton every frame: it maps the bones, corrects for the T-pose vs A-pose rest difference, fits each one-shot to the game's timing, and keeps Ren in place. Moves without a mocap version (wind-up, dodge, eat) use the keyframed clips, and switching between the two blends over 0.12 s. Knock's grip angle is derived from the Mixamo hand's rest pose. To swap a move, edit the `MOCAP` table.
+
 ## Visual style
 `scripts/style.gd` sets the look of the whole game: mid-90s ray-traced CGI, in the spirit of the era's promo renders.
 - Glossy plastic and lacquer with hard white hotspots, saturated colour and densely tessellated round shapes.

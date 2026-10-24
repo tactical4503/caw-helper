@@ -105,7 +105,7 @@ func _run() -> void:
 		main.step(DT)
 		main.step(DT)
 		main.virtual["attack"] = false
-		for j in 25:
+		for j in 35:
 			main.step(DT)
 	check(main.locked_hits >= 3 and main.seen.has("locked"), "light hits on the locked chair show the hint")
 	var hp0: int = main.hp

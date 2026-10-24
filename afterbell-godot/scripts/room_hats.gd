@@ -360,7 +360,7 @@ func _update_player(dt: float) -> void:
 					_hit_guard(target, true)
 			else:
 				act = "light"
-				act_t = 0.32
+				act_t = 0.5   # long enough for the mocap slash to finish
 				sfx.swing()
 				if target:
 					_hit_guard(target, false)

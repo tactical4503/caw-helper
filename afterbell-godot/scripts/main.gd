@@ -866,7 +866,7 @@ func _update_player(dt: float) -> void:
 				_heavy_strike()
 			else:
 				act = "light"
-				act_t = 0.32
+				act_t = 0.5   # long enough for the mocap slash to finish
 				sfx.swing()
 				_light_strike()
 	if was_pressed("dodge") and free and dodge_cd <= 0.0:
