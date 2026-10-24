@@ -4,6 +4,9 @@ A Godot 4 port of the Installment 002 boss fight: **BS-01, the Floor Manager**, 
 
 Open this folder from the Godot project manager (**Import** → select `project.godot`), then press F5. Built and tested on **Godot 4.3**; other 4.x versions should work.
 
+## Playable flow (demonstration build)
+F5 starts in **DS-01 Cosmetics** (`rooms/cosmetics.tscn`, `scripts/room_cosmetics.gd`). It is the safe reflection lesson: the attendant flips a sale sign across the aisle every 6 s, and you return it with a timed guard (K) to the receiver over the west door, which opens the hats gate. The sign can't hurt you here. After three misses, T turns on reflection assist and H asks Mika to hold the catch. E examines the mirror, atomizer and price card. Leaving through the west gate goes to the Floor Manager fight (`main.tscn`). Checks: `godot --headless --path afterbell-godot -s res://tests/room_test.gd`.
+
 ## Layout
 - `scripts/main.gd`: the fight. Contains the state machine, the timing table constants (Section 11), input, camera, and which clip plays when.
 - `scripts/anim_data.gd`: **the keyframe source for every clip** (14 for the Floor Manager, 10 for Ren).

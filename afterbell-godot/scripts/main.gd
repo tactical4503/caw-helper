@@ -190,6 +190,10 @@ func _ready() -> void:
 		box.toggled.connect(func(on: bool) -> void: settings[key] = on)
 	reset_attempt(false)
 	_render(0.0)
+	# Arriving from the cosmetics room: skip the title card.
+	if Engine.has_meta("afterbell_skip_title"):
+		Engine.remove_meta("afterbell_skip_title")
+		_on_start.call_deferred()
 
 
 func _setup_input() -> void:
