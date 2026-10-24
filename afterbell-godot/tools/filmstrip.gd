@@ -5,6 +5,7 @@ extends SceneTree
 ##   godot --path afterbell-godot -s res://tools/filmstrip.gd -- --rig=ren --clips=run,wind,heavy --frames=10
 ## Each sheet is <out>/<rig>_<clip>.png.
 
+const ST := preload("res://scripts/style.gd")
 const CELL := Vector2i(220, 260)
 var rig_kind := "boss"
 var out_dir := "user://sheets"
@@ -41,23 +42,14 @@ func _initialize() -> void:
 	var world := Node3D.new()
 	view.add_child(world)
 	var env := WorldEnvironment.new()
-	env.environment = Environment.new()
-	env.environment.background_mode = Environment.BG_COLOR
-	env.environment.background_color = Color("2a1d26")
-	env.environment.ambient_light_source = Environment.AMBIENT_SOURCE_COLOR
-	env.environment.ambient_light_color = Color("8a7680")
+	env.environment = ST.environment()
 	world.add_child(env)
-	var sun := DirectionalLight3D.new()
-	sun.rotation = Vector3(deg_to_rad(-50), deg_to_rad(-30), 0)
-	sun.shadow_enabled = true
-	world.add_child(sun)
+	world.add_child(ST.sun())
 	var floor_mi := MeshInstance3D.new()
 	var plane := PlaneMesh.new()
 	plane.size = Vector2(8, 8)
 	floor_mi.mesh = plane
-	var fm := StandardMaterial3D.new()
-	fm.albedo_color = Color("2f4a3a")
-	floor_mi.material_override = fm
+	floor_mi.material_override = ST.procedural(Color("1f3a2a"), Color("3d5e4a"), "carpet", 1.5)
 	world.add_child(floor_mi)
 	rig = load("res://rigs/floor_manager.tscn" if rig_kind == "boss" else "res://rigs/ren.tscn").instantiate()
 	world.add_child(rig)

@@ -17,6 +17,8 @@ const TILE := Color("d8ccb0")
 const STEEL := Color("9aa0a6")
 const DARK := Color("0c0a0d")
 
+const ST := preload("res://scripts/style.gd")
+
 const RACK_HOME := [Vector2(-4.9, 0.6), Vector2(4.9, 0.6)]
 const BELL_POS := Vector3(0, 0, -7.0)
 
@@ -82,11 +84,7 @@ static var _mats := {}
 static func mat(color: Color, rough := 0.7, metal := 0.0) -> StandardMaterial3D:
 	var key := "%s:%s:%s" % [color.to_html(), rough, metal]
 	if not _mats.has(key):
-		var m := StandardMaterial3D.new()
-		m.albedo_color = color
-		m.roughness = rough
-		m.metallic = metal
-		_mats[key] = m
+		_mats[key] = ST.plastic(color, rough, metal)
 	return _mats[key]
 
 
@@ -110,7 +108,7 @@ static func box(w: float, h: float, d: float) -> BoxMesh:
 	return b
 
 
-static func cyl(top: float, bottom: float, h: float, segments := 16) -> CylinderMesh:
+static func cyl(top: float, bottom: float, h: float, segments := ST.SEGMENTS) -> CylinderMesh:
 	var c := CylinderMesh.new()
 	c.top_radius = top
 	c.bottom_radius = bottom
@@ -119,7 +117,7 @@ static func cyl(top: float, bottom: float, h: float, segments := 16) -> Cylinder
 	return c
 
 
-static func sphere(r: float, segments := 16) -> SphereMesh:
+static func sphere(r: float, segments := ST.SEGMENTS) -> SphereMesh:
 	var s := SphereMesh.new()
 	s.radius = r
 	s.height = r * 2.0
@@ -144,25 +142,11 @@ static func build_arena(parent: Node3D) -> Arena:
 	parent.add_child(root)
 
 	var env := WorldEnvironment.new()
-	var e := Environment.new()
-	e.background_mode = Environment.BG_COLOR
-	e.background_color = Color("1a1218")
-	e.ambient_light_source = Environment.AMBIENT_SOURCE_COLOR
-	e.ambient_light_color = Color("6b5560")
-	e.ambient_light_energy = 0.6
-	e.tonemap_mode = Environment.TONE_MAPPER_ACES
-	e.fog_enabled = true
-	e.fog_light_color = Color("1a1218")
-	e.fog_density = 0.012
-	env.environment = e
+	env.environment = ST.environment()
 	root.add_child(env)
 
 	# Lighting: warm store interior; the bell is the brightest brass object (Section 3).
-	var key := DirectionalLight3D.new()
-	key.light_color = Color("fff0d6")
-	key.light_energy = 1.3
-	key.shadow_enabled = true
-	key.rotation = Vector3(deg_to_rad(-55), deg_to_rad(-35), 0)
+	var key := ST.sun()
 	root.add_child(key)
 	var bell_light := SpotLight3D.new()
 	bell_light.light_color = Color("ffd59a")
@@ -172,16 +156,9 @@ static func build_arena(parent: Node3D) -> Arena:
 	bell_light.position = Vector3(0, 5.2, BELL_POS.z + 1.6)
 	root.add_child(bell_light)
 	bell_light.look_at(Vector3(0, 1.2, BELL_POS.z), Vector3.FORWARD)
-	for p in [Vector3(-5, 3.6, 1), Vector3(5, 3.6, 1), Vector3(0, 3.6, 5)]:
-		var o := OmniLight3D.new()
-		o.light_color = Color("ffc98a")
-		o.light_energy = 1.2
-		o.omni_range = 9.0
-		o.position = p
-		root.add_child(o)
 
-	put(box(18, 0.1, 20), mat(TILE, 0.8), Vector3(0, -0.05, 0), root, false)
-	put(box(16, 0.02, 18), mat(CARPET, 0.95), Vector3(0, 0.01, 0), root, false)
+	put(box(18, 0.1, 20), ST.procedural(Color("b9a98a"), TILE, "marble"), Vector3(0, -0.05, 0), root, false)
+	put(box(16, 0.02, 18), ST.procedural(Color("1f3a2a"), CARPET_LIGHT, "carpet", 1.5), Vector3(0, 0.01, 0), root, false)
 	# Three carpet inlays fan toward the bell: decoration that also reads as approach lanes.
 	var lever_z := -6.1
 	put(box(4, 0.02, 12), mat(PLUM, 0.9), Vector3(0, 0.025, lever_z + 6.2), root, false)
@@ -190,11 +167,11 @@ static func build_arena(parent: Node3D) -> Arena:
 		strip.rotation.y = s * 0.33
 		put(box(0.08, 0.021, 12), mat(CREAM, 0.9), Vector3(s * 2.04, 0.03, lever_z + 6.2), root, false)
 	# North wall, display platform split around the bell recess.
-	var wall := mat(PLUM_DEEP, 0.85)
+	var wall := ST.procedural(Color("2a1222"), PLUM, "stone", 0.35)
 	put(box(16, 4.2, 0.3), wall, Vector3(0, 2.1, -9.15), root)
 	put(box(16, 0.18, 0.34), mat(CREAM, 0.6), Vector3(0, 0.09, -8.98), root)
 	for s in [-1.0, 1.0]:
-		put(box(4.4, 0.32, 1.6), mat(WOOD, 0.6), Vector3(s * 4.6, 0.16, -8.15), root)
+		put(box(4.4, 0.32, 1.6), ST.procedural(Color("6a4528"), Color("b0814f"), "wood", 0.4), Vector3(s * 4.6, 0.16, -8.15), root)
 	# West wall with the service door; waist-high east barrier over the atrium; low south wall and gate.
 	put(box(0.3, 2.6, 15.2), wall, Vector3(-8.15, 1.3, -1.4), root)
 	put(box(0.3, 2.6, 0.6), wall, Vector3(-8.15, 1.3, 8.7), root)
@@ -205,7 +182,7 @@ static func build_arena(parent: Node3D) -> Arena:
 	put(box(16, 1.0, 0.25), mat(CREAM, 0.6), Vector3(0, 0.5, 9.1), root)
 	for i in range(-2, 3):
 		put(box(0.05, 1.6, 0.05), brass(), Vector3(i * 0.45, 1.3, 9.1), root)
-	put(box(10, 0.1, 30), mat(Color("24161f"), 1.0), Vector3(14, -4.2, 0), root, false)
+	put(box(30, 0.1, 40), ST.water(), Vector3(23, -0.6, 0), root, false)
 	# Six low shoe plinths form the outer edge.
 	for p in [Vector2(-7.0, -3.6), Vector2(-7.0, 2.4), Vector2(7.0, -3.6), Vector2(7.0, 2.4), Vector2(-3.6, 8.0), Vector2(3.6, 8.0)]:
 		put(box(1.1, 0.5, 1.1), mat(CREAM, 0.6), Vector3(p.x, 0.25, p.y), root)

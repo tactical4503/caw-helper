@@ -16,6 +16,15 @@ Open this folder from the Godot project manager (**Import** → select `project.
 - `tools/filmstrip.gd`: renders each clip as a contact sheet (front three-quarter and side views) for review.
 - `docs/sheets/`: sample contact sheets.
 
+## Visual style
+`scripts/style.gd` sets the look of the whole game: mid-90s ray-traced CGI, in the spirit of the era's promo renders.
+- Glossy plastic and lacquer with hard white hotspots, saturated colour and densely tessellated round shapes.
+- Procedural noise textures with bump on the stone, marble and wood.
+- One strong sun with crisp shadows, a vivid blue sky that lights and reflects into the scene, and a mirror-still pool.
+- **No tone mapping**: colours stay pure and highlights clip, as those renderers did.
+
+Every material is created through this file, so the look can be retuned (or swapped for real textures) in one place. Samples are in `docs/style/`. Only the style is borrowed, not any existing characters or designs.
+
 ## Animation
 | Floor Manager | Ren |
 |---|---|
