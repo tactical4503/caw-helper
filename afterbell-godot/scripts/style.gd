@@ -137,41 +137,93 @@ static func water() -> StandardMaterial3D:
 
 
 static func environment() -> Environment:
-	# Warm department-store interior: lamplight, warm bounce, soft bloom on the lamps and brass.
+	# Department-store interior. Neutral-warm ambient keeps the plum walls plum (not salmon), SSAO
+	# darkens corners and the undersides of counters, and only the lamps are bright enough to bloom.
 	var e := Environment.new()
 	e.background_mode = Environment.BG_COLOR
-	e.background_color = Color("2a1c1a")
+	e.background_color = Color("1c1416")
 	e.ambient_light_source = Environment.AMBIENT_SOURCE_COLOR
-	e.ambient_light_color = Color("ffd9b0")
-	e.ambient_light_energy = 0.22
+	e.ambient_light_color = Color("e9dccd")
+	e.ambient_light_energy = 0.32
 	e.reflected_light_source = Environment.REFLECTION_SOURCE_BG
 	e.tonemap_mode = Environment.TONE_MAPPER_FILMIC
-	e.tonemap_exposure = 0.85
-	e.ssr_enabled = true            # glossy floors and counters mirror the lamps (Forward+)
-	e.ssr_max_steps = 48
-	e.ssao_enabled = true           # contact shadows under counters and along walls
-	e.ssao_intensity = 1.5
-	e.glow_enabled = true           # lamps and brass bloom softly
-	e.glow_intensity = 0.6
-	e.glow_bloom = 0.08
-	e.glow_hdr_threshold = 1.2
-	e.fog_enabled = true            # warm haze gives the hall depth
-	e.fog_light_color = Color("c99a70")
-	e.fog_density = 0.008
+	e.tonemap_exposure = 1.0
+	e.tonemap_white = 6.0
+	e.ssr_enabled = false           # expensive; off by default (glossy materials still catch lamp highlights)
+	e.ssao_enabled = true           # contact shadows: corners, under counters, around feet
+	e.ssao_radius = 1.2
+	e.ssao_intensity = 2.2
+	e.ssao_power = 1.6
+	e.glow_enabled = true           # only emissive lamp globes cross the threshold
+	e.glow_intensity = 0.3
+	e.glow_strength = 0.9
+	e.glow_bloom = 0.0
+	e.glow_hdr_threshold = 1.0
+	e.fog_enabled = true            # faint depth falloff, not a milky haze
+	e.fog_light_color = Color("3a2a26")
+	e.fog_density = 0.0025
 	e.adjustment_enabled = true
-	e.adjustment_saturation = 1.15
-	e.adjustment_contrast = 1.05
+	e.adjustment_saturation = 1.05
+	e.adjustment_contrast = 1.1
 	return e
 
 
-## One strong sun with crisp shadows and full specular.
+## Overhead key: daylight from the atrium skylight, nearly vertical so shadows read as indoor and
+## fall under things rather than across the room. Kept low; the lamps do the warm work.
 static func sun() -> DirectionalLight3D:
 	var key := DirectionalLight3D.new()
-	key.light_color = Color("ffd2a0")   # late sun through the atrium skylight
-	key.light_energy = 0.5
-	key.light_specular = 1.0
+	key.light_color = Color("fff1e2")
+	key.light_energy = 0.35
+	key.light_specular = 0.6
 	key.shadow_enabled = true
-	key.shadow_blur = 0.3
-	key.directional_shadow_max_distance = 40.0
-	key.rotation = Vector3(deg_to_rad(-52), deg_to_rad(-38), 0)
+	key.shadow_blur = 2.0
+	key.shadow_bias = 0.04
+	key.directional_shadow_max_distance = 25.0
+	key.rotation = Vector3(deg_to_rad(-78), deg_to_rad(-20), 0)
 	return key
+
+
+static var _lamp_glass: StandardMaterial3D
+
+
+## A wall or column lamp: a frosted cream globe that glows without blowing out, and a warm soft
+## pool of light. No shadows (cheap); low specular so walls get a sheen, not a hot spot.
+static func lamp(parent: Node3D, at: Vector3, energy := 0.9, reach := 5.5) -> OmniLight3D:
+	if _lamp_glass == null:
+		_lamp_glass = StandardMaterial3D.new()
+		_lamp_glass.albedo_color = Color("f6e7cc")
+		_lamp_glass.roughness = 0.6
+		_lamp_glass.emission_enabled = true
+		_lamp_glass.emission = Color("ffd9a0")
+		_lamp_glass.emission_energy_multiplier = 1.5
+	var globe := MeshInstance3D.new()
+	var sphere := SphereMesh.new()
+	sphere.radius = 0.14
+	sphere.height = 0.28
+	globe.mesh = sphere
+	globe.material_override = _lamp_glass
+	globe.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	globe.position = at
+	parent.add_child(globe)
+	var light := OmniLight3D.new()
+	light.light_color = Color("ffd8a8")
+	light.light_energy = energy
+	light.light_specular = 0.25
+	light.omni_range = reach
+	light.omni_attenuation = 1.6
+	light.position = at
+	parent.add_child(light)
+	return light
+
+
+## Overhead fill from the ceiling fixtures: neutral-warm pools on the floor, falling off at walls.
+static func ceiling_light(parent: Node3D, at: Vector3, energy := 0.8, reach := 7.0) -> OmniLight3D:
+	var light := OmniLight3D.new()
+	light.light_color = Color("fff0dc")
+	light.light_energy = energy
+	light.light_specular = 0.0
+	light.omni_range = reach
+	light.omni_attenuation = 1.3
+	light.position = at - Vector3(0, 0.7, 0)   # hang below the ceiling so it doesn't glare on it
+	parent.add_child(light)
+	return light

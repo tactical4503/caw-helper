@@ -309,11 +309,6 @@ static func _build_hall(root: Node3D) -> void:
 	put(box(0.1, 4, 6), sky, Vector3(22.25, 3.2, -2), root, false)  # arched window at sunset
 	# Columns along the walls, each with a hanging banner and a lamp.
 	var banner := ST.textured("plaster_plum", 0.8, mat(PLUM, 0.6))
-	var lamp_glass := StandardMaterial3D.new()
-	lamp_glass.albedo_color = Color("fff1d0")
-	lamp_glass.emission_enabled = true
-	lamp_glass.emission = Color("ffd08a")
-	lamp_glass.emission_energy_multiplier = 3.0
 	for spot in [Vector2(-7.75, -6), Vector2(-7.75, -1), Vector2(-7.75, 4), Vector2(7.95, -6), Vector2(7.95, -1), Vector2(7.95, 4),
 			Vector2(-4, -8.85), Vector2(4, -8.85)]:
 		var on_side: bool = absf(spot.x) > 7.0
@@ -325,13 +320,10 @@ static func _build_hall(root: Node3D) -> void:
 		put(box(0.79 if not on_side else 0.07, 0.08, 0.07 if not on_side else 0.79), brass(), b.position + Vector3(0, 1.0, 0), root)
 		var lamp_pos := Vector3(spot.x, 2.6, spot.y) + face * 0.55
 		put(sphere(0.06), brass(), lamp_pos - face * 0.15, root)
-		put(sphere(0.16), lamp_glass, lamp_pos, root, false)
-		var light := OmniLight3D.new()
-		light.light_color = Color("ffc98a")
-		light.light_energy = 1.1
-		light.omni_range = 6.5
-		light.position = lamp_pos + face * 0.2
-		root.add_child(light)
+		ST.lamp(root, lamp_pos, 0.8, 5.5)
+	# Ceiling fixtures: pools of light down the court's centre and over the bell.
+	for z in [5.0, 0.0, -5.0]:
+		ST.ceiling_light(root, Vector3(0, 5.0, z), 0.9, 8.0)
 
 
 static func build_rack(index: int) -> Rack:

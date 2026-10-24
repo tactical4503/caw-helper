@@ -213,19 +213,11 @@ func _build_room() -> void:
 			var a := k * TAU / 3.0
 			_hat(Vector3(t.x + cos(a) * 0.18, 1.45 + k * 0.12, t.y + sin(a) * 0.18), [B.PLUM, B.RED, B.CREAM][k])
 	# Lamps.
-	var glass := StandardMaterial3D.new()
-	glass.albedo_color = Color("fff1d0")
-	glass.emission_enabled = true
-	glass.emission = Color("ffd08a")
-	glass.emission_energy_multiplier = 3.0
 	for p in [Vector3(-HALF_W + 0.3, 2.5, -6), Vector3(-HALF_W + 0.3, 2.5, 0), Vector3(-HALF_W + 0.3, 2.5, 6), Vector3(HALF_W - 0.3, 2.5, -6), Vector3(HALF_W - 0.3, 2.5, 0)]:
-		B.put(B.sphere(0.15), glass, p, self, false)
-		var light := OmniLight3D.new()
-		light.light_color = Color("ffc98a")
-		light.light_energy = 1.1
-		light.omni_range = 6.5
-		light.position = p
-		add_child(light)
+		ST.lamp(self, p)
+	# Ceiling fixtures down the room; the brightest pool sits over the rack and the staff door.
+	for z in [6.0, 1.0, -2.6, -7.0]:
+		ST.ceiling_light(self, Vector3(0, 3.6, z), 0.95 if z == -2.6 else 0.7, 6.0)
 
 
 func _hat(at: Vector3, color: Color) -> void:

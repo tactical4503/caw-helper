@@ -154,10 +154,17 @@ func _build_rooms() -> void:
 	B.put(B.box(0.05, 0.05, 0.3), B.brass(), Vector3(-0.02, 0, 0), socket_disc)            # the broad slot
 	B.put(B.box(0.06, 0.12, 0.04), B.mat(B.RED, 0.4), Vector3(4.97, 1.55, SOCKET.y + 0.3), self)  # snapped crank stub
 	# Fitting platform with chalk dust; triple mirror.
-	B.put(B.cyl(0.9, 0.95, 0.22), wood, Vector3(-2.6, 0.11, 1.6), self)
+	var dais := StandardMaterial3D.new()   # waxed, not lacquered: no mirror highlights on the fitting platform
+	dais.albedo_color = Color("6e4326")
+	dais.roughness = 0.55
+	B.put(B.cyl(0.9, 0.95, 0.22), dais, Vector3(-2.6, 0.11, 1.6), self)
 	solids.append([Vector2(-2.6, 1.6), 0.95])
+	var chalk := StandardMaterial3D.new()   # faint, matte chalk dust
+	chalk.albedo_color = Color(0.93, 0.9, 0.85, 0.45)
+	chalk.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	chalk.roughness = 1.0
 	for d in [[Vector2(-2.4, 1.4), 0.22], [Vector2(-2.9, 1.9), 0.15], [Vector2(-2.2, 1.95), 0.1]]:
-		var dust := B.put(B.cyl(d[1], d[1], 0.005), B.mat(Color(1, 1, 1, 1), 0.9), Vector3(d[0].x, 0.225, d[0].y), self, false)
+		var dust := B.put(B.cyl(d[1], d[1], 0.005), chalk, Vector3(d[0].x, 0.225, d[0].y), self, false)
 		dust.scale = Vector3(1.0, 1.0, 0.6)
 	for k in 3:
 		var m := B.put(B.box(0.04, 1.6, 0.6), ST.plastic(Color("c8d8e0"), 0.02, 0.9), Vector3(-4.85, 0.95, 0.9 + k * 0.62), self)
@@ -232,19 +239,12 @@ func _build_rooms() -> void:
 	solids.append([Vector2(-0.9, -9.6), 0.45])
 	solids.append([Vector2(2.8, -8.2), 0.45])
 	# Lamps.
-	var glass := StandardMaterial3D.new()
-	glass.albedo_color = Color("fff1d0")
-	glass.emission_enabled = true
-	glass.emission = Color("ffd08a")
-	glass.emission_energy_multiplier = 3.0
-	for p in [Vector3(-4.7, 2.4, -1), Vector3(4.7, 2.4, 3), Vector3(0, 3.3, -9), Vector3(-4.7, 2.4, -11)]:
-		B.put(B.sphere(0.15), glass, p, self, false)
-		var light := OmniLight3D.new()
-		light.light_color = Color("ffc98a")
-		light.light_energy = 1.0
-		light.omni_range = 6.5
-		light.position = p
-		add_child(light)
+	for p in [Vector3(-4.7, 2.4, -1), Vector3(4.7, 2.4, 3), Vector3(-4.7, 2.4, -11)]:
+		ST.lamp(self, p)
+	# Ceiling fixtures: a work light over the fitting platform, the socket, and Receiving's table.
+	ST.ceiling_light(self, Vector3(-2.4, 3.2, 1.4), 0.9, 5.5)
+	ST.ceiling_light(self, Vector3(3.0, 3.2, -1.0), 0.8, 5.5)
+	ST.ceiling_light(self, Vector3(0.5, 3.2, -9.5), 0.85, 7.0)
 	interactables = [
 		[Vector2(STALL.x, STALL.y + 1.5), "tailor"], [Vector2(DOOR_X + 0.65, -4.3), "sleeve"],
 		[SOCKET, "socket"], [Vector2(0.6, -11.2), "tins"], [Vector2(2.8, -7.5), "len"], [Vector2(-0.9, -8.9), "hesta"],

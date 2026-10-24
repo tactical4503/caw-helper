@@ -213,19 +213,11 @@ func _build_room() -> void:
 	var catcher := B.put(B.box(0.2, 0.9, 1.1), B.mat(Color("6b2620"), 0.85), Vector3(CATCH_AT.x - 0.4, 1.45, CATCH_AT.y), self)
 	catcher.name = "Catcher"
 	# Lamps on the walls.
-	var lamp_glass := StandardMaterial3D.new()
-	lamp_glass.albedo_color = Color("fff1d0")
-	lamp_glass.emission_enabled = true
-	lamp_glass.emission = Color("ffd08a")
-	lamp_glass.emission_energy_multiplier = 3.0
 	for p in [Vector3(-4, 2.6, -HALF_D + 0.3), Vector3(4, 2.6, -HALF_D + 0.3), Vector3(HALF_W - 0.3, 2.6, 0), Vector3(-HALF_W + 0.3, 2.6, -2)]:
-		B.put(B.sphere(0.16), lamp_glass, p, self, false)
-		var light := OmniLight3D.new()
-		light.light_color = Color("ffc98a")
-		light.light_energy = 1.1
-		light.omni_range = 6.0
-		light.position = p
-		add_child(light)
+		ST.lamp(self, p)
+	# Ceiling fixtures over each counter and the aisle.
+	for x in [-4.6, 0.0, 4.6]:
+		ST.ceiling_light(self, Vector3(x, 3.9, -0.6), 0.75, 6.0)
 	# The attendant (placeholder figure until the Meshy staff mannequin arrives).
 	attendant = Node3D.new()
 	attendant.name = "Attendant"
@@ -263,7 +255,8 @@ func _build_room() -> void:
 	# A warm spotlight picks out the attendant so the demonstration reads at a glance.
 	var spot := SpotLight3D.new()
 	spot.light_color = Color("ffd9a0")
-	spot.light_energy = 4.0
+	spot.light_energy = 2.5
+	spot.light_specular = 0.3
 	spot.spot_range = 6.0
 	spot.spot_angle = 22.0
 	spot.position = Vector3(THROW_FROM.x - 0.5, 4.0, THROW_FROM.y + 1.0)
