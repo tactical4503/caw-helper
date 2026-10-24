@@ -70,6 +70,8 @@ const MIX_TIME := 0.12
 @export var sword_model := "res://assets/props/knock/knock.glb"
 ## Ren's albedo with the armour paint deepened (tools/deepen_red.py); empty keeps Meshy's own.
 @export var armor_albedo := "res://assets/characters/ren/ren_armor_deep.png"
+## Ren's metallic-roughness map made matte except on metal (tools/matte_pbr.py).
+@export var armor_roughness := "res://assets/characters/ren/ren_mr_matte.png"
 const SWORD_FIT := Transform3D(Basis(Vector3(0, 0.55, 0), Vector3(0.55, 0, 0), Vector3(0, 0, -0.55)), Vector3(0, -0.41, 0))
 
 var _rig: Node3D
@@ -160,8 +162,8 @@ func _ready() -> void:
 				mi.visible = true
 
 
-## Match the game's glossy 90s-CGI finish: keep Meshy's textures, add a sharp clearcoat and
-## tighten the roughness so the armour shows hard highlights like the rest of the scene.
+## Satin finish: Meshy's textures with a matte paint layer (tools/matte_pbr.py) so the armour
+## reads as painted plates; only the metal parts keep tight reflections.
 func _restyle(skin: Node) -> void:
 	for mi in skin.find_children("*", "MeshInstance3D", true, false):
 		var m3 := mi as MeshInstance3D
@@ -172,11 +174,12 @@ func _restyle(skin: Node) -> void:
 			var m := src.duplicate() as StandardMaterial3D
 			if m.albedo_texture and armor_albedo != "" and ResourceLoader.exists(armor_albedo):
 				m.albedo_texture = load(armor_albedo)
-			m.clearcoat_enabled = true
-			m.clearcoat = 0.55
-			m.clearcoat_roughness = 0.08
-			m.roughness = minf(m.roughness, 0.55)
-			m.metallic_specular = 0.6
+			if armor_roughness != "" and ResourceLoader.exists(armor_roughness):
+				m.roughness_texture = load(armor_roughness)
+				m.roughness_texture_channel = BaseMaterial3D.TEXTURE_CHANNEL_GREEN
+				m.roughness = 1.0
+			m.clearcoat_enabled = false
+			m.metallic_specular = 0.4
 			m3.set_surface_override_material(i, m)
 
 

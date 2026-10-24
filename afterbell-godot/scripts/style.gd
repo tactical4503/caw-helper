@@ -1,13 +1,12 @@
 extends RefCounted
 ## Visual style: mid-90s ray-traced CGI promo-render look.
-## Glossy plastic with hard specular hotspots, saturated colour, very round geometry, procedural
+## Matte painted surfaces with reflections kept to metal, saturated colour, very round geometry, procedural
 ## noise textures with bump on stone/brick/wood, one strong sun with crisp shadows, a vivid blue
 ## sky that lights and reflects into everything, and mirror-like water and polished floors.
 ## Every material in the game comes through here, so the look can be retuned (or replaced by
 ## real textures) in one place.
 
 const SATURATION := 1.08     # push colours toward the bold primaries of the era
-const GLOSS := 0.3           # scales authored roughness down: everything reads as lacquer/plastic
 const SEGMENTS := 32         # round things need dense tessellation for clean highlights
 
 
@@ -15,20 +14,19 @@ static func _boost(c: Color) -> Color:
 	return Color.from_hsv(c.h, minf(c.s * SATURATION, 1.0), c.v, c.a)
 
 
-## Glossy plastic (or polished metal when metal > 0). `rough` is the authored value; the style
-## maps it into the shiny range so even "matte" surfaces keep a soft hotspot.
+## Painted / lacquered surfaces are matte-to-satin; only metal (metal >= 0.5) is polished.
+## `rough` is the authored value: 0 = satin, 1 = fully matte. Metals map into a tight, shiny range
+## so brass, steel and the like carry the reflections in a scene.
 static func plastic(color: Color, rough: float, metal: float) -> StandardMaterial3D:
 	var m := StandardMaterial3D.new()
 	m.albedo_color = _boost(color)
 	m.metallic = metal
-	m.roughness = clampf(rough * GLOSS + 0.05, 0.05, 0.4)
-	m.metallic_specular = 0.5
-	if metal < 0.5:
-		# A thin, sharp clearcoat gives the hard white hotspot without washing the base colour
-		# out with sky reflections.
-		m.clearcoat_enabled = true
-		m.clearcoat = 0.35
-		m.clearcoat_roughness = 0.05
+	if metal >= 0.5:
+		m.roughness = clampf(rough * 0.6, 0.15, 0.45)
+		m.metallic_specular = 0.5
+	else:
+		m.roughness = clampf(0.55 + rough * 0.4, 0.55, 0.95)
+		m.metallic_specular = 0.3
 	return m
 
 
@@ -77,7 +75,7 @@ static func procedural(dark: Color, light: Color, kind: String, scale := 0.5) ->
 	m.normal_texture = bump
 	m.uv1_triplanar = true
 	m.uv1_scale = Vector3.ONE * scale
-	m.roughness = {"marble": 0.15, "stone": 0.6, "wood": 0.4}.get(kind, 0.9)  # carpet stays matte
+	m.roughness = {"marble": 0.45, "stone": 0.75, "wood": 0.65}.get(kind, 0.9)  # satin at most
 	m.metallic_specular = 0.4
 	return m
 
@@ -96,22 +94,20 @@ static func textured(name: String, scale: float, fallback: StandardMaterial3D, m
 	m.roughness_texture = load(dir + "roughness.png")
 	m.roughness_texture_channel = BaseMaterial3D.TEXTURE_CHANNEL_GRAYSCALE
 	m.metallic = metal
-	m.metallic_specular = 0.5
+	m.metallic_specular = 0.5 if metal >= 0.5 else 0.35
 	m.uv1_triplanar = true
 	m.uv1_scale = Vector3.ONE * scale
 	return m
 
 
-## A flat sign face from assets/textures/signs/NAME.png (glossy enamel).
+## A flat sign face from assets/textures/signs/NAME.png (satin enamel).
 static func sign_face(name: String) -> StandardMaterial3D:
 	var path := "res://assets/textures/signs/%s.png" % name
 	if not ResourceLoader.exists(path):
 		return null
 	var m := StandardMaterial3D.new()
 	m.albedo_texture = load(path)
-	m.roughness = 0.2
-	m.clearcoat_enabled = true
-	m.clearcoat = 0.4
+	m.roughness = 0.55
 	return m
 
 
