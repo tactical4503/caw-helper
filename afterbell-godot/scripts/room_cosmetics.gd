@@ -73,6 +73,7 @@ var prompt: Label
 const Dialogue := preload("res://scripts/dialogue.gd")
 const Mover := preload("res://scripts/mover.gd")
 const Props := preload("res://scripts/props.gd")
+const Glimpse := preload("res://scripts/glimpse.gd")
 var prop_solids: Array = []   # Rect2 footprints of floor props
 const ShoulderCam := preload("res://scripts/shoulder_cam.gd")
 var mover = Mover.new()
@@ -149,7 +150,7 @@ func _collide_player() -> void:
 func _place_props() -> void:
 	for p in [["perfume_tower", Vector3(6.7, 0, 3.1), 0.0, 0], ["flower_display", Vector3(-6.9, 0, 3.25), 0.0, 0],
 			["mannequin", Vector3(7.2, 0, -3.35), -0.8, 1], ["mannequin", Vector3(-7.2, 0, -3.35), 0.8, 3],
-			["easel", Vector3(1.05, 0, -3.3), 0.0, 1]]:
+			["easel", Vector3(-3.6, 0, -3.35), 0.3, 1]]:
 		Props.place(self, p[0], p[1], p[2], p[3], "SALE")
 		prop_solids.append(Props.footprint(p[0], p[1], p[2]))
 
@@ -170,9 +171,12 @@ func _build_room() -> void:
 	# Walls: south (vestibule, with an opening), north (atrium, closed shutter), east, west (hats gate).
 	for side in [-1.0, 1.0]:
 		B.put(B.box(HALF_W - 1.2, 4.3, 0.3), wall, Vector3(side * (HALF_W + 1.2) / 2.0, 2.15, HALF_D + 0.15), self)
-	B.put(B.box(HALF_W * 2, 4.3, 0.3), wall, Vector3(0, 2.15, -HALF_D - 0.15), self)
-	var shutter := B.put(B.box(3.0, 2.6, 0.08), ST.textured("metal_charcoal", 1.5, B.mat(Color("2b2b2e"), 0.4, 0.6), 0.6), Vector3(0, 1.3, -HALF_D + 0.02), self)
-	shutter.name = "AtriumShutter"
+	# North wall, open where the locked lattice gate shows the atrium beyond.
+	for side in [-1.0, 1.0]:
+		B.put(B.box(HALF_W - 1.5, 4.3, 0.3), wall, Vector3(side * (HALF_W + 1.5) / 2.0, 2.15, -HALF_D - 0.15), self)
+	B.put(B.box(3.0, 1.7, 0.3), wall, Vector3(0, 3.45, -HALF_D - 0.15), self)
+	Props.lattice_gate(self, Vector3(0, 0, -HALF_D - 0.04), 3.0, 2.6)
+	Glimpse.build(self, Vector3(0, 0, -HALF_D - 0.3), 0.0, "atrium", 7.0, 6.0, 7.0)
 	B.put(B.box(0.3, 4.3, HALF_D * 2), wall, Vector3(HALF_W + 0.15, 2.15, 0), self)
 	B.put(B.box(0.3, 4.3, HALF_D + GATE_Z - 0.9), wall, Vector3(-HALF_W - 0.15, 2.15, (-HALF_D + GATE_Z - 0.9) / 2.0), self)
 	B.put(B.box(0.3, 4.3, HALF_D - GATE_Z - 0.9), wall, Vector3(-HALF_W - 0.15, 2.15, (GATE_Z + 0.9 + HALF_D) / 2.0), self)
@@ -223,7 +227,6 @@ func _build_room() -> void:
 		B.put(B.box(0.7, 0.16, 0.7), B.brass(), Vector3(c.x, 0.08, c.y), self)
 	# Doorways: cased frames on the shutter, the hats gate and the vestibule opening.
 	Props.door_frame(self, Vector3(0, 0, -HALF_D - 0.15), 3.0, 2.6)
-	Props.pull_handle(self, Vector3(0, 0.38, -HALF_D + 0.06), 0.8)
 	Props.door_frame(self, Vector3(-HALF_W - 0.15, 0, GATE_Z), 1.8, 2.4, PI / 2.0)
 	B.put(B.box(2.4, 1.5, 0.3), wall, Vector3(0, 3.55, HALF_D + 0.15), self)   # header over the vestibule
 	Props.door_frame(self, Vector3(0, 0, HALF_D + 0.15), 2.4, 2.8)

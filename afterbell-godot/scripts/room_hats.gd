@@ -20,6 +20,7 @@ const REN_RIG := preload("res://rigs/ren.tscn")
 const Dialogue := preload("res://scripts/dialogue.gd")
 const Mover := preload("res://scripts/mover.gd")
 const Props := preload("res://scripts/props.gd")
+const Glimpse := preload("res://scripts/glimpse.gd")
 const ShoulderCam := preload("res://scripts/shoulder_cam.gd")
 var mover = Mover.new()
 const GaugeHud := preload("res://scripts/hud.gd")
@@ -178,6 +179,9 @@ func _build_room() -> void:
 	B.wainscot_between(self, Vector3(HALF_W - 0.02, 0, -HALF_D), Vector3(HALF_W - 0.02, 0, 3.66))
 	B.wainscot_between(self, Vector3(HALF_W - 0.02, 0, 6.34), Vector3(HALF_W - 0.02, 0, HALF_D))
 	Props.portal(self, Vector3(0, 0, -HALF_D - 0.15), EXIT_X * 2.0, 2.4, 0.0, 1.0, "STAFF  ·  ALTERATIONS")
+	# What lies beyond: the staff corridor through the open doors, Cosmetics through the east way.
+	Glimpse.build(self, Vector3(0, 0, -HALF_D - 0.3), 0.0, "staff_corridor", 6.0, 2.8, 3.0)
+	Glimpse.build(self, Vector3(HALF_W + 0.3, 0, 5.0), -PI / 2.0, "cosmetics", 3.6, 2.6, 3.0)
 	Props.portal(self, Vector3(HALF_W + 0.15, 0, 5.0), 1.8, 2.5, PI / 2.0, -1.0, "COSMETICS")
 	# Hat shelving across the room, with the aisle gap (x -1..1) and the alcove (x 1..3.4).
 	var shelf := ST.plastic(Color("6e4326"), 0.35, 0.0)   # lacquered walnut

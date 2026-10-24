@@ -17,6 +17,7 @@ const REN_RIG := preload("res://rigs/ren.tscn")
 const Dialogue := preload("res://scripts/dialogue.gd")
 const Mover := preload("res://scripts/mover.gd")
 const Props := preload("res://scripts/props.gd")
+const Glimpse := preload("res://scripts/glimpse.gd")
 const ShoulderCam := preload("res://scripts/shoulder_cam.gd")
 var mover = Mover.new()
 const GaugeHud := preload("res://scripts/hud.gd")
@@ -145,6 +146,7 @@ func _build_rooms() -> void:
 	Props.portal(self, Vector3(DOOR_X, 0, -5.15), 1.6, Props.DOOR_HEIGHT, 0.0, 1.0, "RECEIVING")
 	Props.portal(self, Vector3(0, 0, 5.15), 1.8, 2.5, 0.0, -1.0, "HATS  &  GLOVES")
 	Props.plaque(self, Vector3(5.0, 2.95, GATE_Z), 1.2, "ATRIUM", -PI / 2.0)
+	Glimpse.build(self, Vector3(5.3, 0, GATE_Z), -PI / 2.0, "atrium", 4.0, 5.0, 6.0)   # seen once the gate rolls up
 	Props.door_frame(self, Vector3(5.15, 0, GATE_Z), 1.8, 2.4, PI / 2.0)
 	B.wainscot(self, Vector3(-4.98, 0, 0), Vector3(0, 0, 10))
 	# Finished lower walls round the rest of Alterations and Receiving, clear of every opening,

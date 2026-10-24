@@ -546,6 +546,48 @@ static func door_leaf(parent: Node3D, hinge: Vector3, width: float, height: floa
 	return pivot
 
 
+## A locked brass lattice gate (folding "lazy tongs") filling an opening: top and bottom track,
+## vertical bars, diamond straps between them, a padlock on a short chain. See-through.
+## Placement like door_frame: `at` is the floor centre of the opening, local x along the wall.
+static func lattice_gate(parent: Node3D, at: Vector3, width: float, height: float, yaw := 0.0) -> Node3D:
+	var gate := Node3D.new()
+	gate.name = "LatticeGate"
+	gate.position = at
+	gate.rotation.y = yaw
+	parent.add_child(gate)
+	_put(_box(width, 0.09, 0.12), _m("brass"), Vector3(0, height - 0.045, 0), gate)
+	_put(_box(width, 0.05, 0.1), _m("brass"), Vector3(0, 0.025, 0), gate)
+	var bays := int(width / 0.3)
+	var bay := width / bays
+	var rows := 3
+	var rh := (height - 0.14) / rows
+	for i in bays + 1:
+		_put(_box(0.022, height - 0.1, 0.022), _m("brass"), Vector3(-width * 0.5 + i * bay, height * 0.5, 0), gate)
+	var length := sqrt(bay * bay + rh * rh)
+	var tilt := atan2(rh, bay)
+	for i in bays:
+		for r in rows:
+			var c := Vector3(-width * 0.5 + (i + 0.5) * bay, 0.07 + (r + 0.5) * rh, 0.0)
+			for s in [-1.0, 1.0]:
+				var strap := _put(_box(length, 0.014, 0.008), _m("brass"), c + Vector3(0, 0, s * 0.016), gate)
+				strap.rotation.z = s * tilt
+	# Padlock and chain where the two halves meet.
+	var lock := Vector3(0, 1.05, 0.06)
+	for k in 4:
+		var link := _put(_cyl(0.022, 0.022, 0.008, 10), _m("steel_dark"), lock + Vector3(0, 0.12 - k * 0.04, 0), gate)
+		link.rotation.x = PI / 2.0 if k % 2 == 0 else 0.0
+	_put(_box(0.09, 0.1, 0.04), _m("brass"), lock + Vector3(0, -0.06, 0.0), gate)
+	var shackle := _put(_cyl(0.035, 0.035, 0.012, 14), _m("steel_dark"), lock + Vector3(0, 0.0, 0.0), gate)
+	shackle.rotation.x = PI / 2.0
+	Atrium_merge(gate)
+	return gate
+
+
+## Bakes a static assembly into a few meshes (the atrium's merge, without a preload cycle).
+static func Atrium_merge(node: Node3D) -> void:
+	load("res://scripts/atrium.gd").merge(node)
+
+
 ## A brass pull bar on two standoffs, for shutters and roller gates. Local x along the bar,
 ## standing off toward +z.
 static func pull_handle(parent: Node3D, at: Vector3, length := 0.5, yaw := 0.0) -> Node3D:
@@ -742,6 +784,7 @@ static func _m(name: String) -> Material:
 		"glass_lilac": m = ST.plastic(Color("b49ad6"), 0.25, 0.0)
 		"vase": m = ST.plastic(Color("1e3029"), 0.4, 0.0)
 		"mirror": m = ST.plastic(Color("c9ccd0"), 0.08, 0.9)
+		"steel_dark": m = ST.plastic(Color("4a4a4e"), 0.35, 0.8)
 		"leaf": m = ST.plastic(Color("3a6a34"), 0.7, 0.0)
 		"lily": m = ST.plastic(Color("f6f0e4"), 0.7, 0.0)
 		"pollen": m = ST.plastic(Color("e2a43a"), 0.8, 0.0)

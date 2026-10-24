@@ -10,6 +10,7 @@ const SHOTS := [
 	["alterations", "res://rooms/alterations.tscn", Vector2(0.5, 2.8), "tailor"],
 	["receiving", "res://rooms/alterations.tscn", Vector2(0.8, -6.2), "hesta"],
 	["court", "res://main.tscn", Vector2(0.3, 4.4), ""],
+	["court_doors", "res://main.tscn", Vector2(-3.5, 6.2), "look_west"],
 ]
 
 var out_dir := "user://rooms"
@@ -55,6 +56,9 @@ func _process(_delta: float) -> bool:
 			for i in 150:
 				room.step(1.0 / 60.0)
 			room._render(1.0)
+			if shot[3] == "look_west":   # face the service doors and the room beyond them
+				room.camera.position = Vector3(-2.0, 1.75, 5.2)
+				room.camera.look_at(Vector3(-9.5, 1.3, 7.6), Vector3.UP)
 		else:
 			match shot[3]:
 				"tailor":

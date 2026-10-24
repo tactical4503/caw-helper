@@ -191,7 +191,8 @@ static func build_arena(parent: Node3D) -> Arena:
 	put(box(0.3, 4.55 - door_h, 2.2), wall, Vector3(-8.15, (4.55 + door_h) * 0.5, 7.3), root)
 	Atrium.Props.door_frame(root, Vector3(-8.15, 0, 7.3), 2.2, door_h, PI / 2.0)
 	Atrium.Props.door_leaf(root, Vector3(-8.15, 0, 6.2), 1.1, door_h, -PI / 2.0)
-	Atrium.Props.door_leaf(root, Vector3(-8.15, 0, 8.4), 1.1, door_h, PI / 2.0)
+	Atrium.Props.door_leaf(root, Vector3(-8.15, 0, 8.4), 1.1, door_h, PI / 2.0, PI / 2.0 * 0.85)   # standing open
+	load("res://scripts/glimpse.gd").build(root, Vector3(-8.3, 0, 7.3), PI / 2.0, "cosmetics", 4.0, 3.4, 3.0)
 	put(box(0.25, 1.05, 18), mat(CREAM, 0.6), Vector3(8.12, 0.52, 0), root)
 	put(box(0.3, 0.08, 18), brass(), Vector3(8.12, 1.07, 0), root)
 	put(box(16, 1.0, 0.25), mat(CREAM, 0.6), Vector3(0, 0.5, 9.1), root)
