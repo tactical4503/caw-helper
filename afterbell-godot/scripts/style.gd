@@ -82,6 +82,39 @@ static func procedural(dark: Color, light: Color, kind: String, scale := 0.5) ->
 	return m
 
 
+## A texture set made by tools/make_texture.py (assets/textures/NAME/{albedo,normal,roughness}.png).
+## Triplanar, so any box gets the same texel density. Falls back to `fallback` if it's missing.
+static func textured(name: String, scale: float, fallback: StandardMaterial3D, metal := 0.0) -> StandardMaterial3D:
+	var dir := "res://assets/textures/%s/" % name
+	if not ResourceLoader.exists(dir + "albedo.png"):
+		return fallback
+	var m := StandardMaterial3D.new()
+	m.albedo_texture = load(dir + "albedo.png")
+	m.normal_enabled = true
+	m.normal_texture = load(dir + "normal.png")
+	m.roughness = 1.0
+	m.roughness_texture = load(dir + "roughness.png")
+	m.roughness_texture_channel = BaseMaterial3D.TEXTURE_CHANNEL_GRAYSCALE
+	m.metallic = metal
+	m.metallic_specular = 0.5
+	m.uv1_triplanar = true
+	m.uv1_scale = Vector3.ONE * scale
+	return m
+
+
+## A flat sign face from assets/textures/signs/NAME.png (glossy enamel).
+static func sign_face(name: String) -> StandardMaterial3D:
+	var path := "res://assets/textures/signs/%s.png" % name
+	if not ResourceLoader.exists(path):
+		return null
+	var m := StandardMaterial3D.new()
+	m.albedo_texture = load(path)
+	m.roughness = 0.2
+	m.clearcoat_enabled = true
+	m.clearcoat = 0.4
+	return m
+
+
 static func water() -> StandardMaterial3D:
 	var noise := FastNoiseLite.new()
 	noise.noise_type = FastNoiseLite.TYPE_SIMPLEX_SMOOTH

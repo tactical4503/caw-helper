@@ -88,8 +88,13 @@ static func mat(color: Color, rough := 0.7, metal := 0.0) -> StandardMaterial3D:
 	return _mats[key]
 
 
+static var _brass: StandardMaterial3D
+
+
 static func brass() -> StandardMaterial3D:
-	return mat(BRASS, 0.35, 0.85)
+	if _brass == null:
+		_brass = ST.textured("brass", 2.0, mat(BRASS, 0.35, 0.85), 0.85)
+	return _brass
 
 
 static func put(mesh: Mesh, material: Material, pos: Vector3, parent: Node3D, cast := true) -> MeshInstance3D:
@@ -157,7 +162,7 @@ static func build_arena(parent: Node3D) -> Arena:
 	root.add_child(bell_light)
 	bell_light.look_at(Vector3(0, 1.2, BELL_POS.z), Vector3.FORWARD)
 
-	put(box(18, 0.1, 20), ST.procedural(Color("b9a98a"), TILE, "marble"), Vector3(0, -0.05, 0), root, false)
+	put(box(18, 0.1, 20), ST.textured("marble_cream", 0.35, ST.procedural(Color("b9a98a"), TILE, "marble")), Vector3(0, -0.05, 0), root, false)
 	put(box(16, 0.02, 18), ST.procedural(Color("1f3a2a"), CARPET_LIGHT, "carpet", 1.5), Vector3(0, 0.01, 0), root, false)
 	# Three carpet inlays fan toward the bell: decoration that also reads as approach lanes.
 	var lever_z := -6.1
@@ -186,7 +191,7 @@ static func build_arena(parent: Node3D) -> Arena:
 	# Six low shoe plinths form the outer edge.
 	for p in [Vector2(-7.0, -3.6), Vector2(-7.0, 2.4), Vector2(7.0, -3.6), Vector2(7.0, 2.4), Vector2(-3.6, 8.0), Vector2(3.6, 8.0)]:
 		put(box(1.1, 0.5, 1.1), mat(CREAM, 0.6), Vector3(p.x, 0.25, p.y), root)
-		put(box(1.14, 0.06, 1.14), mat(PLUM, 0.6), Vector3(p.x, 0.52, p.y), root)
+		put(box(1.14, 0.06, 1.14), ST.textured("laminate_plum", 1.2, mat(PLUM, 0.6)), Vector3(p.x, 0.52, p.y), root)
 		put(box(0.34, 0.14, 0.14), mat(RED, 0.5), Vector3(p.x, 0.62, p.y), root)
 		a.plinths.append(Rect2(p - Vector2(0.6, 0.6), Vector2(1.2, 1.2)))
 
@@ -228,15 +233,20 @@ static func build_arena(parent: Node3D) -> Arena:
 	governor.rotation.z = PI / 2.0
 	for x in [-0.4, 0.0, 0.4]:
 		a.tabs.append(put(box(0.2, 0.28, 0.04), brass(), Vector3(x, -0.42, 0.3), cabinet))
-	put(box(3.2, 0.6, 0.06), mat(CREAM, 0.6), Vector3(0, 3.95, -0.3), bell)
-	var sign_text := Label3D.new()
-	sign_text.text = "S E R V I C E"
-	sign_text.font_size = 72
-	sign_text.pixel_size = 0.004
-	sign_text.modulate = PLUM
-	sign_text.outline_size = 0
-	sign_text.position = Vector3(0, 3.95, -0.26)
-	bell.add_child(sign_text)
+	put(box(3.3, 0.66, 0.06), mat(PLUM, 0.6), Vector3(0, 3.95, -0.3), bell)  # enamel sign backing
+	var face := ST.sign_face("service")
+	if face:
+		var quad := QuadMesh.new()
+		quad.size = Vector2(3.2, 3.2 * 342.0 / 1922.0)
+		put(quad, face, Vector3(0, 3.95, -0.265), bell, false)
+	else:
+		var sign_text := Label3D.new()
+		sign_text.text = "S E R V I C E"
+		sign_text.font_size = 72
+		sign_text.pixel_size = 0.004
+		sign_text.modulate = PLUM
+		sign_text.position = Vector3(0, 3.95, -0.26)
+		bell.add_child(sign_text)
 
 	# Lateral rack channel, painted in once phase two begins.
 	a.lane_marks = Node3D.new()
@@ -277,7 +287,8 @@ static func build_rack(index: int) -> Rack:
 	r.node.add_child(r.cloth)
 	var colors := [GRAY, CREAM, PLUM, GRAY, CREAM] if index == 1 else [PLUM, CREAM, GRAY, PLUM, RED]
 	for i in colors.size():
-		put(box(0.42, 0.95, 0.12), mat(colors[i], 0.95), Vector3(0, -0.5, -0.6 + i * 0.3), r.cloth)
+		var cloth_mat: StandardMaterial3D = ST.textured("linen_cream", 2.0, mat(colors[i], 0.95)) if colors[i] == CREAM else mat(colors[i], 0.95)
+		put(box(0.42, 0.95, 0.12), cloth_mat, Vector3(0, -0.5, -0.6 + i * 0.3), r.cloth)
 	put(box(0.08, 0.14, 0.3), mat(CREAM, 0.5), Vector3(0, 1.05, 0.86), r.node)  # padded handle
 	r.pos = RACK_HOME[index]
 	r.target = r.pos
