@@ -158,5 +158,4 @@ func _run() -> void:
 	room.rack_x = room.STOP_EAST
 	room.virtual["up"] = true
 	until(room, func(): return room.leaving, 200)
-	check(room.leaving and Engine.has_meta("afterbell_skip_title"), "north door leads on to the Floor Manager's court")
-	Engine.remove_meta("afterbell_skip_title")
+	check(room.leaving and room.next_scene == "res://rooms/alterations.tscn", "north door leads on to Alterations")

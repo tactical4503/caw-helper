@@ -91,7 +91,7 @@ var cleared := false
 var pin_taken := false
 var pin_node: Node3D
 var leaving := false
-var next_scene := "res://main.tscn"
+var next_scene := "res://rooms/alterations.tscn"
 var solids: Array = []    # Rect2 footprints in (x, z)
 var trees: Array = []     # Vector2 centres, radius 0.35
 
@@ -430,7 +430,7 @@ func _update_player(dt: float) -> void:
 	elif charging and charge_t >= HEAVY_CHARGE:
 		gauge.show_prompt("attack", "Wound — release")
 	elif p_pos.y < -HALF_D + 1.4 and absf(p_pos.x) < EXIT_X:
-		gauge.show_prompt("go", "North — to Alterations and the court")
+		gauge.show_prompt("go", "North — to Alterations")
 	else:
 		gauge.hide_prompt()
 	if p_pos.y < -HALF_D + 0.5 and absf(p_pos.x) < EXIT_X and not leaving:
@@ -680,7 +680,6 @@ func _take_pin() -> void:
 
 func _leave() -> void:
 	leaving = true
-	Engine.set_meta("afterbell_skip_title", true)
 	fade.go_to(next_scene)
 
 
