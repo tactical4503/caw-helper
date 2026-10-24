@@ -97,6 +97,9 @@ var _last_pos := 0.0
 var _last_locals: Array = []
 var _snapshot: Array = []
 var _mix := 1.0
+var _last_root := Vector3.ZERO
+var _ground_speed := 0.0
+const RUN_CLIP_SPEED := 2.7   # m/s the Mixamo run cycle covers at 1x
 
 
 func _ready() -> void:
@@ -284,6 +287,16 @@ func _process(dt: float) -> void:
 		return
 	_follow_clip()
 	_mix = minf(1.0, _mix + dt / MIX_TIME)
+	# Match the run cycle to how fast Ren actually moves, so feet don't skate.
+	var root_now := _rig.global_position
+	if dt > 0.0:
+		var flat := Vector2(root_now.x - _last_root.x, root_now.z - _last_root.z).length() / dt
+		_ground_speed = lerpf(_ground_speed, minf(flat, 12.0), 1.0 - exp(-10.0 * dt))
+	_last_root = root_now
+	if _mocap and _cur == "run" and _src_anim and _grey_anim.is_playing():
+		_src_anim.speed_scale = clampf(_ground_speed / RUN_CLIP_SPEED, 0.6, 1.9)
+	elif _src_anim:
+		_src_anim.speed_scale = 1.0
 	if _last_locals.size() != _skel.get_bone_count():
 		_last_locals.resize(_skel.get_bone_count())
 	var to_char := _to_skel.inverse()

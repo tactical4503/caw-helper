@@ -71,6 +71,8 @@ var subtitle: Label
 var who: Label
 var prompt: Label
 const Dialogue := preload("res://scripts/dialogue.gd")
+const Mover := preload("res://scripts/mover.gd")
+var mover = Mover.new()
 const GaugeHud := preload("res://scripts/hud.gd")
 const Fade := preload("res://scripts/fade.gd")
 var fade
@@ -326,6 +328,7 @@ func _update_player(dt: float) -> void:
 		float(held.get("down", false)) - float(held.get("up", false)))
 	if input.length() > 1.0:
 		input = input.normalized()
+	input = Mover.to_world(input, camera)
 	var was := guard
 	guard = held.get("guard", false)
 	if guard and not was:
@@ -337,7 +340,7 @@ func _update_player(dt: float) -> void:
 		say("MIKA", "Hold the catch. Got it.", 2.0)
 		_open_gate()
 	var speed := 1.6 if guard else 4.5
-	p_pos += input * speed * dt
+	p_pos += mover.step(input, speed, dt) * dt
 	p_pos.x = clampf(p_pos.x, -HALF_W + 0.4 if not gate_open else -HALF_W - 1.0, HALF_W - 0.4)
 	p_pos.y = clampf(p_pos.y, -HALF_D + 0.4, HALF_D - 0.4)
 	# Counters are solid.
@@ -353,7 +356,7 @@ func _update_player(dt: float) -> void:
 	if guard and placard_state == "fly":
 		p_yaw = lerp_angle(p_yaw, atan2(placard_pos.x - p_pos.x, placard_pos.z - p_pos.y), 1.0 - exp(-14.0 * dt))
 	elif input.length() > 0.1:
-		p_yaw = lerp_angle(p_yaw, atan2(input.x, input.y), 1.0 - exp(-14.0 * dt))
+		p_yaw = Mover.turn(p_yaw, input, dt)
 	ren.position = Vector3(p_pos.x, 0, p_pos.y)
 	ren.rotation.y = p_yaw
 	reflect_t = maxf(0.0, reflect_t - dt)

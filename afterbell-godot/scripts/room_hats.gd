@@ -18,6 +18,8 @@ const ST := preload("res://scripts/style.gd")
 const MAIN := preload("res://scripts/main.gd")
 const REN_RIG := preload("res://rigs/ren.tscn")
 const Dialogue := preload("res://scripts/dialogue.gd")
+const Mover := preload("res://scripts/mover.gd")
+var mover = Mover.new()
 const GaugeHud := preload("res://scripts/hud.gd")
 const Fade := preload("res://scripts/fade.gd")
 var fade
@@ -317,6 +319,7 @@ func _update_player(dt: float) -> void:
 		float(held.get("down", false)) - float(held.get("up", false)))
 	if input.length() > 1.0:
 		input = input.normalized()
+	input = Mover.to_world(input, camera)
 	inv = maxf(0.0, inv - dt)
 	if act != "none":
 		act_t -= dt
@@ -379,9 +382,10 @@ func _update_player(dt: float) -> void:
 		spd = 2.6
 	elif act in ["light", "heavy", "eat"]:
 		spd = 0.6
-	var vel := input * spd
+	var vel: Vector2 = mover.step(input, spd, dt)
 	if act == "dodge":
 		vel = dodge_dir * 10.0
+		mover.vel = dodge_dir * 4.0
 	# Rack pushing: guard held at a handle, walking along the guide.
 	var pushing := false
 	if guard and absf(p_pos.y - RACK_Z) < 0.75 and absf(input.x) > 0.3:
@@ -408,7 +412,7 @@ func _update_player(dt: float) -> void:
 		if t:
 			p_yaw = lerp_angle(p_yaw, atan2(t.pos.x - p_pos.x, t.pos.y - p_pos.y), 1.0 - exp(-14.0 * dt))
 	elif input.length() > 0.1:
-		p_yaw = lerp_angle(p_yaw, atan2(input.x, input.y), 1.0 - exp(-14.0 * dt))
+		p_yaw = Mover.turn(p_yaw, input, dt)
 	speed = vel.length()
 	if rack_moved > 0.5 and not second_awake:
 		second_awake = true

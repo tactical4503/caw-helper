@@ -149,6 +149,8 @@ var hud: B.Hud
 var sfx: B.Sfx
 
 const Dialogue := preload("res://scripts/dialogue.gd")
+const Mover := preload("res://scripts/mover.gd")
+var mover = Mover.new()
 const GaugeHud := preload("res://scripts/hud.gd")
 const Fade := preload("res://scripts/fade.gd")
 var gauge
@@ -829,6 +831,7 @@ func _update_player(dt: float) -> void:
 		(1.0 if is_held("down") else 0.0) - (1.0 if is_held("up") else 0.0))
 	if input.length() > 1.0:
 		input = input.normalized()
+	input = Mover.to_world(input, camera)   # "up" = away from the camera
 
 	inv = maxf(0.0, inv - dt)
 	dodge_cd = maxf(0.0, dodge_cd - dt)
@@ -895,9 +898,10 @@ func _update_player(dt: float) -> void:
 		spd = 1.0
 	elif act == "light" or act == "heavy":
 		spd = 0.6
-	var vel := input * spd
+	var vel: Vector2 = mover.step(input, spd, dt)
 	if act == "dodge":
 		vel = dodge_dir * 11.0
+		mover.vel = dodge_dir * 4.0   # leave the dodge already moving
 	vel += knock
 	knock = knock.lerp(Vector2.ZERO, 1.0 - exp(-8.0 * dt))
 	p_pos.x = clampf(p_pos.x + vel.x * dt, MIN_X, MAX_X)
@@ -925,7 +929,7 @@ func _update_player(dt: float) -> void:
 	if guard or charging:
 		_face_target(dt)
 	elif input.length() > 0.1:
-		p_yaw = damp_angle(p_yaw, atan2(input.x, input.y), 14.0, dt)
+		p_yaw = Mover.turn(p_yaw, input, dt)
 	speed = vel.length()
 	walk += speed * dt * 2.2
 

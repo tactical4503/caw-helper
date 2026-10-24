@@ -15,6 +15,8 @@ const ST := preload("res://scripts/style.gd")
 const MAIN := preload("res://scripts/main.gd")
 const REN_RIG := preload("res://rigs/ren.tscn")
 const Dialogue := preload("res://scripts/dialogue.gd")
+const Mover := preload("res://scripts/mover.gd")
+var mover = Mover.new()
 const GaugeHud := preload("res://scripts/hud.gd")
 const Fade := preload("res://scripts/fade.gd")
 
@@ -327,11 +329,12 @@ func _update_player(dt: float) -> void:
 		float(held.get("down", false)) - float(held.get("up", false)))
 	if input.length() > 1.0:
 		input = input.normalized()
-	var vel := input * 4.2
+	input = Mover.to_world(input, camera)
+	var vel: Vector2 = mover.step(input, 4.2, dt)
 	p_pos += vel * dt
 	_collide()
 	if input.length() > 0.1:
-		p_yaw = lerp_angle(p_yaw, atan2(input.x, input.y), 1.0 - exp(-14.0 * dt))
+		p_yaw = Mover.turn(p_yaw, input, dt)
 	speed = vel.length()
 	if not met_hesta and p_pos.y < -5.8:
 		_hesta_scene()

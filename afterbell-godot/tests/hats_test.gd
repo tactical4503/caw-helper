@@ -37,6 +37,7 @@ func fresh() -> Node:
 func steps(room: Node, n: int) -> void:
 	for i in n:
 		room.step(DT)
+		room._place_camera(10.0)   # camera settled behind Ren, as in play
 
 
 func until(room: Node, cond: Callable, max_steps := 1200) -> bool:
@@ -44,6 +45,7 @@ func until(room: Node, cond: Callable, max_steps := 1200) -> bool:
 		if cond.call():
 			return true
 		room.step(DT)
+		room._place_camera(10.0)
 	return false
 
 

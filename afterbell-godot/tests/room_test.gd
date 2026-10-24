@@ -39,6 +39,7 @@ func until(room: Node, cond: Callable, max_steps := 1200) -> bool:
 		if cond.call():
 			return true
 		room.step(DT)
+		room._place_camera(10.0)
 	return false
 
 

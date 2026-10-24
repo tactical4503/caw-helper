@@ -30,6 +30,7 @@ func check(ok: bool, what: String) -> void:
 func steps(room: Node, n: int) -> void:
 	for i in n:
 		room.step(DT)
+		room._place_camera(10.0)   # camera settled behind Ren, as in play
 
 
 func press(room: Node, key: String) -> void:
