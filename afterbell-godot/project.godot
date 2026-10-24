@@ -1,0 +1,22 @@
+; Engine configuration file.
+; Godot 4.x project. Open this folder from the Godot project manager (Import).
+
+config_version=5
+
+[application]
+
+config/name="AFTERBELL — Closing Time (greybox)"
+config/description="Installment 002 boss greybox: BS-01, the Floor Manager."
+run/main_scene="res://main.tscn"
+
+[display]
+
+window/size/viewport_width=1280
+window/size/viewport_height=720
+window/stretch/mode="canvas_items"
+window/stretch/aspect="expand"
+
+[rendering]
+
+renderer/rendering_method="forward_plus"
+anti_aliasing/quality/msaa_3d=2
