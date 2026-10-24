@@ -9,7 +9,9 @@ const DEG := PI / 180.0
 # World: x east, -z north. The court DS-10 (building x10–26, y22–40) is centred on the origin.
 const BELL := Vector2(0.0, -7.0)         # building (18, 38), shallow north-wall recess
 const LEVER := Vector2(0.0, -6.1)        # low lever the chair bumper strikes (CAN-027)
-const MARK := Vector2(0.0, -1.5)         # presentation mark
+const MARK := Vector2(0.0, -1.5)         # presentation mark (centre lane)
+## The three carpet inlays fan toward the bell; from phase two he presents from the lane facing Ren.
+const MARKS := [Vector2(-3.0, -1.5), Vector2(0.0, -1.5), Vector2(3.0, -1.5)]
 const ENTRY := Vector2(-6.6, 7.4)        # west door near the south-west corner
 const MIN_X := -7.6
 const MAX_X := 7.6
@@ -85,6 +87,7 @@ var stride := 0.0
 
 # Floor Manager
 var m_pos := MARK + Vector2(0, -2)
+var mark := MARK
 var m_yaw := PI
 var chair_yaw := PI
 var m_state := "enter"
@@ -265,6 +268,7 @@ func reset_attempt(keep: bool) -> void:
 		bells = 0
 		phase = 1
 	m_pos = MARK + Vector2(0, -2)
+	mark = MARK
 	m_yaw = PI
 	chair_yaw = PI
 	steer_to = PI
@@ -590,6 +594,20 @@ func _update_sign(dt: float) -> void:
 
 # ---------------------------------------------------------------- Floor Manager AI
 
+## From phase two, choose the presentation lane nearest Ren's line. True if he needs to move.
+func _pick_lane() -> bool:
+	if phase < 2:
+		return false
+	var best: Vector2 = MARKS[0]
+	for m in MARKS:
+		if absf(m.x - p_pos.x) < absf(best.x - p_pos.x):
+			best = m
+	if best.distance_to(m_pos) < 0.5:
+		return false
+	mark = best
+	return true
+
+
 func _idle_duration() -> float:
 	return 1.0 if phase >= 3 else (1.5 if phase == 2 else 2.0)
 
@@ -609,13 +627,13 @@ func _update_manager(dt: float) -> void:
 					seen["valued"] = true
 					say("FLOOR MANAGER", "Valued— … Valued customers. The court is closed for fitting.", 3.0)
 		"roll":
-			var d := m_pos.distance_to(MARK)
+			var d := m_pos.distance_to(mark)
 			if d < 0.08:
 				m_state = "idle"
 				m_t = _idle_duration()
 			else:
-				steer_to = yaw_to(m_pos, MARK)
-				m_pos = m_pos.move_toward(MARK, 2.2 * dt)
+				steer_to = yaw_to(m_pos, mark)
+				m_pos = m_pos.move_toward(mark, 2.2 * dt)
 				if randf() < dt * 1.2:
 					sfx.squeak()
 		"idle", "recover":
@@ -640,6 +658,8 @@ func _update_manager(dt: float) -> void:
 					sfx.rattle()
 					rack0.state = "tell"
 					rack0.dir = 1 if rack0.pos.x < 0.0 else -1
+				elif sign_data == null and _pick_lane():
+					m_state = "roll"   # reposition to the lane facing Ren, then present
 				elif sign_data == null:
 					m_state = "present"
 					m_t = SIGN_TELL

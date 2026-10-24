@@ -166,9 +166,9 @@ static func build_arena(parent: Node3D) -> Arena:
 	put(box(16, 0.02, 18), ST.textured("carpet_green", 0.5, ST.procedural(Color("1f3a2a"), CARPET_LIGHT, "carpet", 1.5)), Vector3(0, 0.01, 0), root, false)
 	# Three carpet inlays fan toward the bell: decoration that also reads as approach lanes.
 	var lever_z := -6.1
-	put(box(4, 0.02, 12), mat(PLUM, 0.9), Vector3(0, 0.025, lever_z + 6.2), root, false)
+	put(box(4, 0.02, 12), ST.textured("carpet_plum", 0.5, mat(PLUM, 0.9)), Vector3(0, 0.025, lever_z + 6.2), root, false)
 	for s in [-1.0, 1.0]:
-		var strip := put(box(1.4, 0.02, 10), mat(CARPET_LIGHT, 0.9), Vector3(s * 4.2, 0.022, lever_z + 5.4), root, false)
+		var strip := put(box(1.4, 0.02, 10), ST.textured("carpet_sage", 0.5, mat(CARPET_LIGHT, 0.9)), Vector3(s * 4.2, 0.022, lever_z + 5.4), root, false)
 		strip.rotation.y = s * 0.33
 		put(box(0.08, 0.021, 12), mat(CREAM, 0.9), Vector3(s * 2.04, 0.03, lever_z + 6.2), root, false)
 	# North wall, display platform split around the bell recess.
@@ -176,7 +176,7 @@ static func build_arena(parent: Node3D) -> Arena:
 	put(box(16, 4.2, 0.3), wall, Vector3(0, 2.1, -9.15), root)
 	put(box(16, 0.18, 0.34), mat(CREAM, 0.6), Vector3(0, 0.09, -8.98), root)
 	for s in [-1.0, 1.0]:
-		put(box(4.4, 0.32, 1.6), ST.procedural(Color("6a4528"), Color("b0814f"), "wood", 0.4), Vector3(s * 4.6, 0.16, -8.15), root)
+		put(box(4.4, 0.32, 1.6), ST.textured("laminate_walnut", 0.8, ST.procedural(Color("6a4528"), Color("b0814f"), "wood", 0.4)), Vector3(s * 4.6, 0.16, -8.15), root)
 	# West wall with the service door; waist-high east barrier over the atrium; low south wall and gate.
 	put(box(0.3, 2.6, 15.2), wall, Vector3(-8.15, 1.3, -1.4), root)
 	put(box(0.3, 2.6, 0.6), wall, Vector3(-8.15, 1.3, 8.7), root)
@@ -187,6 +187,8 @@ static func build_arena(parent: Node3D) -> Arena:
 	put(box(16, 1.0, 0.25), mat(CREAM, 0.6), Vector3(0, 0.5, 9.1), root)
 	for i in range(-2, 3):
 		put(box(0.05, 1.6, 0.05), brass(), Vector3(i * 0.45, 1.3, 9.1), root)
+	wainscot(root, Vector3(0, 0, -8.98), Vector3(16, 0, 0))      # north wall
+	wainscot(root, Vector3(-7.98, 0, -1.4), Vector3(0, 0, 15.2))  # west wall
 	_build_hall(root)
 	# Six low shoe plinths form the outer edge.
 	for p in [Vector2(-7.0, -3.6), Vector2(-7.0, 2.4), Vector2(7.0, -3.6), Vector2(7.0, 2.4), Vector2(-3.6, 8.0), Vector2(3.6, 8.0)]:
@@ -270,6 +272,20 @@ static func build_arena(parent: Node3D) -> Arena:
 	var head := put(box(0.6, 0.01, 0.6), arrow_mat, Vector3(0, 0.05, 1.7), a.aim_arrow, false)
 	head.rotation.y = PI / 4.0
 	return a
+
+
+## Cream lower wall panelling with a brass dado rail, along a wall from its centre.
+## `span` runs along the wall (x or z); the panel sits 2 cm proud of the wall face.
+static func wainscot(root: Node3D, centre: Vector3, span: Vector3) -> void:
+	var along_x := absf(span.x) > absf(span.z)
+	var length := span.length()
+	var panel := ST.textured("plaster_cream", 0.6, mat(CREAM, 0.6))
+	var size := Vector3(length, 1.05, 0.04) if along_x else Vector3(0.04, 1.05, length)
+	put(box(size.x, size.y, size.z), panel, centre + Vector3(0, 0.6, 0), root)
+	var rail := Vector3(length, 0.07, 0.08) if along_x else Vector3(0.08, 0.07, length)
+	put(box(rail.x, rail.y, rail.z), brass(), centre + Vector3(0, 1.14, 0), root)
+	var kick := Vector3(length, 0.14, 0.06) if along_x else Vector3(0.06, 0.14, length)
+	put(box(kick.x, kick.y, kick.z), ST.textured("laminate_plum", 1.0, mat(PLUM, 0.4)), centre + Vector3(0, 0.07, 0), root)
 
 
 ## Interior dressing: ceiling, columns with plum banners, brass wall lamps, and the atrium

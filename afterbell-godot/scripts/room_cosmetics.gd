@@ -162,6 +162,19 @@ func _build_room() -> void:
 	arrow.rotation.y = PI / 2.0
 	arrow.position = Vector3(-HALF_W + 0.05, 1.5, GATE_Z + 1.45)
 	add_child(arrow)
+	# Panelled walls, columns at the corners of the aisle, the shutter framed in brass.
+	B.wainscot(self, Vector3(0, 0, -HALF_D + 0.02), Vector3(HALF_W * 2, 0, 0))
+	B.wainscot(self, Vector3(HALF_W - 0.02, 0, 0), Vector3(0, 0, HALF_D * 2))
+	B.wainscot(self, Vector3(-HALF_W + 0.02, 0, (-HALF_D + GATE_Z - 0.9) / 2.0), Vector3(0, 0, HALF_D + GATE_Z - 0.9))
+	for side in [-1.0, 1.0]:
+		B.wainscot(self, Vector3(side * (HALF_W + 1.2) / 2.0, 0, HALF_D - 0.02), Vector3(HALF_W - 1.2, 0, 0))
+	for c in [Vector2(-2.3, -HALF_D + 0.4), Vector2(2.3, -HALF_D + 0.4), Vector2(-2.3, HALF_D - 0.4), Vector2(2.3, HALF_D - 0.4)]:
+		B.put(B.box(0.6, 4.3, 0.6), cream, Vector3(c.x, 2.15, c.y), self)
+		B.put(B.box(0.7, 0.16, 0.7), B.brass(), Vector3(c.x, 4.1, c.y), self)
+		B.put(B.box(0.7, 0.16, 0.7), B.brass(), Vector3(c.x, 0.08, c.y), self)
+	for x in [-1.55, 1.55]:
+		B.put(B.box(0.1, 2.7, 0.1), B.brass(), Vector3(x, 1.35, -HALF_D + 0.06), self)
+	B.put(B.box(3.2, 0.12, 0.1), B.brass(), Vector3(0, 2.66, -HALF_D + 0.06), self)
 	# Two horseshoe counters, one each side of the central aisle.
 	for s in [-1.0, 1.0]:
 		var cx: float = s * 4.6
@@ -215,6 +228,15 @@ func _build_room() -> void:
 	attendant_arm.position = Vector3(-0.26, 1.55, 0)
 	attendant.add_child(attendant_arm)
 	B.put(B.capsule(0.05, 0.5), ivory, Vector3(0, -0.3, 0), attendant_arm)
+	# A warm spotlight picks out the attendant so the demonstration reads at a glance.
+	var spot := SpotLight3D.new()
+	spot.light_color = Color("ffd9a0")
+	spot.light_energy = 4.0
+	spot.spot_range = 6.0
+	spot.spot_angle = 22.0
+	spot.position = Vector3(THROW_FROM.x - 0.5, 4.0, THROW_FROM.y + 1.0)
+	add_child(spot)
+	spot.look_at(Vector3(THROW_FROM.x + 0.4, 1.4, THROW_FROM.y), Vector3.UP)
 	# Interactables: mirror, atomizer, price card.
 	var mirror := B.put(B.box(0.04, 0.4, 0.3), ST.plastic(Color("c8d8e0"), 0.02, 0.9), Vector3(-3.2, 1.35, -2.3), self)
 	mirror.name = "Mirror"
@@ -229,6 +251,9 @@ func _build_hud() -> void:
 	var title := B._label("DS-01  COSMETICS AND DIRECTORY  ·  demonstration build", 12, B.BRASS)
 	title.position = Vector2(16, 12)
 	layer.add_child(title)
+	var keys := B._label("WASD move  ·  K guard  ·  E examine  ·  T reflection assist", 12, Color(B.IVORY, 0.7))
+	keys.position = Vector2(16, 30)
+	layer.add_child(keys)
 	var bottom := VBoxContainer.new()
 	bottom.set_anchors_preset(Control.PRESET_BOTTOM_WIDE)
 	bottom.offset_top = -150
@@ -343,9 +368,15 @@ func _interact(what: String) -> void:
 
 
 func _update_attendant(dt: float) -> void:
+	var to_ren := atan2(p_pos.x - attendant.position.x, p_pos.y - attendant.position.z)
 	if gate_open:
+		# Demonstration over: it turns to Ren and gives a small, satisfied bow.
 		attendant_arm.rotation.x = lerpf(attendant_arm.rotation.x, 0.0, 1.0 - exp(-4.0 * dt))
+		attendant.rotation.y = lerp_angle(attendant.rotation.y, to_ren, 1.0 - exp(-3.0 * dt))
+		attendant.rotation.x = 0.25 * sin(clampf(gate_progress * PI, 0.0, PI))
 		return
+	var throwing := cycle_t > CYCLE - TELL - 0.4 or cycle_t < 0.4
+	attendant.rotation.y = lerp_angle(attendant.rotation.y, -PI / 2.0 if throwing else lerp_angle(-PI / 2.0, to_ren, 0.6), 1.0 - exp(-5.0 * dt))
 	cycle_t += dt
 	if cycle_t >= CYCLE:
 		cycle_t -= CYCLE

@@ -133,6 +133,18 @@ func _run() -> void:
 	main.racks[0].hit = false
 	check(until(func(): return main.mode == "end", 3000), "losing the last segment ends the attempt")
 
+	print("Lane choice (phase two):")
+	main.hud.end.visible = false
+	fresh(true)
+	main.phase = 2
+	main.bells = 1
+	main.m_next = "sign"
+	main.p_pos = Vector2(3.2, 4.0)
+	check(until(func(): return main.mark.x > 2.0 and main.m_state == "roll", 900), "he moves to the lane facing Ren")
+	check(until(func(): return main.m_state == "present", 900) and main.m_pos.distance_to(Vector2(3.0, -1.5)) < 0.2, "then presents from that lane")
+	main.phase = 1
+	main.bells = 0
+
 	print("Animation clips:")
 	var boss_anim: AnimationPlayer = main.boss_anim
 	var ren_anim: AnimationPlayer = main.ren_anim
