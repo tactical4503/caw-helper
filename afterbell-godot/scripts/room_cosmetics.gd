@@ -102,6 +102,7 @@ func _ready() -> void:
 	camera.current = true
 	sfx = B.Sfx.new()
 	add_child(sfx)
+	sfx.ambience.call_deferred("amb_cosmetics")
 	gauge = GaugeHud.new()
 	add_child(gauge)
 	gauge.set_combat(false)          # safe room: the health panel fades back when quiet

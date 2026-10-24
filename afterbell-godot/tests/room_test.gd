@@ -102,6 +102,10 @@ func _run() -> void:
 		g._process(1.0 / 60.0)
 	check(g.panel_alpha < 0.5, "health panel fades back in a quiet safe room")
 
+	print("Drop-in sounds:")
+	check(room.sfx.play_file("_selftest"), "a file in assets/sfx/ is found and played")
+	check(not room.sfx.play_file("no_such_sound"), "a missing file falls back to the synthesized sound")
+
 	print("Help route (three misses):")
 	room = fresh()
 	room.p_pos = Vector2(0.0, -1.4)

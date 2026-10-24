@@ -687,20 +687,97 @@ class Sfx extends Node:
 			if i % 256 == 0:
 				_voices = _voices.filter(func(v): return v[3] < v[2])
 
-	func chime() -> void: tone(880, 0.35, 0.22, 0.0, -1, "tri"); tone(1175, 0.5, 0.22, 0.15, -1, "tri")
-	func reflect() -> void: tone(1175, 0.18, 0.25, 0.0, -1, "tri"); tone(1568, 0.3, 0.2, 0.06, -1, "tri"); noise(0.05, 0.15)
-	func thud() -> void: tone(120, 0.2, 0.35); noise(0.06, 0.1)
-	func knock() -> void: tone(210, 0.1, 0.2, 0.0, -1, "tri"); noise(0.04, 0.15)
-	func click() -> void: noise(0.02, 0.25)
-	func swing() -> void: noise(0.12, 0.08)
-	func heavy() -> void: noise(0.18, 0.15); tone(90, 0.25, 0.4)
-	func hurt() -> void: tone(180, 0.22, 0.15, 0.0, 90)
-	func squeak() -> void: tone(1900, 0.09, 0.05, 0.0, 2300)
+	# Each cue first looks for a recorded file in assets/sfx/<name>.(ogg|wav|mp3); if there is
+	# one it plays that instead of the synthesized version. Drop files in to upgrade sounds.
+	func chime() -> void:
+		if not play_file("chime"): tone(880, 0.35, 0.22, 0.0, -1, "tri"); tone(1175, 0.5, 0.22, 0.15, -1, "tri")
+	func reflect() -> void:
+		if not play_file("reflect"): tone(1175, 0.18, 0.25, 0.0, -1, "tri"); tone(1568, 0.3, 0.2, 0.06, -1, "tri"); noise(0.05, 0.15)
+	func thud() -> void:
+		if not play_file("thud"): tone(120, 0.2, 0.35); noise(0.06, 0.1)
+	func knock() -> void:
+		if not play_file("knock"): tone(210, 0.1, 0.2, 0.0, -1, "tri"); noise(0.04, 0.15)
+	func click() -> void:
+		if not play_file("click"): noise(0.02, 0.25)
+	func swing() -> void:
+		if not play_file("swing"): noise(0.12, 0.08)
+	func heavy() -> void:
+		if not play_file("heavy"): noise(0.18, 0.15); tone(90, 0.25, 0.4)
+	func hurt() -> void:
+		if not play_file("hurt"): tone(180, 0.22, 0.15, 0.0, 90)
+	func squeak() -> void:
+		if not play_file("squeak"): tone(1900, 0.09, 0.05, 0.0, 2300)
 	func rattle() -> void:
+		if play_file("rattle"):
+			return
 		for i in 8:
 			noise(0.03, 0.15, i * 0.13)
-	func spring() -> void: tone(300, 0.35, 0.15, 0.0, 1200, "tri")
-	func pip() -> void: tone(1568, 0.11, 0.15, 0.05); tone(2093, 0.16, 0.15, 0.2)
+	func spring() -> void:
+		if not play_file("spring"): tone(300, 0.35, 0.15, 0.0, 1200, "tri")
+	func pip() -> void:
+		if not play_file("pip"): tone(1568, 0.11, 0.15, 0.05); tone(2093, 0.16, 0.15, 0.2)
 	func bell() -> void:
+		if play_file("bell"):
+			return
 		for p in [[1.0, 0.22, 2.2], [2.0, 0.09, 1.4], [2.76, 0.07, 1.0], [5.4, 0.04, 0.5]]:
 			tone(523.0 * p[0], p[2], p[1])
+
+	# ------------------------------------------------ recorded sounds
+
+	const SFX_DIR := "res://assets/sfx/"
+	var _files := {}          # name -> AudioStream or null (cached lookups)
+	var _players: Array = []
+	var _ambience: AudioStreamPlayer
+
+	func _stream(name: String) -> AudioStream:
+		if not _files.has(name):
+			_files[name] = null
+			for ext in ["ogg", "wav", "mp3"]:
+				var path: String = SFX_DIR + name + "." + ext
+				if ResourceLoader.exists(path):
+					_files[name] = load(path)
+					break
+		return _files[name]
+
+	## Plays assets/sfx/<name>.* if it exists (slight pitch variety so repeats don't grate).
+	func play_file(name: String, volume_db := 0.0) -> bool:
+		var stream := _stream(name)
+		if stream == null:
+			return false
+		var player: AudioStreamPlayer = null
+		for p in _players:
+			if not p.playing:
+				player = p
+				break
+		if player == null:
+			if _players.size() >= 12:
+				player = _players[0]
+			else:
+				player = AudioStreamPlayer.new()
+				add_child(player)
+				_players.append(player)
+		player.stream = stream
+		player.volume_db = volume_db
+		player.pitch_scale = randf_range(0.96, 1.04)
+		player.play()
+		return true
+
+	## Looping room tone from assets/sfx/<name>.* (e.g. amb_cosmetics); silent if absent.
+	func ambience(name: String, volume_db := -12.0) -> bool:
+		var stream := _stream(name)
+		if stream == null:
+			return false
+		if _ambience == null:
+			_ambience = AudioStreamPlayer.new()
+			add_child(_ambience)
+		if stream is AudioStreamOggVorbis:
+			stream.loop = true
+		elif stream is AudioStreamWAV:
+			stream.loop_mode = AudioStreamWAV.LOOP_FORWARD
+			stream.loop_end = int(stream.get_length() * stream.mix_rate)
+		elif stream is AudioStreamMP3:
+			stream.loop = true
+		_ambience.stream = stream
+		_ambience.volume_db = volume_db
+		_ambience.play()
+		return true

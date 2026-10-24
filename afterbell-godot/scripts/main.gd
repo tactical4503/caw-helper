@@ -185,6 +185,7 @@ func _ready() -> void:
 	camera.look_at(Vector3(0, 1, 0), Vector3.UP)
 	sfx = B.Sfx.new()
 	add_child(sfx)
+	sfx.ambience.call_deferred("amb_court")
 	gauge = GaugeHud.new()   # added before the menu layer so title/end panels draw over it
 	add_child(gauge)
 	gauge.visible = false
