@@ -143,8 +143,8 @@ static func environment() -> Environment:
 	e.background_mode = Environment.BG_COLOR
 	e.background_color = Color("1c1416")
 	e.ambient_light_source = Environment.AMBIENT_SOURCE_COLOR
-	e.ambient_light_color = Color("e9dccd")
-	e.ambient_light_energy = 0.32
+	e.ambient_light_color = Color("f0d8c2")   # warm fill so shade reads amber, not grey
+	e.ambient_light_energy = 0.36
 	e.reflected_light_source = Environment.REFLECTION_SOURCE_BG
 	e.tonemap_mode = Environment.TONE_MAPPER_FILMIC
 	e.tonemap_exposure = 1.0
@@ -152,13 +152,13 @@ static func environment() -> Environment:
 	e.ssr_enabled = false           # expensive; off by default (glossy materials still catch lamp highlights)
 	e.ssao_enabled = true           # contact shadows: corners, under counters, around feet
 	e.ssao_radius = 1.2
-	e.ssao_intensity = 2.2
-	e.ssao_power = 1.6
-	e.glow_enabled = true           # only emissive lamp globes cross the threshold
-	e.glow_intensity = 0.3
+	e.ssao_intensity = 1.5
+	e.ssao_power = 1.3
+	e.glow_enabled = true           # a soft halo round the window and lamps, never a white blob
+	e.glow_intensity = 0.18
 	e.glow_strength = 0.9
 	e.glow_bloom = 0.0
-	e.glow_hdr_threshold = 1.0
+	e.glow_hdr_threshold = 1.2
 	e.fog_enabled = true            # faint depth falloff, not a milky haze
 	e.fog_light_color = Color("3a2a26")
 	e.fog_density = 0.0025
@@ -172,11 +172,13 @@ static func environment() -> Environment:
 ## fall under things rather than across the room. Kept low; the lamps do the warm work.
 static func sun() -> DirectionalLight3D:
 	var key := DirectionalLight3D.new()
-	key.light_color = Color("fff1e2")
+	key.light_color = Color("ffe4cc")
 	key.light_energy = 0.35
 	key.light_specular = 0.6
 	key.shadow_enabled = true
-	key.shadow_blur = 2.0
+	key.shadow_blur = 4.0
+	key.light_angular_distance = 2.5   # wide source: shadow edges soften with distance
+	key.shadow_opacity = 0.75
 	key.shadow_bias = 0.04
 	key.directional_shadow_max_distance = 25.0
 	key.rotation = Vector3(deg_to_rad(-78), deg_to_rad(-20), 0)
@@ -188,15 +190,16 @@ static var _lamp_glass: StandardMaterial3D
 
 ## A wall or column lamp: a frosted cream globe that glows without blowing out, and a warm soft
 ## pool of light. No shadows (cheap); low specular so walls get a sheen, not a hot spot.
-static func lamp(parent: Node3D, at: Vector3, energy := 0.9, reach := 5.5) -> OmniLight3D:
+## `light_offset` moves the light itself away from the wall so the wall gets an even wash.
+static func lamp(parent: Node3D, at: Vector3, energy := 0.9, reach := 5.5, light_offset := Vector3.ZERO) -> OmniLight3D:
 	globe(parent, at)
 	var light := OmniLight3D.new()
-	light.light_color = Color("ffd8a8")
-	light.light_energy = energy
-	light.light_specular = 0.25
+	light.light_color = Color("ffc488")
+	light.light_energy = energy * 0.7   # soft pools, no hot spot on the column beside it
+	light.light_specular = 0.1
 	light.omni_range = reach
 	light.omni_attenuation = 1.6
-	light.position = at
+	light.position = at + light_offset
 	parent.add_child(light)
 	return light
 
@@ -206,11 +209,11 @@ static func lamp(parent: Node3D, at: Vector3, energy := 0.9, reach := 5.5) -> Om
 static func globe(parent: Node3D, at: Vector3, radius := 0.14) -> MeshInstance3D:
 	if _lamp_glass == null:
 		_lamp_glass = StandardMaterial3D.new()
-		_lamp_glass.albedo_color = Color("f6e7cc")
-		_lamp_glass.roughness = 0.6
+		_lamp_glass.albedo_color = Color("eec08a")   # amber frosted glass
+		_lamp_glass.roughness = 0.7
 		_lamp_glass.emission_enabled = true
-		_lamp_glass.emission = Color("ffd9a0")
-		_lamp_glass.emission_energy_multiplier = 1.5
+		_lamp_glass.emission = Color("ffae66")
+		_lamp_glass.emission_energy_multiplier = 0.65
 	var g := MeshInstance3D.new()
 	var sphere := SphereMesh.new()
 	sphere.radius = radius
@@ -226,7 +229,7 @@ static func globe(parent: Node3D, at: Vector3, radius := 0.14) -> MeshInstance3D
 ## Overhead fill from the ceiling fixtures: neutral-warm pools on the floor, falling off at walls.
 static func ceiling_light(parent: Node3D, at: Vector3, energy := 0.8, reach := 7.0) -> OmniLight3D:
 	var light := OmniLight3D.new()
-	light.light_color = Color("fff0dc")
+	light.light_color = Color("ffdcb4")
 	light.light_energy = energy
 	light.light_specular = 0.0
 	light.omni_range = reach

@@ -318,7 +318,7 @@ static func _build_hall(arena_root: Node3D) -> void:
 			Atrium.fleur(root, bb.position + Vector3(0, b[1] * 0.12, 0) + face * 0.05, face, 0.36)
 		var lamp_pos := Vector3(spot.x, 2.6, spot.y) + face * 0.55
 		put(sphere(0.06), brass(), lamp_pos - face * 0.15, root)
-		ST.lamp(root, lamp_pos, 0.8, 5.5)
+		ST.lamp(root, lamp_pos, 0.8, 5.5, face * 0.5)
 		ST.globe(root, Vector3(spot.x, 12.6, spot.y) + face * 0.55)
 	# Chandeliers on long drops from the roof: pools of light down the court and over the bell.
 	for z in [5.0, 0.0, -5.0]:

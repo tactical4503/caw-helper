@@ -267,7 +267,7 @@ static func _sky_mat() -> StandardMaterial3D:
 		return _mats["sky"]
 	var g := Gradient.new()
 	g.offsets = PackedFloat32Array([0.0, 0.42, 0.78, 1.0])
-	g.colors = PackedColorArray([Color("4b3a7c"), Color("c27aa8"), Color("ffab78"), Color("ffd59c")])
+	g.colors = PackedColorArray([Color("d99a9a"), Color("f7ad92"), Color("ffc29c"), Color("ffdcb6")])   # dusky rose → peach → gold
 	var tex := GradientTexture2D.new()
 	tex.gradient = g
 	tex.fill_from = Vector2(0, 0)
@@ -278,7 +278,7 @@ static func _sky_mat() -> StandardMaterial3D:
 	m.albedo_color = Color.BLACK
 	m.emission_enabled = true
 	m.emission_texture = tex
-	m.emission_energy_multiplier = 1.5
+	m.emission_energy_multiplier = 1.15
 	_mats["sky"] = m
 	return m
 
@@ -294,8 +294,8 @@ static func _roof(a: Node3D) -> void:
 	var light := StandardMaterial3D.new()
 	light.albedo_color = Color("fff3dc")
 	light.emission_enabled = true
-	light.emission = Color("ffe9c4")
-	light.emission_energy_multiplier = 0.9
+	light.emission = Color("ffd2a6")
+	light.emission_energy_multiplier = 0.45
 	var skylight := _put(_box(6.0, 0.05, depth - 6.0), light, Vector3(0, ROOF - 0.02, mid_z), a, false)
 	skylight.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 	var z := NORTH_Z + 2.0
@@ -348,12 +348,13 @@ static func _lower_hall(a: Node3D) -> void:
 static func _lights(a: Node3D) -> void:
 	# Sunset through the window: a long warm wash down the atrium onto the bell area.
 	var sun_in := SpotLight3D.new()
-	sun_in.light_color = Color("ffb98a")
-	sun_in.light_energy = 2.2
+	sun_in.light_color = Color("ffbf9c")   # peach
+	sun_in.light_energy = 2.8
 	sun_in.light_specular = 0.2
 	sun_in.spot_range = 34.0
-	sun_in.spot_angle = 32.0
-	sun_in.spot_attenuation = 0.8
+	sun_in.spot_angle = 42.0
+	sun_in.spot_attenuation = 0.6
+	sun_in.spot_angle_attenuation = 2.5   # feathered edge
 	sun_in.position = Vector3(0, 12.5, NORTH_Z + 1.0)
 	a.add_child(sun_in)
 	sun_in.look_at(Vector3(0, 0, -4.0), Vector3.UP)
