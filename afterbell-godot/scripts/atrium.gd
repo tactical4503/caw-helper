@@ -7,6 +7,7 @@ extends RefCounted
 ## sit behind the court's columns. A coffered roof with a skylight closes it all at 16 m.
 
 const ST := preload("res://scripts/style.gd")
+const Props := preload("res://scripts/props.gd")
 
 const CREAM := Color("efe3c8")
 const IVORY := Color("e6dccb")
@@ -41,6 +42,7 @@ static func build(root: Node3D) -> void:
 	_window(a)
 	_roof(a)
 	_lower_hall(a)
+	_dress_aisles(a)
 	_lights(a)
 	merge(a)
 
@@ -325,24 +327,31 @@ static func _lower_hall(a: Node3D) -> void:
 				_put(_box(0.16, 0.22, 0.2), _m("plum" if i % 2 else "cream"), Vector3(s * (0.68 + i * 0.24), y + 0.13, NORTH_Z + 0.22), a)
 	_put(_box(4.2, 0.4, 0.45), _m("cream"), Vector3(0, 3.6, NORTH_Z + 0.2), a)
 	_put(_box(OUTER_X * 2.0, 0.3, 0.3), _m("brass"), Vector3(0, under - 0.15, NORTH_Z + 0.2), a)
-	# Round display table with a vase of white lilies, between the escalators.
-	var t := Vector3(0, 0, -13.5)
-	_put(_cyl(1.0, 1.0, 0.75, 32), _m("plum"), t + Vector3(0, 0.375, 0), a)
-	_put(_cyl(1.08, 1.08, 0.06, 32), _m("cream"), t + Vector3(0, 0.78, 0), a)
-	_put(_cyl(1.12, 1.12, 0.04, 32), _m("brass"), t + Vector3(0, 0.02, 0), a)
-	_put(_cyl(0.12, 0.2, 0.5, 16), _m("vase"), t + Vector3(0, 1.06, 0), a)
-	var rng := RandomNumberGenerator.new()
-	rng.seed = 11
-	for i in 22:
-		var d := Vector3(rng.randf_range(-1, 1), rng.randf_range(0.2, 1.0), rng.randf_range(-1, 1)).normalized()
-		var stem := t + Vector3(0, 1.25, 0) + d * rng.randf_range(0.25, 0.5)
-		_put(_sphere(0.07), _m("lily") if i % 3 else _m("leaf"), stem, a)
+	# Lilies between the escalators, perfume counters either side.
+	Props.place(a, "flower_display", Vector3(0, 0, -13.5))
+	for side in [-1.0, 1.0]:
+		Props.place(a, "perfume_counter", Vector3(side * 3.0, 0, -12.2), 0.0, 1 if side > 0 else 2)
 	# Suit racks and mannequins on the lower floor beyond the balustrade.
 	for s in [-1.0, 1.0]:
 		rack(a, Vector3(s * 3.2, 0, -16.5), 0.0)
 		mannequin(a, Vector3(s * 7.4, 0, -12.5), 0.0, 1)
 		mannequin(a, Vector3(s * 7.4, 0, -16.0), 0.0, 2)
 		palm(a, Vector3(s * 2.6, 0, -10.6))
+
+
+## The aisle beyond the court's east rail: perfume counters facing the fight, mannequins between
+## them, and the same lilies on each gallery landing.
+static func _dress_aisles(a: Node3D) -> void:
+	for z in [-6.5, -1.5, 3.5]:
+		Props.place(a, "perfume_counter", Vector3(10.6, 0, z), -PI / 2.0, int(z) & 3)
+	for z in [-4.0, 1.0, 6.5]:
+		Props.place(a, "mannequin", Vector3(9.3, 0, z), -PI / 2.0, int(absf(z)) % 4)
+	Props.place(a, "perfume_tower", Vector3(11.2, 0, 7.6))
+	Props.place(a, "easel", Vector3(9.4, 0, -8.3), -PI / 2.0 + 0.4, 1, "SALE")
+	for level in LEVELS:
+		for s in [-1.0, 1.0]:
+			Props.place(a, "flower_display", Vector3(s * 11.4, level, -11.0))
+			Props.place(a, "perfume_counter", Vector3(s * 12.0, level, 6.0), -s * PI / 2.0, 3)
 
 
 static func _lights(a: Node3D) -> void:
@@ -399,52 +408,14 @@ static func fleur(a: Node3D, at: Vector3, face: Vector3, size: float) -> void:
 	foot.scale = Vector3(0.14, 0.22, 0.05) * s
 
 
-## A store mannequin: ivory figure in a suit (or dress), with a fedora on some.
+## Mannequins and racks come from the shared prop library, so the atrium repeats the same
+## models as the departments.
 static func mannequin(a: Node3D, at: Vector3, yaw: float, look: int) -> void:
-	var m := Node3D.new()
-	m.position = at
-	m.rotation.y = yaw
-	a.add_child(m)
-	var suit: StandardMaterial3D = [_m("suit_navy"), _m("suit_brown"), _m("suit_charcoal")][look % 3]
-	_put(_cyl(0.22, 0.24, 0.05, 20), _m("brass"), Vector3(0, 0.025, 0), m)
-	_put(_cyl(0.025, 0.025, 0.25, 8), _m("brass"), Vector3(0, 0.15, 0), m)
-	for side in [-1.0, 1.0]:
-		_put(_cyl(0.07, 0.06, 0.82, 10), suit, Vector3(side * 0.1, 0.62, 0), m)
-		_put(_box(0.1, 0.06, 0.24), _m("shoe"), Vector3(side * 0.1, 0.2, 0.04), m)
-	var torso := _put(_cyl(0.2, 0.15, 0.62, 16), suit, Vector3(0, 1.32, 0), m)
-	torso.scale = Vector3(1, 1, 0.68)
-	_put(_box(0.08, 0.3, 0.02), _m("shirt"), Vector3(0, 1.45, 0.14), m)
-	for side in [-1.0, 1.0]:
-		var arm := _put(_cyl(0.055, 0.05, 0.6, 10), suit, Vector3(side * 0.25, 1.32, 0), m)
-		arm.rotation.z = side * 0.08
-		_put(_sphere(0.05), _m("ivory"), Vector3(side * 0.28, 0.98, 0.0), m)
-	_put(_cyl(0.05, 0.06, 0.1, 10), _m("ivory"), Vector3(0, 1.68, 0), m)
-	var head := _put(_sphere(0.12), _m("ivory"), Vector3(0, 1.84, 0), m)
-	head.scale = Vector3(0.9, 1.15, 0.95)
-	if look != 1:
-		_put(_cyl(0.19, 0.19, 0.015, 20), _m("hat"), Vector3(0, 1.95, 0), m)
-		_put(_cyl(0.1, 0.12, 0.13, 16), _m("hat"), Vector3(0, 2.02, 0), m)
-		_put(_cyl(0.122, 0.122, 0.03, 16), _m("plum"), Vector3(0, 1.98, 0), m)
+	Props.place(a, "mannequin", at, yaw, look)
 
 
-## A brass garment rack of suits on hangers. `yaw` 0 runs the rail along x.
 static func rack(a: Node3D, at: Vector3, yaw: float) -> void:
-	var r := Node3D.new()
-	r.position = at
-	r.rotation.y = yaw
-	a.add_child(r)
-	var len := 1.6
-	for s in [-1.0, 1.0]:
-		_put(_cyl(0.025, 0.025, 1.55, 8), _m("brass"), Vector3(s * len * 0.5, 0.78, 0), r)
-		_put(_box(0.04, 0.04, 0.5), _m("brass"), Vector3(s * len * 0.5, 0.03, 0), r)
-	var rail := _put(_cyl(0.02, 0.02, len, 8), _m("brass"), Vector3(0, 1.55, 0), r)
-	rail.rotation.z = PI / 2.0
-	var coats := [_m("suit_navy"), _m("suit_charcoal"), _m("suit_brown"), _m("plum"), _m("suit_navy"), _m("suit_charcoal")]
-	for i in 9:
-		var x := -len * 0.42 + i * (len * 0.84 / 8.0)
-		var coat := _put(_box(0.07, 0.95, 0.5), coats[i % coats.size()], Vector3(x, 1.0, 0), r)
-		coat.scale.z = 1.0 - (i % 2) * 0.06
-		_put(_box(0.02, 0.05, 0.42), _m("wood"), Vector3(x, 1.5, 0), r)
+	Props.place(a, "rack", at, yaw, int(absf(at.z)) % 2)
 
 
 ## A potted palm: brass-banded cream urn, a fan of drooping fronds.

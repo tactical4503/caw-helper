@@ -72,6 +72,8 @@ var who: Label
 var prompt: Label
 const Dialogue := preload("res://scripts/dialogue.gd")
 const Mover := preload("res://scripts/mover.gd")
+const Props := preload("res://scripts/props.gd")
+var prop_solids: Array = []   # Rect2 footprints of floor props
 const ShoulderCam := preload("res://scripts/shoulder_cam.gd")
 var mover = Mover.new()
 const GaugeHud := preload("res://scripts/hud.gd")
@@ -125,6 +127,17 @@ func _ready() -> void:
 
 
 # ---------------------------------------------------------------- building
+
+## Dressing that fills the corners without touching the demonstration: a perfume tower and
+## lilies by the vestibule, mannequins at the back, a sale easel, the department sign.
+func _place_props() -> void:
+	for p in [["perfume_tower", Vector3(6.7, 0, 3.1), 0.0, 0], ["flower_display", Vector3(-6.9, 0, 3.25), 0.0, 0],
+			["mannequin", Vector3(7.2, 0, -3.35), -0.8, 1], ["mannequin", Vector3(-7.2, 0, -3.35), 0.8, 3],
+			["easel", Vector3(1.05, 0, -3.3), 0.0, 1]]:
+		Props.place(self, p[0], p[1], p[2], p[3], "SALE")
+		prop_solids.append(Props.footprint(p[0], p[1], p[2]))
+	Props.place(self, "hanging_sign", Vector3(0, 3.45, -HALF_D + 0.15), 0.0, 0, "COSMETICS  ·  FRAGRANCE")
+
 
 func _build_room() -> void:
 	var env := WorldEnvironment.new()
@@ -207,18 +220,17 @@ func _build_room() -> void:
 			glass.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
 			glass.roughness = 0.03
 			B.put(B.box(size.x, 0.03, size.z), glass, Vector3(pos.x, 1.04, pos.z), self, false)
-			# Bottle clusters: static background, grouped by height.
-			for i in 4:
-				var bx: float = pos.x - size.x * 0.35 + i * size.x * 0.23 if size.x > 1 else pos.x
-				var bz: float = pos.z if size.x > 1 else pos.z - size.z * 0.35 + i * size.z * 0.23
-				var col: Color = [B.PLUM, B.CREAM, Color("8a3c6a"), B.RED][i]
-				B.put(B.cyl(0.05, 0.06, 0.16 + 0.05 * (i % 2)), ST.plastic(col, 0.2, 0.0), Vector3(bx, 1.12, bz), self)
+			# Perfume boxes and testers along the long runs.
+			if size.x > 1:
+				for k in [-0.85, 0.85]:
+					Props.place(self, "perfume_boxes", Vector3(pos.x + k, 1.055, pos.z), 0.0, int(pos.z * 3.0 + k + s * 4.0) & 3)
 	# Padded catcher on the west counter.
 	var catcher := B.put(B.box(0.2, 0.9, 1.1), B.mat(Color("6b2620"), 0.85), Vector3(CATCH_AT.x - 0.4, 1.45, CATCH_AT.y), self)
 	catcher.name = "Catcher"
 	# Lamps on the walls.
 	for p in [Vector3(-4, 2.6, -HALF_D + 0.3), Vector3(4, 2.6, -HALF_D + 0.3), Vector3(HALF_W - 0.3, 2.6, 0), Vector3(-HALF_W + 0.3, 2.6, -2)]:
 		ST.lamp(self, p)
+	_place_props()
 	# Ceiling fixtures over each counter and the aisle.
 	for x in [-4.6, 0.0, 4.6]:
 		ST.ceiling_light(self, Vector3(x, 3.9, -0.6), 0.75, 6.0)
@@ -355,6 +367,7 @@ func _update_player(dt: float) -> void:
 				p_pos.x = r.position.x if absf(p_pos.x - r.position.x) < absf(r.end.x - p_pos.x) else r.end.x
 			else:
 				p_pos.y = r.position.y if absf(p_pos.y - r.position.y) < absf(r.end.y - p_pos.y) else r.end.y
+	p_pos = Props.push_out(p_pos, prop_solids)
 	if guard and placard_state == "fly":
 		p_yaw = lerp_angle(p_yaw, atan2(placard_pos.x - p_pos.x, placard_pos.z - p_pos.y), 1.0 - exp(-14.0 * dt))
 	elif input.length() > 0.1:

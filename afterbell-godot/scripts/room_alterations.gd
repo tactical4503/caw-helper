@@ -16,6 +16,7 @@ const MAIN := preload("res://scripts/main.gd")
 const REN_RIG := preload("res://rigs/ren.tscn")
 const Dialogue := preload("res://scripts/dialogue.gd")
 const Mover := preload("res://scripts/mover.gd")
+const Props := preload("res://scripts/props.gd")
 const ShoulderCam := preload("res://scripts/shoulder_cam.gd")
 var mover = Mover.new()
 const GaugeHud := preload("res://scripts/hud.gd")
@@ -241,6 +242,13 @@ func _build_rooms() -> void:
 	_person(Vector2(2.8, -8.2), Color("e8dcc2"), Color("8a5a3c"), true)     # Len: cream porter jacket and cap
 	solids.append([Vector2(-0.9, -9.6), 0.45])
 	solids.append([Vector2(2.8, -8.2), 0.45])
+	# Garments waiting for collection, finished pieces on mannequins, the fitting-room sign.
+	for p in [["rack", Vector3(3.4, 0, 4.3), 0.0, 0], ["rack", Vector3(0.4, 0, -4.4), 0.0, 1],
+			["mannequin", Vector3(-4.25, 0, 4.2), 0.7, 2], ["mannequin", Vector3(-4.3, 0, -4.3), 0.7, 1],
+			["rack", Vector3(6.3, 0, -10.8), PI / 2.0, 0]]:
+		Props.place(self, p[0], p[1], p[2], p[3])
+		solids.append(Props.footprint(p[0], p[1], p[2]))
+	Props.place(self, "hanging_sign", Vector3(STALL.x, 2.85, STALL.y + 1.0), 0.0, 0, "FITTING  ROOM").scale = Vector3.ONE * 0.8
 	# Lamps.
 	for p in [Vector3(-4.7, 2.4, -1), Vector3(4.7, 2.4, 3), Vector3(-4.7, 2.4, -11)]:
 		ST.lamp(self, p)

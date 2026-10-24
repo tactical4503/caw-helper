@@ -201,6 +201,7 @@ static func build_arena(parent: Node3D) -> Arena:
 		put(box(1.14, 0.04, 1.14), brass(), Vector3(p.x, 0.48, p.y), root)                                          # brass band
 		put(box(0.34, 0.14, 0.14), mat(RED, 0.5), Vector3(p.x, 0.62, p.y), root)
 		a.plinths.append(Rect2(p - Vector2(0.6, 0.6), Vector2(1.2, 1.2)))
+		Atrium.Props.place(root, "sale_card", Vector3(p.x, 0.555, p.y + 0.2), 0.0 if p.y < 7.0 else PI)
 
 	# Bell stand, low lever, governor cabinet, SERVICE sign.
 	var bell := Node3D.new()
@@ -346,10 +347,12 @@ static func build_rack(index: int) -> Rack:
 	r.cloth = Node3D.new()
 	r.cloth.position.y = 1.62
 	r.node.add_child(r.cloth)
+	# The same tailored coats as every store rack, hung across the rail.
 	var colors := [GRAY, CREAM, PLUM, GRAY, CREAM] if index == 1 else [PLUM, CREAM, GRAY, PLUM, RED]
 	for i in colors.size():
 		var cloth_mat: StandardMaterial3D = ST.textured("linen_cream", 2.0, mat(colors[i], 0.95)) if colors[i] == CREAM else mat(colors[i], 0.95)
-		put(box(0.42, 0.95, 0.12), cloth_mat, Vector3(0, -0.5, -0.6 + i * 0.3), r.cloth)
+		Atrium.Props.coat(r.cloth, Vector3(0, 0.0, -0.6 + i * 0.3), cloth_mat, false, PI / 2.0)
+	Atrium.merge(r.cloth)   # the coats swing as one piece; bake them into a few meshes
 	put(box(0.08, 0.14, 0.3), mat(CREAM, 0.5), Vector3(0, 1.05, 0.86), r.node)  # padded handle
 	r.pos = RACK_HOME[index]
 	r.target = r.pos

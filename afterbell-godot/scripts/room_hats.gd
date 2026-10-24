@@ -19,6 +19,7 @@ const MAIN := preload("res://scripts/main.gd")
 const REN_RIG := preload("res://rigs/ren.tscn")
 const Dialogue := preload("res://scripts/dialogue.gd")
 const Mover := preload("res://scripts/mover.gd")
+const Props := preload("res://scripts/props.gd")
 const ShoulderCam := preload("res://scripts/shoulder_cam.gd")
 var mover = Mover.new()
 const GaugeHud := preload("res://scripts/hud.gd")
@@ -215,6 +216,13 @@ func _build_room() -> void:
 		for k in 3:
 			var a := k * TAU / 3.0
 			_hat(Vector3(t.x + cos(a) * 0.18, 1.45 + k * 0.12, t.y + sin(a) * 0.18), [B.PLUM, B.RED, B.CREAM][k])
+	# Dressing along the walls, clear of the guards' posts, the hat trees and the rack's run.
+	for p in [["rack", Vector3(-4.3, 0, 3.4), PI / 2.0, 1], ["rack", Vector3(4.3, 0, -6.6), PI / 2.0, 0],
+			["mannequin", Vector3(-4.3, 0, 8.3), 0.6, 0], ["mannequin", Vector3(4.3, 0, 8.3), -0.6, 1],
+			["mannequin", Vector3(-4.3, 0, -8.3), 0.6, 3], ["mannequin", Vector3(2.6, 0, -8.4), -0.3, 2],
+			["flower_display", Vector3(-3.7, 0, -6.0), 0.0, 0], ["easel", Vector3(3.9, 0, 1.8), -0.3, 0]]:
+		Props.place(self, p[0], p[1], p[2], p[3], "HATS  &  GLOVES")
+		solids.append(Props.footprint(p[0], p[1], p[2]))
 	# Lamps.
 	for p in [Vector3(-HALF_W + 0.3, 2.5, -6), Vector3(-HALF_W + 0.3, 2.5, 0), Vector3(-HALF_W + 0.3, 2.5, 6), Vector3(HALF_W - 0.3, 2.5, -6), Vector3(HALF_W - 0.3, 2.5, 0)]:
 		ST.lamp(self, p)
