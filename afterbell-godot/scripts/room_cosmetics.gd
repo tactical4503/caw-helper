@@ -128,6 +128,22 @@ func _ready() -> void:
 
 # ---------------------------------------------------------------- building
 
+## Walls, counters and floor props are solid (tests/paths_test.gd walks the room with this).
+func _collide_player() -> void:
+	p_pos.x = clampf(p_pos.x, -HALF_W + 0.4 if not gate_open else -HALF_W - 1.0, HALF_W - 0.4)
+	p_pos.y = clampf(p_pos.y, -HALF_D + 0.4, HALF_D - 0.4)
+	for s in [-1.0, 1.0]:
+		var r := Rect2(Vector2(s * 4.6 - 1.7 - 0.3, -2.65 - 0.3), Vector2(3.4 + 0.6, 3.6 + 0.6))
+		if r.has_point(p_pos):
+			var dx := minf(absf(p_pos.x - r.position.x), absf(r.end.x - p_pos.x))
+			var dz := minf(absf(p_pos.y - r.position.y), absf(r.end.y - p_pos.y))
+			if dx < dz:
+				p_pos.x = r.position.x if absf(p_pos.x - r.position.x) < absf(r.end.x - p_pos.x) else r.end.x
+			else:
+				p_pos.y = r.position.y if absf(p_pos.y - r.position.y) < absf(r.end.y - p_pos.y) else r.end.y
+	p_pos = Props.push_out(p_pos, prop_solids)
+
+
 ## Dressing that fills the corners without touching the demonstration: a perfume tower and
 ## lilies by the vestibule, mannequins at the back, a sale easel, the department sign.
 func _place_props() -> void:
@@ -363,19 +379,7 @@ func _update_player(dt: float) -> void:
 		_open_gate()
 	var speed := 1.6 if guard else 4.5
 	p_pos += mover.step(input, speed, dt) * dt
-	p_pos.x = clampf(p_pos.x, -HALF_W + 0.4 if not gate_open else -HALF_W - 1.0, HALF_W - 0.4)
-	p_pos.y = clampf(p_pos.y, -HALF_D + 0.4, HALF_D - 0.4)
-	# Counters are solid.
-	for s in [-1.0, 1.0]:
-		var r := Rect2(Vector2(s * 4.6 - 1.7 - 0.3, -2.65 - 0.3), Vector2(3.4 + 0.6, 3.6 + 0.6))
-		if r.has_point(p_pos):
-			var dx := minf(absf(p_pos.x - r.position.x), absf(r.end.x - p_pos.x))
-			var dz := minf(absf(p_pos.y - r.position.y), absf(r.end.y - p_pos.y))
-			if dx < dz:
-				p_pos.x = r.position.x if absf(p_pos.x - r.position.x) < absf(r.end.x - p_pos.x) else r.end.x
-			else:
-				p_pos.y = r.position.y if absf(p_pos.y - r.position.y) < absf(r.end.y - p_pos.y) else r.end.y
-	p_pos = Props.push_out(p_pos, prop_solids)
+	_collide_player()
 	if guard and placard_state == "fly":
 		p_yaw = lerp_angle(p_yaw, atan2(placard_pos.x - p_pos.x, placard_pos.z - p_pos.y), 1.0 - exp(-14.0 * dt))
 	elif input.length() > 0.1:

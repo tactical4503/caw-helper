@@ -51,6 +51,8 @@ func _initialize() -> void:
 	Props.door_leaf(w, Vector3(-5.1, 0, -1.3), 1.1, 2.2)
 	Props.door_leaf(w, Vector3(-2.9, 0, -1.3), 1.1, 2.2, PI, -0.6, true)
 	Props.pull_handle(w, Vector3(3.5, 1.0, -1.5), 0.6)
+	Props.place(w, "folded_table", Vector3(-1.6, 0, 2.0), 0.0, 1)
+	Props.place(w, "mannequin_group", Vector3(1.6, 0, 2.0), 0.0, 0)
 	Props.place(w, "hanging_sign", Vector3(0, 3.2, -1.4), 0.0, 0, "COSMETICS  ·  FRAGRANCE")
 	for lx in [-6.0, 0.0, 6.0]:
 		ST.ceiling_light(w, Vector3(lx, 3.8, 1.5), 1.2, 9.0)

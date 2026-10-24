@@ -26,6 +26,7 @@ const FIGURE_SCALE := 0.9     # mannequins stand about his height, hats included
 const HALF := {
 	"rack": Vector2(0.95, 0.32), "mannequin": Vector2(0.3, 0.3), "perfume_counter": Vector2(0.88, 0.34),
 	"perfume_tower": Vector2(0.6, 0.6), "flower_display": Vector2(0.66, 0.66), "easel": Vector2(0.36, 0.32),
+	"folded_table": Vector2(0.68, 0.38), "mannequin_group": Vector2(0.88, 0.88),
 }
 
 static var _cache := {}
@@ -118,7 +119,9 @@ static func _build(kind: String, v: int) -> Node3D:
 			_mannequin(figure, v)
 		"perfume_counter": _perfume_counter(n, v)
 		"perfume_tower": _perfume_tower(n, v)
-		"perfume_boxes": _perfume_boxes(n, Vector3.ZERO, Vector2(0.6, 0.34), v)
+		"perfume_boxes": _perfume_boxes(n, Vector3.ZERO, Vector2(1.1, 0.4), v)
+		"folded_table": _folded_table(n, v)
+		"mannequin_group": _mannequin_group(n, v)
 		"flower_display": _flower_display(n)
 		"easel": _easel(n, v)
 		"sale_card": _sale_card(n)
@@ -136,12 +139,12 @@ static func _rack(n: Node3D, v: int) -> void:
 		_put(_sphere(0.035, 10), _m("brass"), Vector3(s * len * 0.5, 1.66, 0), n)
 	var rail := _put(_cyl(0.024, 0.024, len + 0.04, 10), _m("brass"), Vector3(0, 1.62, 0), n)
 	rail.rotation.z = PI / 2.0
-	var palette := ["suit_navy", "suit_charcoal", "suit_brown", "suit_navy", "plum", "suit_charcoal"] if v == 0 \
-			else ["dress_cream", "plum", "dress_rose", "dress_cream", "dress_sage", "plum"]
+	# Sorted into colour blocks of three, evenly spaced and hung square.
+	var blocks := ["suit_navy", "suit_charcoal", "suit_brown"] if v == 0 else ["dress_cream", "dress_rose", "plum"]
 	var count := 9
 	for i in count:
 		var x := -len * 0.42 + i * (len * 0.84 / (count - 1))
-		coat(n, Vector3(x, 1.6, 0), _m(palette[(i * 5 + v) % palette.size()]), v == 1, (i % 3 - 1) * 0.05)
+		coat(n, Vector3(x, 1.6, 0), _m(blocks[i / 3]), v == 1)
 
 
 static func _mannequin(n: Node3D, v: int) -> void:
@@ -216,66 +219,134 @@ static func _perfume_counter(n: Node3D, v: int) -> void:
 
 
 static func _perfume_tower(n: Node3D, v: int) -> void:
+	var fam: Array = FAMILIES[v % FAMILIES.size()]
 	_put(_cyl(0.55, 0.57, 0.45, 32), _m("plum"), Vector3(0, 0.225, 0), n)
 	_put(_cyl(0.58, 0.58, 0.04, 32), _m("brass"), Vector3(0, 0.46, 0), n)
 	_put(_cyl(0.6, 0.6, 0.05, 32), _m("cream"), Vector3(0, 0.505, 0), n)
 	_put(_cyl(0.3, 0.32, 0.36, 28), _m("cream"), Vector3(0, 0.71, 0), n)
 	_put(_cyl(0.33, 0.33, 0.03, 28), _m("brass"), Vector3(0, 0.9, 0), n)
-	var rng := RandomNumberGenerator.new()
-	rng.seed = 400 + v
-	for i in 10:   # gift boxes round the lower tier
-		var a := TAU * i / 10.0 + rng.randf_range(-0.1, 0.1)
-		_gift(n, Vector3(cos(a) * 0.45, 0.53, sin(a) * 0.45), rng, a)
-	_perfume_boxes(n, Vector3(0, 0.915, 0), Vector2(0.4, 0.4), v + 7)
-	# A display-size bottle crowning it.
-	_put(_cyl(0.1, 0.12, 0.26, 20), _m("glass_rose"), Vector3(0, 1.06, 0), n)
-	_put(_cyl(0.035, 0.04, 0.06, 12), _m("brass"), Vector3(0, 1.22, 0), n)
-	_put(_sphere(0.06, 14), _m("brass"), Vector3(0, 1.29, 0), n)
+	# Ten identical boxes round the lower tier, facing out, alternating the family's colours.
+	for i in 10:
+		var a := TAU * i / 10.0
+		var g := Node3D.new()
+		g.position = Vector3(cos(a) * 0.44, 0.53, sin(a) * 0.44)
+		g.rotation.y = -a + PI / 2.0
+		n.add_child(g)
+		_put(_box(0.15, 0.16, 0.11), _m(fam[i % 2]), Vector3(0, 0.08, 0), g)
+		_put(_box(0.152, 0.162, 0.012), _m("brass"), Vector3(0, 0.08, 0), g)
+	# Hero bottle in the middle of the top tier, six small ones round it.
+	_bottle_at(n, Vector3(0, 0.915, 0), fam[2], 0.24, 0.09, false)
+	for i in 6:
+		var a := TAU * i / 6.0
+		_bottle_at(n, Vector3(cos(a) * 0.22, 0.915, sin(a) * 0.22), fam[2], 0.09, 0.025, i % 2 == 0)
 
 
-## Gift boxes and bottles arranged inside `area` (x by z) on a surface at height `at.y`.
+## Colour families for perfume displays: [box, accent box, glass].
+const FAMILIES := [["box_pink", "box_rose", "glass_rose"], ["box_lilac", "plum", "glass_lilac"],
+		["cream", "box_rose", "glass_amber"], ["suit_navy", "cream", "glass_amber"]]
+
+
+## One perfume arrangement on a surface at `at` (centre), filling about `area` (x by z): a
+## pyramid of gift boxes on the left, a stepped riser of matching bottles in the middle, a
+## mirrored tester tray on the right. Everything lines up; colours stay in one family.
 static func _perfume_boxes(n: Node3D, at: Vector3, area: Vector2, v: int) -> void:
-	var rng := RandomNumberGenerator.new()
-	rng.seed = 90 + v
-	var cols := maxi(2, int(area.x / 0.2))
-	var rows := maxi(1, int(area.y / 0.18))
-	for c in cols:
-		for r in rows:
-			var p := at + Vector3(-area.x * 0.5 + (c + 0.5) * area.x / cols, 0, -area.y * 0.5 + (r + 0.5) * area.y / rows)
-			p += Vector3(rng.randf_range(-0.02, 0.02), 0, rng.randf_range(-0.02, 0.02))
-			if (c + r + v) % 3 == 0:
-				_bottle(n, p, rng)
-			else:
-				var top := _gift(n, p, rng, rng.randf_range(-0.2, 0.2))
-				if rng.randf() < 0.35:   # a second box stacked on top
-					_gift(n, p + Vector3(0, top, 0), rng, rng.randf_range(-0.3, 0.3), 0.75)
+	var fam: Array = FAMILIES[v % FAMILIES.size()]
+	var w := area.x
+	var d := minf(area.y, 0.36)
+	_riser(n, at, minf(w * 0.38, 0.42), d, fam)
+	_pyramid(n, at + Vector3(-w * 0.34, 0, 0.0), minf(w * 0.27, 0.3), fam)
+	_tray(n, at + Vector3(w * 0.34, 0, 0.02), minf(w * 0.12, 0.13), fam)
 
 
-## One wrapped perfume box with a brass ribbon; returns its height.
-static func _gift(n: Node3D, at: Vector3, rng: RandomNumberGenerator, yaw: float, size := 1.0) -> float:
-	var colors := ["box_pink", "box_lilac", "cream", "plum", "suit_navy", "box_rose"]
-	var w := rng.randf_range(0.11, 0.17) * size
-	var h := rng.randf_range(0.1, 0.2) * size
-	var g := Node3D.new()
-	g.position = at
-	g.rotation.y = yaw
-	n.add_child(g)
-	_put(_box(w, h, w * 0.8), _m(colors[rng.randi() % colors.size()]), Vector3(0, h * 0.5, 0), g)
-	_put(_box(w + 0.004, h + 0.004, 0.014), _m("brass"), Vector3(0, h * 0.5, 0), g)   # ribbon
-	_put(_box(w + 0.006, 0.012, w * 0.8 + 0.006), _m("brass"), Vector3(0, h - 0.012, 0), g)   # lid edge
-	return h
+## Three stepped tiers, back highest; a row of identical bottles on each, a hero bottle on top.
+static func _riser(n: Node3D, at: Vector3, w: float, d: float, fam: Array) -> void:
+	var td := d / 3.0
+	for i in 3:
+		var h := 0.04 + 0.05 * i
+		var z := d * 0.5 - td * (i + 0.5)
+		_put(_box(w, h, td), _m("cream"), at + Vector3(0, h * 0.5, z), n)
+		_put(_box(w + 0.006, 0.01, 0.006), _m("brass"), at + Vector3(0, h - 0.005, z + td * 0.5), n)
+		var count := 1 if i == 2 else maxi(2, int(w / 0.085))
+		for k in count:
+			var x := 0.0 if count == 1 else -w * 0.5 + (k + 0.5) * w / count
+			var big := i == 2
+			_bottle_at(n, at + Vector3(x, h, z), fam[2] if i != 1 else "glass_amber", 0.17 if big else 0.1, 0.05 if big else 0.03, i == 0)
 
 
-static func _bottle(n: Node3D, at: Vector3, rng: RandomNumberGenerator) -> void:
-	var glass: String = ["glass_rose", "glass_amber", "glass_lilac"][rng.randi() % 3]
-	var h := rng.randf_range(0.1, 0.16)
-	var r := rng.randf_range(0.035, 0.05)
-	if rng.randf() < 0.5:
-		_put(_cyl(r, r * 1.1, h, 14), _m(glass), at + Vector3(0, h * 0.5, 0), n)
-	else:
+## Gift boxes stacked 3-2-1 facing front, alternating the family's two box colours.
+static func _pyramid(n: Node3D, at: Vector3, w: float, fam: Array) -> void:
+	var s := w / 3.0
+	var y := 0.0
+	for row in 3:
+		var count := 3 - row
+		for k in count:
+			var x := (k - (count - 1) * 0.5) * s
+			var col: String = fam[(k + row) % 2]
+			_put(_box(s * 0.96, s * 0.8, s * 0.85), _m(col), at + Vector3(x, y + s * 0.4, 0), n)
+			_put(_box(s * 0.97, s * 0.81, 0.012), _m("brass"), at + Vector3(x, y + s * 0.4, 0), n)    # ribbon
+			_put(_box(0.012, s * 0.81, s * 0.86), _m("brass"), at + Vector3(x, y + s * 0.4, 0), n)
+		y += s * 0.8
+
+
+## A round mirrored tray with three tester bottles and a little cream card.
+static func _tray(n: Node3D, at: Vector3, r: float, fam: Array) -> void:
+	_put(_cyl(r, r, 0.012, 24), _m("brass"), at + Vector3(0, 0.006, 0), n)
+	_put(_cyl(r - 0.012, r - 0.012, 0.014, 24), _m("mirror"), at + Vector3(0, 0.008, 0), n)
+	for k in 3:
+		var a := TAU * k / 3.0 + PI / 2.0
+		_bottle_at(n, at + Vector3(cos(a) * r * 0.5, 0.015, sin(a) * r * 0.5), fam[2], 0.08, 0.022, false)
+	var card := _put(_box(0.07, 0.05, 0.004), _m("shirt"), at + Vector3(0, 0.04, r + 0.02), n)
+	card.rotation.x = -0.35
+
+
+static func _bottle_at(n: Node3D, at: Vector3, glass: String, h: float, r: float, square: bool) -> void:
+	if square:
 		_put(_box(r * 2.2, h, r * 1.4), _m(glass), at + Vector3(0, h * 0.5, 0), n)
+	else:
+		_put(_cyl(r, r * 1.1, h, 14), _m(glass), at + Vector3(0, h * 0.5, 0), n)
 	_put(_cyl(r * 0.35, r * 0.4, 0.03, 10), _m("brass"), at + Vector3(0, h + 0.015, 0), n)
 	_put(_sphere(r * 0.55, 10), _m("brass"), at + Vector3(0, h + 0.05, 0), n)
+
+
+## A walnut display table of folded knitwear: three neat stacks, one colour each.
+static func _folded_table(n: Node3D, v: int) -> void:
+	var h := WAIST * 0.82
+	_put(rounded_block(1.3, 0.05, 0.7, 0.06, 0.012), _m("walnut"), Vector3(0, h - 0.05, 0), n)
+	_put(rounded_block(1.2, 0.09, 0.6, 0.04), _m("walnut_dark"), Vector3(0, h - 0.14, 0), n)   # apron
+	_put(_box(1.24, 0.014, 0.64), _m("brass"), Vector3(0, h - 0.05, 0), n)
+	for x in [-0.55, 0.55]:
+		for z in [-0.25, 0.25]:
+			_put(_cyl(0.025, 0.018, h - 0.14, 10), _m("walnut"), Vector3(x, (h - 0.14) * 0.5, z), n)
+			_put(_cyl(0.022, 0.022, 0.03, 10), _m("brass"), Vector3(x, 0.015, z), n)
+	var stacks: Array = [["suit_navy", "suit_charcoal", "dress_cream"], ["dress_rose", "plum", "dress_cream"],
+			["dress_sage", "dress_cream", "suit_brown"], ["box_lilac", "plum", "box_pink"]][v % 4]
+	for k in 3:
+		var x := (k - 1) * 0.4
+		for i in 5:
+			var y := h + 0.024 + i * 0.048
+			_put(_box(0.32, 0.044, 0.25), _m(stacks[k]), Vector3(x, y, 0), n)
+			_put(_box(0.3, 0.012, 0.012), _m(stacks[k]), Vector3(x, y + 0.012, 0.128), n)   # folded edge
+	# A small brass card stand at the front.
+	_put(_box(0.12, 0.01, 0.05), _m("brass"), Vector3(0.0, h + 0.005, 0.3), n)
+	var card := _put(_box(0.16, 0.1, 0.006), _m("sale_red"), Vector3(0.0, h + 0.06, 0.3), n)
+	card.rotation.x = -0.3
+
+
+## Two mannequins posed toward each other on a shared round platform.
+static func _mannequin_group(n: Node3D, v: int) -> void:
+	_put(rounded_block(1.7, 0.04, 1.7, 0.84), _m("plinth"), Vector3.ZERO, n)
+	_put(_cyl(0.85, 0.86, 0.12, 40), _m("plum"), Vector3(0, 0.1, 0), n)
+	_put(_cyl(0.87, 0.87, 0.02, 40), _m("brass"), Vector3(0, 0.165, 0), n)
+	_put(_cyl(0.84, 0.84, 0.02, 40), _m("cream"), Vector3(0, 0.17, 0), n)
+	var looks: Array = [[0, 1], [2, 3], [0, 3], [2, 1]][v % 4]
+	for k in 2:
+		var s := -1.0 if k == 0 else 1.0
+		var fig := Node3D.new()
+		fig.position = Vector3(s * 0.34, 0.18, -0.05 * k)
+		fig.rotation.y = -s * 0.4
+		fig.scale = Vector3.ONE * FIGURE_SCALE
+		n.add_child(fig)
+		_mannequin(fig, looks[k])
 
 
 static func _flower_display(n: Node3D) -> void:
@@ -670,6 +741,7 @@ static func _m(name: String) -> Material:
 		"glass_amber": m = ST.plastic(Color("d79a52"), 0.25, 0.0)
 		"glass_lilac": m = ST.plastic(Color("b49ad6"), 0.25, 0.0)
 		"vase": m = ST.plastic(Color("1e3029"), 0.4, 0.0)
+		"mirror": m = ST.plastic(Color("c9ccd0"), 0.08, 0.9)
 		"leaf": m = ST.plastic(Color("3a6a34"), 0.7, 0.0)
 		"lily": m = ST.plastic(Color("f6f0e4"), 0.7, 0.0)
 		"pollen": m = ST.plastic(Color("e2a43a"), 0.8, 0.0)

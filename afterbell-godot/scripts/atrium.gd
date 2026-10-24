@@ -342,14 +342,16 @@ static func _lower_hall(a: Node3D) -> void:
 static func _dress_aisles(a: Node3D) -> void:
 	for z in [-6.5, -1.5, 3.5]:
 		Props.place(a, "perfume_counter", Vector3(10.6, 0, z), -PI / 2.0, int(z) & 3)
-	for z in [-4.0, 1.0, 6.5]:
-		Props.place(a, "mannequin", Vector3(9.3, 0, z), -PI / 2.0, int(absf(z)) % 4)
+	for z in [-4.0, 1.0]:
+		Props.place(a, "mannequin_group", Vector3(10.0, 0, z), -PI / 2.0, int(absf(z)) % 4)
+	Props.place(a, "mannequin", Vector3(9.3, 0, 6.5), -PI / 2.0, 2)
 	Props.place(a, "perfume_tower", Vector3(11.2, 0, 7.6))
 	Props.place(a, "easel", Vector3(9.4, 0, -8.3), -PI / 2.0 + 0.4, 1, "SALE")
 	for level in LEVELS:
 		for s in [-1.0, 1.0]:
 			Props.place(a, "flower_display", Vector3(s * 11.4, level, -11.0))
 			Props.place(a, "perfume_counter", Vector3(s * 12.0, level, 6.0), -s * PI / 2.0, 3)
+			Props.place(a, "folded_table", Vector3(s * 11.2, level, -1.5), -s * PI / 2.0, int(level) % 4)
 
 
 static func _lights(a: Node3D) -> void:
