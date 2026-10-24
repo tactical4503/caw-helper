@@ -515,8 +515,8 @@ static func _m(name: String) -> StandardMaterial3D:
 	var m: StandardMaterial3D
 	match name:
 		"floor": m = ST.textured("tile_cream", 0.6, ST.plastic(Color("d8ccb0"), 0.5, 0.0))
-		"carpet": m = ST.textured("carpet_green", 0.5, ST.plastic(Color("2f4a3a"), 0.9, 0.0))
-		"plum_wall": m = ST.textured("plaster_plum", 0.3, ST.plastic(PLUM_DEEP, 0.85, 0.0))
+		"carpet": m = ST.textured("carpet_forest", 0.5, ST.plastic(Color("2f4a3a"), 0.9, 0.0))
+		"plum_wall": m = ST.textured("plaster_cream", 0.3, ST.plastic(CREAM, 0.7, 0.0))
 		"stone": m = ST.textured("stone_cream", 0.35, ST.plastic(Color("ddd0b4"), 0.75, 0.0))
 		"slab": m = ST.plastic(Color("d9ccb0"), 0.7, 0.0)
 		"ceiling": m = ST.plastic(Color("cbbd9f"), 0.8, 0.0)

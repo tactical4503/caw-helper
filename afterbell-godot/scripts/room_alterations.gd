@@ -116,17 +116,17 @@ func _build_rooms() -> void:
 	add_child(env)
 	add_child(ST.sun())
 	var cream := B.mat(B.CREAM, 0.5)
-	var plaster := ST.textured("plaster_sage", 0.3, B.mat(Color("8fa58c"), 0.8))
-	var plum := ST.textured("plaster_plum", 0.3, B.mat(B.PLUM_DEEP, 0.85))
+	var plaster := ST.textured("plaster_cream", 0.3, B.mat(B.CREAM, 0.7))
+	var plum := ST.textured("plaster_cream", 0.3, B.mat(B.CREAM, 0.7))
 	var metal := ST.textured("metal_charcoal", 1.5, B.mat(Color("2b2b2e"), 0.4, 0.6), 0.6)
 	var wood := ST.plastic(Color("6e4326"), 0.35, 0.0)
 	var card := ST.textured("cardboard", 1.2, B.mat(Color("a57a4c"), 0.9))
 	# Floors: carpet in Alterations, worn tile in Receiving.
 	B.put(B.box(14, 0.1, 20), ST.textured("tile_cream", 0.6, cream), Vector3(1, -0.05, -4), self, false)
-	B.put(B.box(9.6, 0.02, 9.6), ST.textured("carpet_plum", 0.5, B.mat(B.PLUM, 0.9)), Vector3(0, 0.01, 0), self, false)
+	B.put(B.box(9.6, 0.02, 9.6), ST.textured("carpet_forest", 0.5, B.mat(B.CARPET, 0.9)), Vector3(0, 0.01, 0), self, false)
 	var ceil := B.put(B.box(14, 0.2, 20), B.mat(Color("cbbd9f"), 0.8), Vector3(1, 3.6, -4), self, false)
 	ceil.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
-	# Alterations walls: sage plaster (a working room), plum outside the doorways.
+	# Alterations walls: cream plaster like the rest of the store.
 	B.put(B.box(0.3, 3.6, 10), plaster, Vector3(-5.15, 1.8, 0), self)
 	B.put(B.box(0.3, 3.6, 5 + GATE_Z - 0.9), plaster, Vector3(5.15, 1.8, (-5 + GATE_Z - 0.9) / 2.0), self)
 	B.put(B.box(0.3, 3.6, 5 - GATE_Z - 0.9), plaster, Vector3(5.15, 1.8, (GATE_Z + 0.9 + 5) / 2.0), self)

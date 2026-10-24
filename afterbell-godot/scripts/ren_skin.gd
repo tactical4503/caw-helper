@@ -68,6 +68,8 @@ const MIX_TIME := 0.12
 ## along z, and it is 1.9 m long; this maps it onto the greybox sword frame (grip at the origin,
 ## blade along -y, flat face on z) at 1.05 m.
 @export var sword_model := "res://assets/props/knock/knock.glb"
+## Ren's albedo with the armour paint deepened (tools/deepen_red.py); empty keeps Meshy's own.
+@export var armor_albedo := "res://assets/characters/ren/ren_armor_deep.png"
 const SWORD_FIT := Transform3D(Basis(Vector3(0, 0.55, 0), Vector3(0.55, 0, 0), Vector3(0, 0, -0.55)), Vector3(0, -0.41, 0))
 
 var _rig: Node3D
@@ -168,6 +170,8 @@ func _restyle(skin: Node) -> void:
 			if src == null:
 				continue
 			var m := src.duplicate() as StandardMaterial3D
+			if m.albedo_texture and armor_albedo != "" and ResourceLoader.exists(armor_albedo):
+				m.albedo_texture = load(armor_albedo)
 			m.clearcoat_enabled = true
 			m.clearcoat = 0.55
 			m.clearcoat_roughness = 0.08

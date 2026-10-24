@@ -133,10 +133,10 @@ func _build_room() -> void:
 	var sun := ST.sun()
 	add_child(sun)
 	var cream := B.mat(B.CREAM, 0.5)
-	var wall := ST.textured("plaster_plum", 0.3, B.mat(B.PLUM_DEEP, 0.85))
+	var wall := ST.textured("plaster_cream", 0.3, B.mat(B.CREAM, 0.7))
 	var laminate := ST.textured("laminate_plum", 1.0, B.mat(B.PLUM, 0.3))
 	B.put(B.box(HALF_W * 2 + 2, 0.1, HALF_D * 2 + 2), ST.textured("tile_cream", 0.6, cream), Vector3(0, -0.05, 0), self, false)
-	B.put(B.box(HALF_W * 2 - 1, 0.02, HALF_D * 2 - 1), ST.textured("carpet_green", 0.5, B.mat(B.CARPET, 0.95)), Vector3(0, 0.01, 0), self, false)
+	B.put(B.box(HALF_W * 2 - 1, 0.02, HALF_D * 2 - 1), ST.textured("carpet_forest", 0.5, B.mat(B.CARPET, 0.95)), Vector3(0, 0.01, 0), self, false)
 	var ceil := B.put(B.box(HALF_W * 2 + 2, 0.2, HALF_D * 2 + 2), B.mat(Color("cbbd9f"), 0.8), Vector3(0, 4.3, 0), self, false)
 	ceil.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 	# Walls: south (vestibule, with an opening), north (atrium, closed shutter), east, west (hats gate).
@@ -199,7 +199,8 @@ func _build_room() -> void:
 			var pos: Vector3 = part[0]
 			var size: Vector3 = part[1]
 			B.put(B.box(size.x, size.y, size.z), cream, pos, self)
-			B.put(B.box(size.x + 0.02, 0.18, size.z + 0.02), laminate, Vector3(pos.x, 0.09, pos.z), self)  # plum kickplate
+			B.put(B.box(size.x + 0.02, 0.42, size.z + 0.02), laminate, Vector3(pos.x, 0.21, pos.z), self)  # plum display base
+			B.put(B.box(size.x + 0.04, 0.04, size.z + 0.04), B.brass(), Vector3(pos.x, 0.43, pos.z), self)  # brass band
 			B.put(B.box(size.x + 0.04, 0.04, size.z + 0.04), B.brass(), Vector3(pos.x, 1.0, pos.z), self)  # brass trim
 			var glass := StandardMaterial3D.new()
 			glass.albedo_color = Color(0.85, 0.95, 0.92, 0.25)

@@ -149,9 +149,9 @@ func _build_room() -> void:
 	add_child(env)
 	add_child(ST.sun())
 	var cream := B.mat(B.CREAM, 0.5)
-	var wall := ST.textured("plaster_plum", 0.3, B.mat(B.PLUM_DEEP, 0.85))
+	var wall := ST.textured("plaster_cream", 0.3, B.mat(B.CREAM, 0.7))
 	B.put(B.box(HALF_W * 2 + 2, 0.1, HALF_D * 2 + 2), ST.textured("tile_cream", 0.6, cream), Vector3(0, -0.05, 0), self, false)
-	B.put(B.box(HALF_W * 2 - 1, 0.02, HALF_D * 2 - 1), ST.textured("carpet_green", 0.5, B.mat(B.CARPET, 0.95)), Vector3(0, 0.01, 0), self, false)
+	B.put(B.box(HALF_W * 2 - 1, 0.02, HALF_D * 2 - 1), ST.textured("carpet_forest", 0.5, B.mat(B.CARPET, 0.95)), Vector3(0, 0.01, 0), self, false)
 	var ceil := B.put(B.box(HALF_W * 2 + 2, 0.2, HALF_D * 2 + 2), B.mat(Color("cbbd9f"), 0.8), Vector3(0, 4.0, 0), self, false)
 	ceil.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 	# Walls. East wall has the opening from Cosmetics at z 4.1–5.9; north wall the staff door.
