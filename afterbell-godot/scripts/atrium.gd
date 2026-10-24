@@ -122,7 +122,7 @@ static func _mezzanine(a: Node3D) -> void:
 		rack(a, Vector3(x, level, -23.4), 0.0)
 	for x in [-3.9, 3.9]:
 		palm(a, Vector3(x, level, -24.8))
-	Props.counter(a, Vector3(0, level, -21.5), Vector3(2.4, 1.05, 0.8))
+	Props.counter(a, Vector3(0, level, -21.5), Vector3(2.4, Props.WAIST, 0.8))
 
 
 ## Cream fascia band along a floor edge (with brass trim), running `span` from `centre`.

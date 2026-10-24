@@ -138,8 +138,8 @@ func _build_rooms() -> void:
 	B.put(B.box(5 - DOOR_X - 0.8 + 2, 3.6, 0.3), plaster, Vector3((DOOR_X + 0.8 + 7) / 2.0, 1.8, -5.15), self)
 	B.put(B.box(1.6, 1.2, 0.3), plaster, Vector3(DOOR_X, 3.0, -5.15), self)
 	# Doorways: Receiving door (cased, its door swung back into Receiving), the south entrance.
-	Props.door_frame(self, Vector3(DOOR_X, 0, -5.15), 1.6, 2.4)
-	Props.door_leaf(self, Vector3(DOOR_X - 0.8, 0, -5.3), 1.55, 2.4, 0.0, PI / 2.0 * 0.92)
+	Props.door_frame(self, Vector3(DOOR_X, 0, -5.15), 1.6, Props.DOOR_HEIGHT)
+	Props.door_leaf(self, Vector3(DOOR_X - 0.8, 0, -5.3), 1.55, Props.DOOR_HEIGHT, 0.0, PI / 2.0 * 0.92)
 	B.put(B.box(1.8, 1.1, 0.3), plaster, Vector3(0, 3.05, 5.15), self)
 	Props.door_frame(self, Vector3(0, 0, 5.15), 1.8, 2.5)
 	Props.door_frame(self, Vector3(5.15, 0, GATE_Z), 1.8, 2.4, PI / 2.0)
@@ -181,7 +181,7 @@ func _build_rooms() -> void:
 		var m := B.put(B.box(0.04, 1.6, 0.6), ST.plastic(Color("c8d8e0"), 0.02, 0.9), Vector3(-4.85, 0.95, 0.9 + k * 0.62), self)
 		m.rotation.y = (k - 1) * 0.25
 	# Sewing counter, pincushion in a saucer, a fan that turns its head but doesn't spin.
-	Props.counter(self, Vector3(-4.5, 0, -2.2), Vector3(0.8, 0.98, 2.6), "walnut")
+	Props.counter(self, Vector3(-4.5, 0, -2.2), Vector3(0.8, Props.WAIST, 2.6), "walnut")
 	solids.append(Rect2(Vector2(-4.9, -3.5), Vector2(0.8, 2.6)))
 	B.put(B.cyl(0.1, 0.08, 0.02), B.mat(B.CREAM, 0.3), Vector3(-4.5, 1.0, -1.4), self)
 	B.put(B.sphere(0.07), B.mat(B.RED, 0.6), Vector3(-4.5, 1.06, -1.4), self)
@@ -242,12 +242,12 @@ func _build_rooms() -> void:
 	load_sign.position = Vector3(-4.9, 3.15, -9.0)
 	add_child(load_sign)
 	# Biscuit table: red tins with cream sleeves, and the water jug.
-	Props.counter(self, Vector3(0.6, 0, -11.9), Vector3(1.4, 0.81, 0.7), "walnut")
+	Props.counter(self, Vector3(0.6, 0, -11.9), Vector3(1.4, Props.WAIST, 0.7), "walnut")
 	solids.append(Rect2(Vector2(-0.1, -12.25), Vector2(1.4, 0.7)))
 	for i in 3:
-		B.put(B.cyl(0.07, 0.07, 0.1), B.mat(B.RED, 0.3), Vector3(0.2 + i * 0.18, 0.86, -11.9), self)
-		B.put(B.cyl(0.072, 0.072, 0.04), B.mat(B.CREAM, 0.4), Vector3(0.2 + i * 0.18, 0.86, -11.9), self)
-	B.put(B.cyl(0.09, 0.11, 0.3), ST.plastic(Color("cfe3ea"), 0.05, 0.0), Vector3(1.1, 0.95, -11.9), self)
+		B.put(B.cyl(0.07, 0.07, 0.1), B.mat(B.RED, 0.3), Vector3(0.2 + i * 0.18, Props.WAIST + 0.05, -11.9), self)
+		B.put(B.cyl(0.072, 0.072, 0.04), B.mat(B.CREAM, 0.4), Vector3(0.2 + i * 0.18, Props.WAIST + 0.05, -11.9), self)
+	B.put(B.cyl(0.09, 0.11, 0.3), ST.plastic(Color("cfe3ea"), 0.05, 0.0), Vector3(1.1, Props.WAIST + 0.15, -11.9), self)
 	_person(Vector2(-0.9, -9.6), Color("5b2a4a"), Color("d9a77f"), false)   # Hesta: plum cardigan
 	_person(Vector2(2.8, -8.2), Color("e8dcc2"), Color("8a5a3c"), true)     # Len: cream porter jacket and cap
 	solids.append([Vector2(-0.9, -9.6), 0.45])

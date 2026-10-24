@@ -16,6 +16,13 @@ extends RefCounted
 
 const ST := preload("res://scripts/style.gd")
 
+## Ren is the ruler (rigs/ren.tscn, measured with tools/ruler.gd): 1.83 m tall standing, about
+## 1.70 m in his guard crouch, belt at 1.02 m. Furniture and doorways are sized from him.
+const REN_HEIGHT := 1.83
+const WAIST := 1.0            # counter tops sit at his belt
+const DOOR_HEIGHT := 2.4      # doorways clear his helmet by more than half a metre
+const FIGURE_SCALE := 0.9     # mannequins stand about his height, hats included
+
 const HALF := {
 	"rack": Vector2(0.95, 0.32), "mannequin": Vector2(0.3, 0.3), "perfume_counter": Vector2(0.88, 0.34),
 	"perfume_tower": Vector2(0.6, 0.6), "flower_display": Vector2(0.66, 0.66), "easel": Vector2(0.36, 0.32),
@@ -104,7 +111,11 @@ static func _build(kind: String, v: int) -> Node3D:
 	var n := Node3D.new()
 	match kind:
 		"rack": _rack(n, v)
-		"mannequin": _mannequin(n, v)
+		"mannequin":
+			var figure := Node3D.new()
+			figure.scale = Vector3.ONE * FIGURE_SCALE
+			n.add_child(figure)
+			_mannequin(figure, v)
 		"perfume_counter": _perfume_counter(n, v)
 		"perfume_tower": _perfume_tower(n, v)
 		"perfume_boxes": _perfume_boxes(n, Vector3.ZERO, Vector2(0.6, 0.34), v)
@@ -197,11 +208,11 @@ static func _mannequin(n: Node3D, v: int) -> void:
 static func _perfume_counter(n: Node3D, v: int) -> void:
 	var w := 1.7
 	var d := 0.62
-	counter(n, Vector3.ZERO, Vector3(w, 1.0, d), "plum" if v % 2 else "cream")
+	counter(n, Vector3.ZERO, Vector3(w, WAIST, d), "plum" if v % 2 else "cream")
 	for s in [-1.0, 1.0]:   # inset panels on the cabinet front
 		_put(_box(w * 0.4, 0.26, 0.012), _m("plum"), Vector3(s * w * 0.23, 0.68, d * 0.5 - 0.005), n)
 		_put(_box(w * 0.4 + 0.03, 0.015, 0.016), _m("brass"), Vector3(s * w * 0.23, 0.825, d * 0.5 - 0.003), n)
-	_perfume_boxes(n, Vector3(0, 1.0, 0), Vector2(w - 0.25, d - 0.18), v)
+	_perfume_boxes(n, Vector3(0, WAIST, 0), Vector2(w - 0.25, d - 0.18), v)
 
 
 static func _perfume_tower(n: Node3D, v: int) -> void:

@@ -183,13 +183,15 @@ static func build_arena(parent: Node3D) -> Arena:
 		put(Atrium.Props.rounded_block(4.4, 0.26, 1.6, 0.12, 0.03), ST.textured("laminate_plum", 1.2, mat(PLUM, 0.5)), Vector3(s * 4.6, 0.06, -8.15), root)
 		put(Atrium.Props.rounded_block(4.44, 0.03, 1.64, 0.13), brass(), Vector3(s * 4.6, 0.2, -8.15), root)
 	# West wall with the service door; waist-high east barrier over the atrium; low south wall and gate.
-	put(box(0.3, 2.6, 15.2), wall, Vector3(-8.15, 1.3, -1.4), root)
-	put(box(0.3, 2.6, 0.6), wall, Vector3(-8.15, 1.3, 8.7), root)
+	# West wall runs up to the gallery floor, so the service doors sit in a full wall.
+	put(box(0.3, 4.55, 15.2), wall, Vector3(-8.15, 2.275, -1.4), root)
+	put(box(0.3, 4.55, 0.6), wall, Vector3(-8.15, 2.275, 8.7), root)
 	# Service doors from Cosmetics: header, cased frame, a closed pair of panelled doors.
-	put(box(0.3, 0.4, 2.2), wall, Vector3(-8.15, 2.4, 7.3), root)
-	Atrium.Props.door_frame(root, Vector3(-8.15, 0, 7.3), 2.2, 2.2, PI / 2.0)
-	Atrium.Props.door_leaf(root, Vector3(-8.15, 0, 6.2), 1.1, 2.2, -PI / 2.0)
-	Atrium.Props.door_leaf(root, Vector3(-8.15, 0, 8.4), 1.1, 2.2, PI / 2.0)
+	var door_h: float = Atrium.Props.DOOR_HEIGHT
+	put(box(0.3, 4.55 - door_h, 2.2), wall, Vector3(-8.15, (4.55 + door_h) * 0.5, 7.3), root)
+	Atrium.Props.door_frame(root, Vector3(-8.15, 0, 7.3), 2.2, door_h, PI / 2.0)
+	Atrium.Props.door_leaf(root, Vector3(-8.15, 0, 6.2), 1.1, door_h, -PI / 2.0)
+	Atrium.Props.door_leaf(root, Vector3(-8.15, 0, 8.4), 1.1, door_h, PI / 2.0)
 	put(box(0.25, 1.05, 18), mat(CREAM, 0.6), Vector3(8.12, 0.52, 0), root)
 	put(box(0.3, 0.08, 18), brass(), Vector3(8.12, 1.07, 0), root)
 	put(box(16, 1.0, 0.25), mat(CREAM, 0.6), Vector3(0, 0.5, 9.1), root)
