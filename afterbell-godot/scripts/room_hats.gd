@@ -147,6 +147,7 @@ func _ready() -> void:
 	var game := get_node_or_null("/root/Game")
 	if game:
 		game.enter_room("res://rooms/hats.tscn", "Hats & Gloves")
+	B.Atrium.merge_direct(self)   # static architecture into a few meshes per material
 
 
 # ---------------------------------------------------------------- building

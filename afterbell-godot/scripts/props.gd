@@ -39,6 +39,10 @@ const HALF := {
 	"leather_table": Vector2(0.68, 0.38),
 }
 
+## Small or recessed stock that doesn't need to cast real-time shadows (measured: shadow
+## passes were most of the court's draw calls).
+const NO_SHADOW := ["price_card", "sale_card", "perfume_boxes", "window_stock", "hanging_sign"]
+
 static var _cache := {}
 static var _mats := {}
 
@@ -604,12 +608,12 @@ static func _planter(n: Node3D, v: int) -> void:
 			var a := TAU * i / 16.0 + rng.randf_range(-0.12, 0.12)
 			_frond(n, Vector3(0, 0.66, 0), a, rng.randf_range(0.7, 1.2), 0.1, 7, 0.11, 0.3, _m("fern"))
 	else:
-		for c in 3:
-			var ca := TAU * c / 3.0
-			var top := Vector3(cos(ca) * 0.08, 1.35 + c * 0.25, sin(ca) * 0.08)
+		for c in 4:   # four canes at staggered heights, each with a full head of arching fronds
+			var ca := TAU * c / 4.0 + 0.3
+			var top := Vector3(cos(ca) * 0.09, 1.25 + c * 0.2, sin(ca) * 0.09)
 			_tube(n, Vector3(cos(ca) * 0.04, 0.66, sin(ca) * 0.04), top, 0.018, _m("wood"), 6)
-			for i in 4:
-				_frond(n, top, ca + TAU * i / 4.0 + rng.randf_range(-0.3, 0.3), rng.randf_range(0.6, 0.9), 0.13, 8, 0.24, 0.2, _m("leaf"))
+			for i in 5:
+				_frond(n, top, ca + TAU * i / 5.0 + rng.randf_range(-0.3, 0.3), rng.randf_range(0.5, 0.95), 0.13, 8, 0.27, 0.2, _m("leaf"))
 
 
 ## A small price card in a brass clip on a weighted foot; the price is a Label3D per placement.
@@ -1320,6 +1324,7 @@ static func door_frame(parent: Node3D, at: Vector3, width: float, height: float,
 		_put(_box(width + cw * 2.0 + 0.08, 0.05, proud + 0.05), _m("walnut"), Vector3(0, height + 0.225, z + face * 0.02), f)   # cap
 		_put(_box(width + cw * 2.0 + 0.02, 0.02, proud + 0.02), _m("brass"), Vector3(0, height + 0.19, z + face * 0.005), f)
 	_put(_box(width, 0.015, wall + 0.06), _m("brass"), Vector3(0, 0.008, 0), f)   # threshold
+	Atrium_merge(f)   # its parts never move relative to each other
 	return f
 
 
@@ -1351,6 +1356,7 @@ static func portal(parent: Node3D, at: Vector3, width: float, height: float, yaw
 	_put(_box(width + 0.28, 0.3, depth - 0.02), _m("cream"), Vector3(0, height + 0.15, z), p)     # soffit over the casing
 	if text != "":
 		plaque(p, Vector3(0, top + 0.27, z + side * (depth * 0.5)), minf(span - 0.3, 2.2), text, PI if side < 0.0 else 0.0)
+	Atrium_merge(p)   # its parts never move relative to each other
 	return p
 
 
@@ -1364,6 +1370,7 @@ static func plaque(parent: Node3D, at: Vector3, width: float, text: String, yaw 
 	_put(_box(width + 0.06, 0.36, 0.03), _m("brass"), Vector3(0, 0, 0.015), q)
 	_put(_box(width, 0.3, 0.04), _m("plum"), Vector3(0, 0, 0.02), q)
 	_label(q, text, Vector3(0, 0, 0.042), minf(0.0042, (width - 0.12) / (maxf(text.length(), 1) * 0.55 * 64.0)), Color("eee6d4"), 64)
+	Atrium_merge(q)   # its parts never move relative to each other
 	return q
 
 
@@ -1404,6 +1411,7 @@ static func door_leaf(parent: Node3D, hinge: Vector3, width: float, height: floa
 	if window:
 		var glass := _put(_box(width - 0.36, 0.7, 0.012), _m("door_glass"), Vector3(width * 0.5, 1.75, 0), pivot)
 		glass.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	Atrium_merge(pivot)   # its parts never move relative to each other
 	return pivot
 
 
@@ -1571,6 +1579,8 @@ static func _instance(kind: String, variant: int) -> Node3D:
 	var root := Node3D.new()
 	var mi := MeshInstance3D.new()
 	mi.mesh = _cache[key]
+	if kind in NO_SHADOW:   # small stock: its contact shadow grounds it; skip the shadow passes
+		mi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 	root.add_child(mi)
 	return root
 

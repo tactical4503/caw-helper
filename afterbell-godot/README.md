@@ -1,11 +1,24 @@
-# AFTERBELL — Godot 4 greybox
+# AFTERBELL — Chapter One: Closing Time
 
-A Godot 4 port of the Installment 002 boss fight: **BS-01, the Floor Manager**, in the Menswear Court (DS-10). The fight logic matches the browser greybox in `../afterbell/`.
+A playable chapter of AFTERBELL Installment 002, *Closing Time: Bellwether's Department Store*: from Cosmetics through Hats and Alterations to the Floor Manager's court in the atrium, with a title screen, pause menu, checkpoints and a chapter ending. It is a vertical slice of the documented game, not the complete game (see `PROGRESS.md` for scope, verification and known limits).
 
-Open this folder from the Godot project manager (**Import** → select `project.godot`), then press F5. Built and tested on **Godot 4.3**; other 4.x versions should work.
+Open this folder from the Godot project manager (**Import** → select `project.godot`), then press F5. Built on **Godot 4.3** (Forward+). The window is 4:3 (1280×960) and letterboxes on wide screens.
 
-## Playable flow (demonstration build)
-F5 starts in **DS-01 Cosmetics**, then **DS-02 Hats**, **DS-03 Alterations with the DS-04 Receiving refuge**, then the **Floor Manager's court**. This is a condensed slice: the atrium and upper floor are skipped.
+## Controls
+| Action | Keys |
+|---|---|
+| Move | W A S D / arrow keys |
+| Attack | J or left click — hold to wind a heavy strike (three clicks) |
+| Guard | K or right click — tap as a sign arrives to send it back |
+| Dodge | Space |
+| Examine / talk / biscuit | E |
+| Reflection assist | T |
+| Ask Mika for help (Cosmetics, after misses) | H |
+| Retreat (court, by the west door) | R |
+| Pause (controls, settings, restart checkpoint, quit to title) | Esc |
+
+## Playable flow
+The title screen starts a **New game** in **DS-01 Cosmetics**, then **DS-02 Hats**, **DS-03 Alterations with the DS-04 Receiving refuge**, then the **Floor Manager's court**. Each room you enter becomes the checkpoint that **Continue** and **Restart from checkpoint** return to. Winning the court ends the chapter (Store Governor, Night Receipt suit) and returns to the title.
 - **Cosmetics** (`rooms/cosmetics.tscn`): the safe reflection lesson. Return the attendant's sale sign with a timed guard (K) to the receiver over the west door, which opens the hats gate. The sign can't hurt you here. After three misses, T turns on reflection assist and H asks Mika to hold the catch. E examines the mirror, atomizer and price card.
 - **Hats** (`rooms/hats.tscn`): the first etiquette guards (EN-H01). Each has a 0.85 s baton tell and two stability pips: three light hits topple it, or one wound heavy strike during its tell or recovery does. They sit down and are never destroyed. The movable rack runs on a guide with two stops (hold guard at a handle and walk). The east stop opens the north aisle; the west stop opens the alcove with souvenir pin SV-01. The second guard appears once you've moved the rack, and only one guard strikes at a time.
 - **Alterations / Receiving** (`rooms/alterations.tscn`): the tailor's lost sleeve, Knock slotted sideways into the crank socket (6 s) to open the atrium gate, Hesta's first scene, Len's governor news, and a biscuit tin plus water jug that restock supplies.

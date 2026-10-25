@@ -32,6 +32,7 @@ static func build(parent: Node3D, at: Vector3, yaw: float, kind: String, width :
 	for v in g.find_children("*", "VisualInstance3D", true, false):
 		if v is GeometryInstance3D or v is Label3D:
 			(v as VisualInstance3D).layers = 1 | (1 << (LAYER - 1))
+	load("res://scripts/atrium.gd").merge(g)   # keeps layer 2 (see Atrium.merge)
 	return g
 
 

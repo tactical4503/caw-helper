@@ -287,6 +287,7 @@ static func sconce(parent: Node3D, at: Vector3, face: Vector3, energy := 0.8, re
 	light.omni_attenuation = 1.0
 	light.position = Vector3(0, 0.2, 0.55)   # out from the wall: an even wash, no hot spot
 	s.add_child(light)
+	load("res://scripts/atrium.gd").merge(s)
 	return light
 
 

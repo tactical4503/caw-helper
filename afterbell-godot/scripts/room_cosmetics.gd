@@ -138,6 +138,7 @@ func _ready() -> void:
 	if game:
 		game.enter_room("res://rooms/cosmetics.tscn", "Cosmetics & Directory")
 		settings.reflect_assist = game.settings.reflect_assist
+	B.Atrium.merge_direct(self)   # static architecture into a few meshes per material
 
 
 # ---------------------------------------------------------------- building

@@ -655,6 +655,7 @@ static func light_environment(e: Environment, key: DirectionalLight3D) -> void:
 	key.light_specular = 0.04   # no glare lines off the escalator glass at this angle
 	key.rotation = Vector3(deg_to_rad(-58), deg_to_rad(205), 0)   # from high above the window, slanting south-east
 	key.directional_shadow_max_distance = 48.0
+	key.directional_shadow_mode = DirectionalLight3D.SHADOW_PARALLEL_2_SPLITS   # half the shadow draws of 4 splits
 	key.shadow_blur = 3.0
 
 
@@ -857,6 +858,25 @@ static func palm(a: Node3D, at: Vector3) -> void:
 ## Bakes every static mesh under `root` into one mesh per material (and shadow setting), so the
 ## hundreds of boxes that make the hall cost a few dozen draws. Leaves lights, labels, MultiMeshes
 ## and any mesh with children alone. Only for geometry that never moves.
+## Like merge(), but only for a room's own direct, unnamed, childless mesh children: the
+## static architecture placed straight into the room. Named meshes and every assembly that
+## moves (gates, curtains, people, racks) are left exactly as they are.
+static func merge_direct(root: Node3D) -> void:
+	if DisplayServer.get_name() == "headless":
+		return
+	var holder := Node3D.new()
+	holder.name = "MergedStatic"
+	var moved := 0
+	for c in root.get_children():
+		if c is MeshInstance3D and c.get_child_count() == 0 and c.material_override and String(c.name).begins_with("@"):
+			root.remove_child(c)
+			holder.add_child(c)
+			moved += 1
+	root.add_child(holder)
+	if moved > 1:
+		merge(holder)
+
+
 static func merge(root: Node3D) -> void:
 	if DisplayServer.get_name() == "headless":
 		return   # no mesh data without a renderer; tests don't need the batching
@@ -870,7 +890,7 @@ static func merge(root: Node3D) -> void:
 				continue
 			var xf: Transform3D = item[1] * (c as Node3D).transform
 			if c is MeshInstance3D and c.mesh and c.material_override and c.get_child_count() == 0:
-				var key := "%d/%d" % [c.material_override.get_instance_id(), c.cast_shadow]
+				var key := "%d/%d/%d" % [c.material_override.get_instance_id(), c.cast_shadow, c.layers]
 				if not groups.has(key):
 					groups[key] = []
 				groups[key].append([c, xf])
@@ -889,6 +909,7 @@ static func merge(root: Node3D) -> void:
 		mi.mesh = st.commit()
 		mi.material_override = parts[0][0].material_override
 		mi.cast_shadow = parts[0][0].cast_shadow
+		mi.layers = parts[0][0].layers   # glimpse rooms render on their own layer
 		root.add_child(mi)
 		for part in parts:
 			part[0].get_parent().remove_child(part[0])
