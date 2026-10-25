@@ -69,6 +69,17 @@ Each one is skipped when its files are absent, so a clean clone builds the same 
 - **Export:** `export_presets.cfg` now includes `assets/imports/*`, so local builds carry the models.
 - **Stage sections:** not placed. They have no fitting location in the store, so they stay in the staging scene.
 
+## Used as gameplay figures (user request)
+- **Enemies.** The plum clerk (npc10) and the teal clerk (npc12) are now the two etiquette guards in Hats (`GUARD_MODELS`, room_hats.gd).
+  - Their own skeletons are posed from code by `scripts/skin_pose.gd`: shoulders, elbows, hips, knees, spine and head.
+  - Poses: baton raised on the tell, palm out, the strike, a walking stride, and sitting on a stool when toppled.
+  - A baton follows the right hand.
+  - The gameplay (timings, hits, pips, the state machine) is unchanged; the six test suites pass.
+  - Without the files, the guards fall back to the built-in ivory figures.
+- **Mannequins.** Every `mannequin` and `mannequin_group` placement in the store now uses the supplied dress forms: the female form where a dress was shown, the male form for suits; pairs keep their plum platform (`Props._supplied_mannequin`).
+  - Not swapped: the two counter clerks and the small figures baked into shop-window stock.
+- **Rendering:** `tools/guard_shots.gd` renders the guards in each pose.
+
 ## Use
 - Run `rooms/asset_staging.tscn` (F6). A/D orbit, W/S zoom, Q/E switch row.
 - To render one group: `godot --path . -s res://tools/staging_shots.gd -- --group=props|characters|stage1|stage2 --views=front,back,top,close,close_back --out=<dir>`.

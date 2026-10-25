@@ -26,6 +26,12 @@ const ShoulderCam := preload("res://scripts/shoulder_cam.gd")
 var mover = Mover.new()
 const GaugeHud := preload("res://scripts/hud.gd")
 const Fade := preload("res://scripts/fade.gd")
+const Imported := preload("res://scripts/imported_assets.gd")
+const SkinPose := preload("res://scripts/skin_pose.gd")
+## The two etiquette guards are the supplied staff figures: the plum-suited clerk (npc10) at the
+## post and the teal-dressed clerk (npc12) who joins after the rack moves. Without their files
+## the guards fall back to the built-in ivory figures.
+const GUARD_MODELS := [["clerk_plum", "npc10"], ["clerk_teal", "npc12"]]
 var fade
 
 # Local coordinates: x east, -z north. DS-02 is building x0–10, y6–24 (10 m × 18 m).
@@ -64,6 +70,11 @@ class Guard:
 	var hit_done := false
 	var spoke := false
 	var orbit := 1.0
+	var pose: RefCounted = null   # SkinPose when the guard is one of the supplied figures
+	var baton: Node3D
+	var stool: Node3D
+	var stride := 0.0
+	var last := Vector2.ZERO
 
 var keys_prev := {}
 var held := {}
@@ -140,8 +151,8 @@ func _ready() -> void:
 	gauge.set_biscuits(biscuits)
 	gauge.set_objective("Get past the staff")
 	_build_hud()
-	guards.append(_make_guard(Vector2(-2.6, -1.4), "post"))
-	guards.append(_make_guard(Vector2(-3.4, 6.6), "dormant"))
+	guards.append(_make_guard(Vector2(-2.6, -1.4), "post", 0))
+	guards.append(_make_guard(Vector2(-3.4, 6.6), "dormant", 1))
 	say("MIKA", "Hats. Staff doors are north, past that rack.", 2.6)
 	_place_camera(1.0)
 	var game := get_node_or_null("/root/Game")
@@ -255,10 +266,11 @@ func _build_room() -> void:
 	Finish.done(fin)
 
 
-func _make_guard(at: Vector2, state: String) -> Guard:
+func _make_guard(at: Vector2, state: String, which := 0) -> Guard:
 	var g := Guard.new()
 	g.post = at
 	g.pos = at
+	g.last = at
 	g.state = state
 	g.node = Node3D.new()
 	add_child(g.node)
@@ -266,6 +278,35 @@ func _make_guard(at: Vector2, state: String) -> Guard:
 	var body := Node3D.new()
 	body.name = "Body"
 	g.node.add_child(body)
+	var figure: Node3D = Imported.make(GUARD_MODELS[which][0])
+	if figure:
+		body.add_child(figure)
+		g.pose = SkinPose.new(figure, GUARD_MODELS[which][1])
+		# The padded measuring baton, carried in the right hand (placed each frame).
+		g.baton = Node3D.new()
+		body.add_child(g.baton)
+		var stick := B.put(B.cyl(0.028, 0.028, 0.75), B.mat(Color("8a6440"), 0.4), Vector3(0, 0, 0.3), g.baton)
+		stick.rotation.x = PI / 2.0
+		B.put(B.sphere(0.045), B.brass(), Vector3(0, 0, 0.68), g.baton)
+		# The arms are driven through the skeleton; these two nodes only carry the swing angles.
+		g.arm_palm = Node3D.new()
+		body.add_child(g.arm_palm)
+		g.arm_baton = Node3D.new()
+		body.add_child(g.arm_baton)
+		g.cap = Node3D.new()
+		g.cap.position = Vector3(0, 1.84, 0)
+		body.add_child(g.cap)
+		B.put(B.cyl(0.12, 0.12, 0.07), B.mat(B.CREAM, 0.4), Vector3.ZERO, g.cap)     # staff usher cap
+		B.put(B.cyl(0.15, 0.15, 0.015), B.mat(B.BLACK, 0.3), Vector3(0, -0.035, 0), g.cap)
+		# "A short break": a folding stool appears under a guard that sits down.
+		g.stool = Node3D.new()
+		g.node.add_child(g.stool)
+		B.put(B.cyl(0.2, 0.2, 0.05), B.mat(Color("5e3a22"), 0.5), Vector3(0, 0.5, -0.05), g.stool)
+		for lx in [-0.13, 0.13]:
+			B.put(B.box(0.03, 0.5, 0.03), B.brass(), Vector3(lx, 0.25, -0.05), g.stool)
+		g.stool.visible = false
+		g.node.visible = state != "dormant"
+		return g
 	for side in [-1.0, 1.0]:
 		B.put(B.capsule(0.07, 0.4), ivory, Vector3(side * 0.1, 0.4, 0), body)
 	B.put(B.cyl(0.2, 0.15, 0.65), ivory, Vector3(0, 1.15, 0), body).scale = Vector3(1, 1, 0.7)
@@ -763,8 +804,35 @@ func _render_actors(dt: float) -> void:
 				sit = 1.0
 		gg.arm_baton.rotation.x = lerpf(gg.arm_baton.rotation.x, baton_x, 1.0 - exp(-(30.0 if gg.state == "strike" else 10.0) * dt))
 		gg.arm_palm.rotation.x = lerpf(gg.arm_palm.rotation.x, palm_x, 1.0 - exp(-10.0 * dt))
-		body.position.y = lerpf(body.position.y, -0.55 * sit, 1.0 - exp(-8.0 * dt))
+		body.position.y = lerpf(body.position.y, (-0.42 if gg.pose else -0.55) * sit, 1.0 - exp(-8.0 * dt))
 		body.rotation.x = lerpf(body.rotation.x, -0.25 * sit + (0.15 if gg.state == "flinch" else 0.0), 1.0 - exp(-8.0 * dt))
+		if gg.pose:
+			_pose_figure(gg, dt, sit)
+			gg.stool.visible = sit > 0.5
+
+
+## Drives a supplied staff figure's skeleton from the guard's state: baton arm and palm arm from
+## the same swing angles the built-in figure uses, elbows bent with them, a walking stride while
+## it moves, legs folded when it sits; the baton follows the right hand.
+func _pose_figure(g: Guard, dt: float, sit: float) -> void:
+	var moved := g.pos.distance_to(g.last) / maxf(dt, 0.0001)
+	g.last = g.pos
+	g.stride += dt * clampf(moved, 0.0, 3.0) * 4.5
+	var swing := sin(g.stride) * clampf(moved / 1.5, 0.0, 1.0) * 0.45 * (1.0 - sit)
+	var baton_a: float = g.arm_baton.rotation.x
+	var palm_a: float = g.arm_palm.rotation.x
+	var bend := clampf(-baton_a * 0.35, 0.0, 1.0)
+	var r := {
+		"r_arm": baton_a, "r_fore": -0.25 - bend,
+		"l_arm": palm_a - swing * 0.5, "l_fore": -0.15 - clampf(-palm_a * 0.3, 0.0, 0.6),
+		"r_thigh": swing - 1.45 * sit, "r_shin": maxf(-swing, 0.0) * 0.8 + 1.45 * sit,
+		"l_thigh": -swing - 1.45 * sit, "l_shin": maxf(swing, 0.0) * 0.8 + 1.45 * sit,
+		"spine": 0.12 if g.state == "tell" else (-0.1 if g.state == "strike" else 0.0),
+		"head": -0.15 if g.state in ["tell", "circle"] else 0.0,
+	}
+	g.pose.apply(r, {"l_arm": 0.18 if g.state in ["tell", "circle"] else 0.0})
+	var hand: Vector3 = g.pose.skel.global_transform * g.pose.hand("r_hand")
+	g.baton.global_transform = Transform3D(g.node.global_basis * Basis(Vector3.RIGHT, baton_a - 0.25 - bend), hand)
 
 
 func _place_camera(delta: float) -> void:

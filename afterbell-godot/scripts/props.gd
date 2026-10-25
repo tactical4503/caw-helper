@@ -23,6 +23,7 @@ extends RefCounted
 ## should treat as solid.
 
 const ST := preload("res://scripts/style.gd")
+const Imported := preload("res://scripts/imported_assets.gd")
 
 ## Ren is the ruler (rigs/ren.tscn, measured with tools/ruler.gd): 1.83 m tall standing, about
 ## 1.70 m in his guard crouch, belt at 1.02 m. Furniture and doorways are sized from him.
@@ -49,6 +50,8 @@ static var _mats := {}
 
 ## Builds (or reuses) a prop and adds it to `parent`. `text` is for signs.
 static func place(parent: Node3D, kind: String, at: Vector3, yaw := 0.0, variant := 0, text := "") -> Node3D:
+	if kind in ["mannequin", "mannequin_group"] and Imported.exists("mannequin_male"):
+		return _supplied_mannequin(parent, kind, at, yaw, variant)
 	var node := _instance(kind, variant)
 	node.name = kind.capitalize().replace(" ", "")
 	node.position = at
@@ -76,6 +79,32 @@ static func place(parent: Node3D, kind: String, at: Vector3, yaw := 0.0, variant
 		"hanging_sign":
 			# Scale the lettering so the whole name fits inside the 2 m panel.
 			_label(node, text, Vector3(0, 0, 0.035), minf(0.0045, 1.8 / (maxf(text.length(), 1) * 0.55 * 64.0)), Color("4a2238"), 64)
+	return node
+
+
+## The store's mannequins are the supplied dress forms (assets/imports/props): the female form
+## where the built-in figure would wear a dress, the male form for the suits. A pair keeps its
+## round plum platform. Used whenever those files are present.
+static func _supplied_mannequin(parent: Node3D, kind: String, at: Vector3, yaw: float, variant: int) -> Node3D:
+	var node := Node3D.new()
+	node.name = kind.capitalize().replace(" ", "")
+	node.position = at
+	node.rotation.y = yaw
+	parent.add_child(node)
+	if kind == "mannequin":
+		var form: Node3D = Imported.make("mannequin_female" if variant % 4 in [1, 3] else "mannequin_male")
+		node.add_child(form)
+		contact_shadow(node, Vector2(0.75, 0.75))
+		return node
+	node.add_child(_instance("mannequin_platform", 0))
+	var looks: Array = [[0, 1], [2, 3], [0, 3], [2, 1]][variant % 4]
+	for k in 2:
+		var s := -1.0 if k == 0 else 1.0
+		var form: Node3D = Imported.make("mannequin_female" if looks[k] in [1, 3] else "mannequin_male")
+		form.position = Vector3(s * 0.38, 0.18, -0.05 * k)
+		form.rotation.y = -s * 0.4
+		node.add_child(form)
+	contact_shadow(node, Vector2(2.1, 2.1))
 	return node
 
 
@@ -201,6 +230,7 @@ static func _build(kind: String, v: int) -> Node3D:
 		"leather_table": _leather_table(n, v)
 		"hanging_sign": _hanging_sign(n)
 		"clerk": _clerk(n, v)
+		"mannequin_platform": _mannequin_platform(n)
 		"gift_boxes": _gift_boxes(n, v)
 		"bouquet": _bouquet(n)
 	return n
@@ -508,12 +538,17 @@ static func _folded_table_frame(n: Node3D) -> void:
 			_put(_cyl(0.022, 0.022, 0.03, 10), _m("brass"), Vector3(x, 0.015, z), n)
 
 
-## Two mannequins posed toward each other on a shared round platform.
-static func _mannequin_group(n: Node3D, v: int) -> void:
+## The round plum platform a pair of mannequins stands on.
+static func _mannequin_platform(n: Node3D) -> void:
 	_put(rounded_block(1.7, 0.04, 1.7, 0.84), _m("plinth"), Vector3.ZERO, n)
 	_put(_cyl(0.85, 0.86, 0.12, 40), _m("plum"), Vector3(0, 0.1, 0), n)
 	_put(_cyl(0.87, 0.87, 0.02, 40), _m("brass"), Vector3(0, 0.165, 0), n)
 	_put(_cyl(0.84, 0.84, 0.02, 40), _m("cream"), Vector3(0, 0.17, 0), n)
+
+
+## Two mannequins posed toward each other on a shared round platform.
+static func _mannequin_group(n: Node3D, v: int) -> void:
+	_mannequin_platform(n)
 	var looks: Array = [[0, 1], [2, 3], [0, 3], [2, 1]][v % 4]
 	for k in 2:
 		var s := -1.0 if k == 0 else 1.0
