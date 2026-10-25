@@ -56,7 +56,15 @@ Ren's idle, run, guard, reflect, light and heavy attacks, and hit reaction are M
 - One strong sun with crisp shadows, a vivid blue sky that lights and reflects into the scene, and a mirror-still pool.
 - **No tone mapping**: colours stay pure and highlights clip, as those renderers did.
 
-Every material is created through this file, so the look can be retuned (or swapped for real textures) in one place. Samples are in `docs/style/`. Only the style is borrowed, not any existing characters or designs.
+The active grade is `Style.LOOK = "cg95"`, matched to the user's 90s promo-render reference:
+- blue sky fill in the shade;
+- one crisp warm sun;
+- lacquer-gloss materials with clipped white hotspots, and a clear coat on Ren's plates;
+- deep bump;
+- strong saturation and contrast;
+- a light blue haze.
+
+Set it to `"store"` for the earlier soft, filmic closing-time look. Every material is created through this file, so the look can be retuned (or swapped for real textures) in one place. Samples are in `docs/style/`. Only the style is borrowed, not any existing characters or designs.
 
 ## Animation
 | Floor Manager | Ren |

@@ -58,6 +58,20 @@ small stock (price cards, perfume clusters, window stock) no longer casts shadow
 frames, portals, plaques, door leaves, sconces and glimpses merged per material; each room's
 loose static meshes merged (`Atrium.merge_direct`).
 
+## Look: 90s promo render (user request, reference image)
+`Style.LOOK = "cg95"` (style.gd) restyles the game toward the 90s promo render the user picked:
+- no tone mapping, so highlights clip;
+- saturated blue sky fill in the shade;
+- a crisp warm-white key at full specular;
+- glossy lacquer materials;
+- normal maps at 1.7x;
+- saturation 1.38 and contrast 1.3;
+- bloom on the hotspots and a light blue haze.
+
+The atrium keeps its sun direction and reach; Ren gets a clear coat. To revert, set it to `"store"`.
+
+How it was checked: Forward+ renders of Cosmetics, Hats, Alterations, the court and the counters; all six test suites pass; draw calls unchanged (perf_probe). Not seen in real time.
+
 ## Current task
 Delivery: builds exported and the Linux build verified. Remaining polish is listed under
 known defects.

@@ -195,6 +195,14 @@ func _restyle(skin: Node) -> void:
 				m.roughness = 1.0
 			m.clearcoat_enabled = false
 			m.metallic_specular = 0.25   # no bright streaks across his back from overhead lights
+			if preload("res://scripts/style.gd").CG:
+				# The promo-render look: lacquered plates under a clear coat, so the key leaves a
+				# hard white hotspot on each rounded plate while the paint underneath stays satin.
+				m.roughness = 0.6
+				m.metallic_specular = 0.55
+				m.clearcoat_enabled = true
+				m.clearcoat = 0.7
+				m.clearcoat_roughness = 0.12
 			m3.set_surface_override_material(i, m)
 
 

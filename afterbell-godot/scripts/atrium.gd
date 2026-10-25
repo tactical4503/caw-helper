@@ -657,6 +657,11 @@ static func light_environment(e: Environment, key: DirectionalLight3D) -> void:
 	key.directional_shadow_max_distance = 48.0
 	key.directional_shadow_mode = DirectionalLight3D.SHADOW_PARALLEL_2_SPLITS   # half the shadow draws of 4 splits
 	key.shadow_blur = 3.0
+	if ST.CG:   # the promo-render grade (Style.LOOK); keeps this hall's sun direction and reach
+		ST.cg_environment(e)
+		ST.cg_key(key)
+		key.light_energy = 0.95
+		key.light_specular = 0.6   # escalator glass would streak at full specular
 
 
 static func _lights(a: Node3D) -> void:

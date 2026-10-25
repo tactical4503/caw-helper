@@ -6,7 +6,13 @@ extends RefCounted
 ## Every material in the game comes through here, so the look can be retuned (or replaced by
 ## real textures) in one place.
 
-const SATURATION := 1.08     # push colours toward the bold primaries of the era
+## "cg95": the 90s promo render (the user's reference): glossy lacquer with hard white hotspots,
+## a crisp sun, blue sky-fill in the shade, saturated colour, deep bump, no tone mapping.
+## "store": the previous soft, filmic closing-time look. Switch here; nothing else changes.
+const LOOK := "cg95"
+const CG := LOOK == "cg95"
+
+const SATURATION := 1.22 if CG else 1.08   # push colours toward the bold primaries of the era
 const SEGMENTS := 32         # round things need dense tessellation for clean highlights
 
 
@@ -21,6 +27,14 @@ static func plastic(color: Color, rough: float, metal: float) -> StandardMateria
 	var m := StandardMaterial3D.new()
 	m.albedo_color = _boost(color)
 	m.metallic = metal
+	if CG:   # lacquer and plastic: tight hotspots, everything has a sheen; matte only for cloth
+		if metal >= 0.5:
+			m.roughness = clampf(rough * 0.45, 0.08, 0.3)
+			m.metallic_specular = 0.7
+		else:
+			m.roughness = clampf(0.18 + rough * 0.5, 0.18, 0.72)
+			m.metallic_specular = 0.65
+		return m
 	if metal >= 0.5:
 		m.roughness = clampf(rough * 0.6, 0.15, 0.45)
 		m.metallic_specular = 0.5
@@ -97,11 +111,15 @@ static func textured(name: String, _legacy_scale: float, fallback: StandardMater
 	m.albedo_texture = load(dir + "albedo.png")
 	m.normal_enabled = true
 	m.normal_texture = load(dir + "normal.png")
-	m.roughness = 1.0
+	m.roughness = 0.62 if CG else 1.0   # scales the roughness map: polished, catching the key
+	if CG:
+		m.normal_scale = 1.7   # the deep, chunky bump of 90s procedural shaders
 	m.roughness_texture = load(dir + "roughness.png")
 	m.roughness_texture_channel = BaseMaterial3D.TEXTURE_CHANNEL_GRAYSCALE
 	m.metallic = metal
-	m.metallic_specular = 0.5 if metal >= 0.5 else 0.35
+	m.metallic_specular = (0.7 if metal >= 0.5 else 0.6) if CG else (0.5 if metal >= 0.5 else 0.35)
+	if CG:
+		m.albedo_color = Color(1.06, 1.02, 0.98)   # a touch warmer and brighter
 	m.uv1_triplanar = true
 	m.uv1_scale = Vector3.ONE / TEXTURE_TILE_M
 	m.texture_filter = BaseMaterial3D.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS_ANISOTROPIC   # no shimmer at grazing angles
@@ -171,7 +189,34 @@ static func environment() -> Environment:
 	e.adjustment_enabled = true
 	e.adjustment_saturation = 1.05
 	e.adjustment_contrast = 1.1
+	if CG:
+		cg_environment(e)
 	return e
+
+
+## The promo-render grade: no tone mapping (highlights clip to white), shade filled by a blue
+## sky, strong saturation and contrast, a bloom on the clipped hotspots, blue aerial haze.
+static func cg_environment(e: Environment) -> void:
+	e.tonemap_mode = Environment.TONE_MAPPER_LINEAR
+	e.tonemap_exposure = 1.0
+	e.ambient_light_color = Color("5f86d8")   # a saturated sky blue: shade goes deep blue, not milky
+	e.ambient_light_energy = 0.34
+	e.ssao_intensity = 2.0
+	e.ssao_power = 1.3
+	e.glow_enabled = true
+	e.glow_intensity = 0.32
+	e.glow_strength = 1.0
+	e.glow_bloom = 0.04
+	e.glow_hdr_threshold = 0.95
+	e.glow_blend_mode = Environment.GLOW_BLEND_MODE_SCREEN
+	e.fog_enabled = true
+	e.fog_light_color = Color("7fa6e6")
+	e.fog_light_energy = 0.5
+	e.fog_density = 0.0016   # only the far end of the hall softens toward blue
+	e.fog_aerial_perspective = 0.15
+	e.adjustment_saturation = 1.38
+	e.adjustment_contrast = 1.3
+	e.adjustment_brightness = 0.98
 
 
 ## Overhead key: daylight from the atrium skylight, nearly vertical so shadows read as indoor and
@@ -188,7 +233,20 @@ static func sun() -> DirectionalLight3D:
 	key.shadow_bias = 0.04
 	key.directional_shadow_max_distance = 25.0
 	key.rotation = Vector3(deg_to_rad(-78), deg_to_rad(-20), 0)
+	if CG:
+		cg_key(key)
 	return key
+
+
+## One strong, warm-white sun with crisp-edged shadows and full specular, so lacquer, brass and
+## Ren's armour get hard white hotspots.
+static func cg_key(key: DirectionalLight3D) -> void:
+	key.light_color = Color("fff1dc")
+	key.light_energy = 1.05
+	key.light_specular = 1.0
+	key.shadow_blur = 0.6
+	key.light_angular_distance = 0.6
+	key.shadow_opacity = 0.92
 
 
 static var _lamp_glass: StandardMaterial3D
