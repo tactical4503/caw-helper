@@ -7,6 +7,7 @@ extends Node
 ## "Restart from checkpoint" re-enter that room from its door.
 
 const SAVE_PATH := "user://afterbell_save.json"
+var save_path := SAVE_PATH   # tests point this elsewhere
 const TITLE := "res://rooms/title.tscn"
 const FIRST_ROOM := "res://rooms/cosmetics.tscn"
 const COURT := "res://main.tscn"
@@ -71,15 +72,15 @@ func has_save() -> bool:
 func save_game() -> void:
 	if testing():
 		return
-	var f := FileAccess.open(SAVE_PATH, FileAccess.WRITE)
+	var f := FileAccess.open(save_path, FileAccess.WRITE)
 	if f:
 		f.store_string(JSON.stringify({"checkpoint": checkpoint, "flags": flags, "settings": settings}, "\t"))
 
 
 func load_game() -> void:
-	if not FileAccess.file_exists(SAVE_PATH):
+	if not FileAccess.file_exists(save_path):
 		return
-	var data = JSON.parse_string(FileAccess.get_file_as_string(SAVE_PATH))
+	var data = JSON.parse_string(FileAccess.get_file_as_string(save_path))
 	if typeof(data) != TYPE_DICTIONARY:
 		return
 	checkpoint = str(data.get("checkpoint", ""))

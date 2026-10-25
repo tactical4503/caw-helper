@@ -18,7 +18,7 @@ const REN_RIG := preload("res://rigs/ren.tscn")
 # Local room coordinates: x east, -z north. DS-01 is building x10–26, y6–14 (16 m × 8 m).
 const HALF_W := 8.0
 const HALF_D := 4.0
-const ENTRY := Vector2(0.0, 3.2)             # from the vestibule, south
+const ENTRY := Vector2(0.0, 0.9)             # a few steps in from the south door, so the follow camera has its full distance
 const THROW_FROM := Vector2(5.4, -1.4)       # attendant behind the east counter
 const CATCH_AT := Vector2(-5.4, -1.4)        # padded catcher on the west counter
 const GATE_Z := 1.8                          # hats gate in the west wall
@@ -84,6 +84,7 @@ var fade
 var gauge
 var dialogue
 var settings := {"reflect_assist": false}
+var intro_t := 0.0   # opening: a held view of the counters and the atrium gate, then the follow camera
 
 
 func _ready() -> void:
@@ -130,6 +131,7 @@ func _ready() -> void:
 		say("NELL", "The service bell's up past the atrium. Through that gate.", 2.8)
 		if shell:
 			shell.set_flag("opened")
+		intro_t = 5.5
 	say("NELL", "It keeps doing that. Over and over.", 2.6)
 	say("MIKA", "It's feeding the gate release. Catch the sign with the flat of Knock — send it to the receiver over the west door.", 4.2)
 	say("", "Tap guard (K) just as the bordered sign reaches you.", 3.0)
@@ -598,6 +600,12 @@ func _update_subs(dt: float) -> void:
 func _place_camera(delta: float) -> void:
 	var walls := Rect2(-HALF_W + 0.35, -HALF_D + 0.35, HALF_W * 2.0 - 0.7, HALF_D * 2.0 - 0.7)
 	ShoulderCam.place(camera, p_pos, Vector2(0, -1), delta, walls, 62.0)
+	if intro_t > 0.0:
+		intro_t = maxf(0.0, intro_t - delta)
+		var k := smoothstep(0.0, 1.0, clampf(intro_t / 2.0, 0.0, 1.0))
+		var est := Transform3D(Basis.IDENTITY, Vector3(-1.2, 2.5, HALF_D - 0.4)).looking_at(Vector3(0.0, 1.3, -HALF_D), Vector3.UP)
+		camera.global_transform = camera.global_transform.interpolate_with(est, k)
+		camera.fov = lerpf(camera.fov, 66.0, k)
 
 
 ## A short line from the chapter shell (errand complete, item found); quiet without it.

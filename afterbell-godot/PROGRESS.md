@@ -19,7 +19,7 @@ Not built: vestibule (DS-00), shoes (DS-06), upper landing / linens / toys / ser
 | Title screen (in-engine atrium, New/Continue/Controls/Settings/Quit) | done | Forward+ render via tools/shell_shots.gd |
 | Pause menu (Esc): resume, controls, settings, restart checkpoint, quit to title | done | same run, screenshots |
 | Settings: master/effects/ambience volume buses, assists, shake | done | screenshot; volume audibility untested (no audio device here) |
-| Checkpoint save (user://afterbell_save.json), Continue | done | shell_shots run: checkpoint and flags written and read back |
+| Checkpoint save (user://afterbell_save.json), Continue | done | tests/chapter_test.gd (19 checks: round trip, corrupt and foreign saves, buses, pause, chapter flag) + shell_shots run |
 | Chapter end screen (governor, Night Receipt suit) → title | done | shell_shots run, screenshot |
 | Atrium / court composition toward the reference | largely done | Forward+ renders (court, atrium_aisle, gallery views) |
 | Department stock (leather goods, perfumery, millinery, footwear, gloves, tailoring, outfitters) | done | close-up renders (tools/furniture_shots.gd --only=stock_a,stock_b) |
@@ -27,7 +27,7 @@ Not built: vestibule (DS-00), shoes (DS-06), upper landing / linens / toys / ser
 | Charm beats, objective chain, inspectables | done | headless room tests pass; dialogue not playtested in real time |
 | Audio (owned, synthesized: bell, chime, register, steps, ambience) | done | files generated; not heard (no audio device in container) |
 | Performance | measured, two passes of reductions | tools/perf_probe.gd (counts below) |
-| Export build | not done | no export templates installed (see blockers) |
+| Export build (Linux, Windows) | done | Linux export boots to the title and loads every gameplay scene with no errors (exported binary run under xvfb, frames recorded); Windows export built but not run (no Windows here) |
 
 ## Chapter flow (as implemented)
 1. Title → New game: Cosmetics. Opening lines (clock stopped at 5:59, the bell upstairs).
@@ -59,11 +59,17 @@ frames, portals, plaques, door leaves, sconces and glimpses merged per material;
 loose static meshes merged (`Atrium.merge_direct`).
 
 ## Current task
-Court draw-call census (what still dominates main.tscn), then the full playthrough check.
+Delivery: builds exported and the Linux build verified. Remaining polish is listed under
+known defects.
 
 ## Next exact action
-Run `$G --rendering-driver opengl3 --path . -s <scratch>/census.gd -- res://main.tscn` to list
-the court's largest unmerged mesh groups; merge the static ones.
+Optional: further court draw-call work (remaining draws are many baked prop instances, one
+per material surface); a real-hardware fps measurement by the user.
+
+## Room entry points
+Ren now enters each room a few steps in from its door (Cosmetics, Hats, Alterations), because
+at the doors the follow camera was squeezed against the wall and opened on a cramped close-up.
+Cosmetics also opens on a held establishing view on a new game.
 
 ## Changed files and asset paths (this build session)
 - New: `scripts/game.gd` (autoload Game), `scripts/title.gd`, `rooms/title.tscn`,
@@ -85,8 +91,9 @@ the court's largest unmerged mesh groups; merge the static ones.
   `assets/meshy_output/history.json` (gitignored).
 
 ## Known defects and blockers
-- **Export**: Godot 4.3 export templates are not installed in this container, so no tested
-  playable build has been exported. The project runs from the editor (F5) / `godot --path`.
+- **Export**: `export_presets.cfg` has Linux and Windows presets (scenes + runtime-loaded
+  folders; unused source GLBs excluded). Builds go to `../build/` (gitignored, ~134 MB Linux,
+  ~152 MB Windows). The Windows build is untested.
 - **Meshy**: blocked on login approval (see above).
 - The four-image comparison sheet mentioned in the brief was not attached; the department
   store reference image was used as the target.

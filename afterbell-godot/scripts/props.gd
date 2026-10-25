@@ -59,7 +59,12 @@ static func place(parent: Node3D, kind: String, at: Vector3, yaw := 0.0, variant
 		contact_shadow(node, Vector2(h.x * 2.0 + 0.35, h.y * 2.0 + 0.35))
 	match kind:
 		"easel":
-			_label(node, text, Vector3(0, 1.12, 0.056), 0.0042 if text.length() <= 5 else 0.0026, Color("eee6d4"), 56, 0.0 if text.length() <= 5 else 0.52)
+			# Short words big; longer text wraps, scaled so its longest word still fits the board.
+			var longest := 0
+			for word in text.split(" ", false):
+				longest = maxi(longest, word.length())
+			var px := 0.0042 if text.length() <= 5 else minf(0.0026, 0.5 / (maxf(longest, 1) * 0.66 * 56.0))
+			_label(node, text, Vector3(0, 1.12, 0.056), px, Color("eee6d4"), 56, 0.0 if text.length() <= 5 else 0.54)
 		"sale_card":
 			_label(node, text if text != "" else "SALE", Vector3(0, 0.3, 0.012), 0.0022, Color("eee6d4"), 48)
 		"price_card":

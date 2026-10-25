@@ -31,7 +31,7 @@ var fade
 # Local coordinates: x east, -z north. DS-02 is building x0–10, y6–24 (10 m × 18 m).
 const HALF_W := 5.0
 const HALF_D := 9.0
-const ENTRY := Vector2(4.2, 5.0)           # from Cosmetics, through the east wall
+const ENTRY := Vector2(0.8, 4.6)           # in from the east door (Cosmetics), off the wall so the camera has room
 const EXIT_X := 0.9                         # north door half-width
 const NOTICE_AT := Vector2(3.3, 1.9)          # in front of the easel by the east wall
 const PARTITION_Z := -3.3                   # hat shelving across the room with the aisle gap

@@ -27,7 +27,7 @@ const Fade := preload("res://scripts/fade.gd")
 
 # Local coordinates: x east, -z north. Alterations x0–10, y24–34 → x -5..5, z -5..5.
 # Receiving x0–12, y34–42 sits north of it → x -5..7, z -13..-5.
-const ENTRY := Vector2(0.0, 4.2)          # from Hats, south
+const ENTRY := Vector2(0.0, 1.3)          # a few steps in from the south door (Hats), clear of the camera squeeze
 const DOOR_X := -2.5                      # alterations ↔ receiving doorway (north wall)
 const GATE_Z := 0.5                       # atrium gate in the east wall
 const SOCKET := Vector2(4.1, -0.9)        # where Ren stands to use the crank socket

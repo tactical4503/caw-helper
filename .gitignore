@@ -1,0 +1,6 @@
+
+# Exported game builds
+build/
+
+# Exported game builds (afterbell-godot/export_presets.cfg writes here)
+/build/
