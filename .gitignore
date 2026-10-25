@@ -4,3 +4,7 @@ build/
 
 # Exported game builds (afterbell-godot/export_presets.cfg writes here)
 /build/
+
+# Third-party models from the AFTERBELL asset package (original rights retained by their owners;
+# kept local, not redistributed in this public repository). See afterbell-godot/docs/ASSET_IMPORT.md.
+/afterbell-godot/assets/imports/
