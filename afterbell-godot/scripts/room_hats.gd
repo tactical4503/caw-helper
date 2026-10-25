@@ -75,6 +75,14 @@ class Guard:
 	var stool: Node3D
 	var stride := 0.0
 	var last := Vector2.ZERO
+	var ang := {}            # joint -> current Vector3 (springs toward the pose each frame)
+	var vel := {}
+	var vis_yaw := 0.0       # the body turns smoothly after the gameplay facing
+	var clock := 0.0
+	var seed := 0.0
+	var shown := ""          # the state the pose last saw, and how long it has held
+	var held := 0.0
+	var speed := 0.0
 
 var keys_prev := {}
 var held := {}
@@ -282,6 +290,8 @@ func _make_guard(at: Vector2, state: String, which := 0) -> Guard:
 	if figure:
 		body.add_child(figure)
 		g.pose = SkinPose.new(figure, GUARD_MODELS[which][1])
+		g.seed = which * 2.3
+		g.vis_yaw = g.yaw
 		# The padded measuring baton, carried in the right hand (placed each frame).
 		g.baton = Node3D.new()
 		body.add_child(g.baton)
@@ -783,8 +793,12 @@ func _render_actors(dt: float) -> void:
 	rack.position = Vector3(rack_x, 0, RACK_Z)
 	for g in guards:
 		var gg: Guard = g
-		gg.node.position = Vector3(gg.pos.x, 0, gg.pos.y)
-		gg.node.rotation.y = gg.yaw
+		gg.node.position = Vector3(gg.pos.x, gg.node.position.y if gg.pose else 0.0, gg.pos.y)
+		if gg.pose:   # the figure's body follows its facing with a little lag; its head leads
+			gg.vis_yaw = lerp_angle(gg.vis_yaw, gg.yaw, 1.0 - exp(-7.0 * dt))
+			gg.node.rotation.y = gg.vis_yaw
+		else:
+			gg.node.rotation.y = gg.yaw
 		var body: Node3D = gg.node.get_node("Body")
 		var baton_x := -0.3
 		var palm_x := -0.2
@@ -811,28 +825,137 @@ func _render_actors(dt: float) -> void:
 			gg.stool.visible = sit > 0.5
 
 
-## Drives a supplied staff figure's skeleton from the guard's state: baton arm and palm arm from
-## the same swing angles the built-in figure uses, elbows bent with them, a walking stride while
-## it moves, legs folded when it sits; the baton follows the right hand.
+## Joint springs: stiffness (how fast a joint chases its pose) and damping ratio (below 1 it
+## overshoots a touch and settles, which reads as weight). Fast for the strike, soft for idling.
+const SPRING_SOFT := Vector2(55.0, 0.85)
+const SPRING_FIRM := Vector2(140.0, 0.7)
+const SPRING_SNAP := Vector2(420.0, 0.55)
+const STRIDE := 0.62           # metres per half gait cycle (one step)
+
+
+## Drives a supplied staff figure's skeleton from the guard's state. Each frame builds a target
+## pose (idle breathing and weight shift, a gait cycle from the distance actually walked, the
+## tell's wind-up, the strike and its follow-through, a flinch, the sit), then every joint
+## springs toward it, so poses blend into one another instead of switching. The head turns to
+## Ren ahead of the body, and the baton follows the right hand.
 func _pose_figure(g: Guard, dt: float, sit: float) -> void:
-	var moved := g.pos.distance_to(g.last) / maxf(dt, 0.0001)
+	if dt <= 0.0:
+		return
+	g.clock += dt
+	if g.state != g.shown:
+		g.shown = g.state
+		g.held = 0.0
+	g.held += dt
+	var moved := g.pos.distance_to(g.last)
 	g.last = g.pos
-	g.stride += dt * clampf(moved, 0.0, 3.0) * 4.5
-	var swing := sin(g.stride) * clampf(moved / 1.5, 0.0, 1.0) * 0.45 * (1.0 - sit)
-	var baton_a: float = g.arm_baton.rotation.x
-	var palm_a: float = g.arm_palm.rotation.x
-	var bend := clampf(-baton_a * 0.35, 0.0, 1.0)
-	var r := {
-		"r_arm": baton_a, "r_fore": -0.25 - bend,
-		"l_arm": palm_a - swing * 0.5, "l_fore": -0.15 - clampf(-palm_a * 0.3, 0.0, 0.6),
-		"r_thigh": swing - 1.45 * sit, "r_shin": maxf(-swing, 0.0) * 0.8 + 1.45 * sit,
-		"l_thigh": -swing - 1.45 * sit, "l_shin": maxf(swing, 0.0) * 0.8 + 1.45 * sit,
-		"spine": 0.12 if g.state == "tell" else (-0.1 if g.state == "strike" else 0.0),
-		"head": -0.15 if g.state in ["tell", "circle"] else 0.0,
+	g.speed = lerpf(g.speed, moved / dt, 1.0 - exp(-10.0 * dt))
+	var gait := clampf(g.speed / 1.2, 0.0, 1.0) * (1.0 - sit)
+	g.stride += moved / STRIDE * PI
+	var t := g.clock + g.seed
+	var ph := g.stride
+
+	# Idle: breathing, a slow weight shift from foot to foot, arms hanging relaxed.
+	var breathe := sin(t * 1.7) * 0.025
+	var shift := sin(t * 0.55) * 0.05 * (1.0 - gait)
+	var p := {
+		"spine": Vector3(breathe + 0.05 * gait, sin(ph) * 0.1 * gait, shift * 0.6),
+		"head": Vector3(-breathe * 0.6, 0.0, -shift * 0.4),
+		"r_arm": Vector3(-0.12 + sin(ph) * 0.32 * gait, 0.0, -0.1),
+		"r_fore": Vector3(-0.3 - 0.15 * gait, 0.0, 0.0),
+		"l_arm": Vector3(-0.05 - sin(ph) * 0.32 * gait, 0.0, 0.1),
+		"l_fore": Vector3(-0.22 - 0.15 * gait, 0.0, 0.0),
+		# Gait: thighs swing opposite the arms; each knee folds as its foot swings through.
+		"r_thigh": Vector3(-sin(ph) * 0.42 * gait - shift * 0.3, 0.0, 0.0),
+		"l_thigh": Vector3(sin(ph) * 0.42 * gait + shift * 0.3, 0.0, 0.0),
+		"r_shin": Vector3(maxf(sin(ph + 1.3), 0.0) * 0.75 * gait + 0.04, 0.0, 0.0),
+		"l_shin": Vector3(maxf(-sin(ph + 1.3), 0.0) * 0.75 * gait + 0.04, 0.0, 0.0),
 	}
-	g.pose.apply(r, {"l_arm": 0.18 if g.state in ["tell", "circle"] else 0.0})
+	var spring := SPRING_SOFT
+	match g.state:
+		"tell":
+			# Wind-up: weight back, baton cocked over the shoulder, the other palm out to Ren,
+			# knees softening. The lift eases in over the tell and settles near its top.
+			var k := smoothstep(0.0, 0.55, g.held)
+			p["spine"] = Vector3(-0.14 * k + breathe, -0.18 * k, 0.0)
+			p["r_arm"] = Vector3(lerpf(-0.12, -2.55, k), 0.0, -0.25 * k)
+			p["r_fore"] = Vector3(lerpf(-0.3, -1.25, k), 0.0, 0.0)
+			p["l_arm"] = Vector3(lerpf(-0.05, -1.35, k), 0.0, 0.22 * k)
+			p["l_fore"] = Vector3(-0.15, 0.0, 0.0)
+			p["r_thigh"] = Vector3(-0.12 * k, 0.0, 0.0)
+			p["l_thigh"] = Vector3(0.1 * k, 0.0, 0.0)
+			p["r_shin"] = Vector3(0.2 * k, 0.0, 0.0)
+			p["l_shin"] = Vector3(0.12 * k, 0.0, 0.0)
+			spring = SPRING_FIRM
+		"strike":
+			# The swing: through and past level, the body stepping and leaning into it.
+			p["spine"] = Vector3(0.24, 0.2, 0.0)
+			p["r_arm"] = Vector3(-0.35, 0.0, 0.05)
+			p["r_fore"] = Vector3(-0.05, 0.0, 0.0)
+			p["l_arm"] = Vector3(0.25, 0.0, 0.18)
+			p["r_thigh"] = Vector3(-0.45, 0.0, 0.0)
+			p["r_shin"] = Vector3(0.35, 0.0, 0.0)
+			p["l_thigh"] = Vector3(0.2, 0.0, 0.0)
+			spring = SPRING_SNAP
+		"recover":
+			# Follow-through settles: the baton comes back down, a breath, upright again.
+			p["spine"] = Vector3(0.1 - 0.1 * smoothstep(0.0, 0.6, g.held), 0.0, 0.0)
+			p["r_arm"] = Vector3(-0.25, 0.0, -0.08)
+		"circle":
+			p["l_arm"] = Vector3(-1.3, 0.0, 0.15)    # points Ren back toward the aisle
+			p["l_fore"] = Vector3(-0.08, 0.0, 0.0)
+		"flinch":
+			# Knocked back: head and chest snap away, arms lift for balance, knees give.
+			p["spine"] = Vector3(-0.32, 0.0, 0.08)
+			p["head"] = Vector3(-0.35, 0.0, 0.0)
+			p["r_arm"] = Vector3(-0.5, 0.0, -0.35)
+			p["l_arm"] = Vector3(-0.4, 0.0, 0.35)
+			p["r_shin"] = Vector3(0.3, 0.0, 0.0)
+			p["l_shin"] = Vector3(0.3, 0.0, 0.0)
+			spring = SPRING_SNAP if g.held < 0.12 else SPRING_FIRM
+		"seated", "standing":
+			# On the stool: thighs level, shins down, forearms resting on the knees, head bowed;
+			# getting back up unfolds the same joints.
+			var s2 := sit
+			p["spine"] = Vector3(0.18 * s2 + breathe, 0.0, 0.0)
+			p["head"] = Vector3(0.25 * s2, 0.0, 0.0)
+			p["r_thigh"] = Vector3(-1.5 * s2, 0.0, 0.05)
+			p["l_thigh"] = Vector3(-1.5 * s2, 0.0, -0.05)
+			p["r_shin"] = Vector3(1.5 * s2, 0.0, 0.0)
+			p["l_shin"] = Vector3(1.5 * s2, 0.0, 0.0)
+			p["r_arm"] = Vector3(-0.55 * s2 - 0.1, 0.0, -0.1)
+			p["l_arm"] = Vector3(-0.55 * s2 - 0.05, 0.0, 0.1)
+			p["r_fore"] = Vector3(-0.85 * s2 - 0.25, 0.0, 0.0)
+			p["l_fore"] = Vector3(-0.85 * s2 - 0.2, 0.0, 0.0)
+	# The head turns to watch Ren before the body comes round (within a natural range).
+	var to_p := p_pos - g.pos
+	var look := wrapf(atan2(to_p.x, to_p.y) - g.vis_yaw, -PI, PI)
+	var head: Vector3 = p["head"]
+	p["head"] = Vector3(head.x, clampf(look, -0.7, 0.7) * (1.0 - sit * 0.6), head.z)
+	# Springs.
+	var k2: float = spring.x
+	var damp: float = 2.0 * sqrt(k2) * spring.y
+	var out := {}
+	for role in p:
+		var x: Vector3 = g.ang.get(role, p[role])
+		var v: Vector3 = g.vel.get(role, Vector3.ZERO)
+		var steps := maxi(1, ceili(dt / 0.008))   # stiff springs stay stable at low frame rates
+		var h := dt / steps
+		for i in steps:
+			v += ((p[role] - x) * k2 - v * damp) * h
+			x += v * h
+		g.ang[role] = x
+		g.vel[role] = v
+		out[role] = x
+	g.pose.apply(out)
+	# A gentle bob through the gait; the stride lifts the hips at mid-step.
+	var bob := (absf(sin(ph)) - 0.6) * 0.035 * gait
+	g.node.position.y = lerpf(g.node.position.y, bob, 1.0 - exp(-20.0 * dt))
+	# The baton sits in the right fist, square to the forearm.
 	var hand: Vector3 = g.pose.skel.global_transform * g.pose.hand("r_hand")
-	g.baton.global_transform = Transform3D(g.node.global_basis * Basis(Vector3.RIGHT, baton_a - 0.25 - bend), hand)
+	var arm: Vector3 = out["r_arm"]
+	var fore: Vector3 = out["r_fore"]
+	var body: Node3D = g.node.get_node("Body")
+	g.baton.global_transform = Transform3D(body.global_basis * Basis(Vector3.RIGHT, arm.x + fore.x) * Basis(Vector3.BACK, arm.z), hand)
 
 
 func _place_camera(delta: float) -> void:

@@ -43,13 +43,19 @@ func ok() -> bool:
 
 
 ## Sets each listed role to its angle (radians, about the figure's x axis); others return to rest.
-## `twist` optionally turns a role about the figure's z axis (arms out to the side).
+## `twist` optionally turns a role about the figure's z axis (arms out to the side). A role's
+## value may instead be a Vector3 (pitch about x, yaw about y, roll about z), for heads and spines.
 func apply(angles: Dictionary, twist := {}) -> void:
 	if not ok():
 		return
 	for role in idx:
 		var i: int = idx[role]
-		var r := Basis(Vector3.RIGHT, float(angles.get(role, 0.0))) * Basis(Vector3.BACK, float(twist.get(role, 0.0)))
+		var v = angles.get(role, 0.0)
+		var r: Basis
+		if v is Vector3:
+			r = Basis(Vector3.UP, v.y) * Basis(Vector3.RIGHT, v.x) * Basis(Vector3.BACK, v.z)
+		else:
+			r = Basis(Vector3.RIGHT, float(v)) * Basis(Vector3.BACK, float(twist.get(role, 0.0)))
 		var p: Basis = parent_rest[i]
 		var rest: Transform3D = rest_local[i]
 		var b: Basis = p.inverse() * r * p * rest.basis
