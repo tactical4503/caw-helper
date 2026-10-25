@@ -26,6 +26,10 @@ const ESC_FOOT_Z := -10.0
 const LEVELS := [5.0, 10.2]   # upper floor heights
 const ROOF := 16.0
 const SLAB := 0.45
+const UPPER_ESC_X := 11.9      # gallery-to-gallery escalators, against the outer walls
+const UPPER_ESC_FOOT := 2.0
+const UPPER_ESC_TOP := -6.6
+const HOLE := Rect2(11.12, -6.85, 1.56, 9.1)   # the opening in the top gallery floor (|x|, z)
 
 static var _mats := {}
 
@@ -39,6 +43,14 @@ static func build(root: Node3D) -> void:
 	_mezzanine(a)
 	for side in [-1.0, 1.0]:
 		escalator(a, Vector3(side * ESC_X, 0, ESC_FOOT_Z), LEVELS[0], MEZZ_Z)
+		# The top gallery is reached by a second escalator on each side gallery.
+		var up := Node3D.new()
+		up.position.y = LEVELS[0]
+		a.add_child(up)
+		escalator(up, Vector3(side * UPPER_ESC_X, 0, UPPER_ESC_FOOT), LEVELS[1] - LEVELS[0], UPPER_ESC_TOP, 1.15, true)
+	_colonnade(a)
+	_aisle(a)
+	_shops(a)
 	_window(a)
 	_roof(a)
 	_lower_hall(a)
@@ -74,19 +86,42 @@ static func _galleries(a: Node3D) -> void:
 	var mid_z := (SOUTH_Z + NORTH_Z) * 0.5
 	var width := OUTER_X - GALLERY_X
 	for level in LEVELS:
+		var top: bool = level == LEVELS[1]
 		for s in [-1.0, 1.0]:
 			var cx: float = s * (GALLERY_X + width * 0.5)
-			_put(_box(width, SLAB, depth), _m("slab"), Vector3(cx, level - SLAB * 0.5, mid_z), a)
-			_put(_box(width - 0.2, 0.02, depth - 0.2), _m("carpet"), Vector3(cx, level + 0.01, mid_z), a, false)
+			if top:
+				# The top floor opens where the escalator arrives: three slab pieces round the hole.
+				for piece in [[GALLERY_X, OUTER_X, NORTH_Z, HOLE.position.y], [GALLERY_X, OUTER_X, HOLE.end.y, SOUTH_Z],
+						[GALLERY_X, HOLE.position.x, HOLE.position.y, HOLE.end.y], [HOLE.end.x, OUTER_X, HOLE.position.y, HOLE.end.y]]:
+					_slab(a, s, piece[0], piece[1], piece[2], piece[3], level)
+				# Rails round the opening.
+				balustrade(a, Vector3(s * (HOLE.position.x - 0.08), level, HOLE.position.y), Vector3(s * (HOLE.position.x - 0.08), level, HOLE.end.y))
+				balustrade(a, Vector3(s * HOLE.position.x, level, HOLE.end.y + 0.08), Vector3(s * OUTER_X, level, HOLE.end.y + 0.08))
+			else:
+				_slab(a, s, GALLERY_X, OUTER_X, NORTH_Z, SOUTH_Z, level)
 			_fascia(a, Vector3(s * GALLERY_X, level, mid_z), Vector3(0, 0, depth))
-			balustrade(a, Vector3(s * (GALLERY_X + 0.1), level, NORTH_Z), Vector3(s * (GALLERY_X + 0.1), level, SOUTH_Z))
-			# Dressing: racks against the back wall, mannequins looking down over the rail.
-			for z in [-21.0, -13.0, -5.0, 3.0]:
-				rack(a, Vector3(s * (OUTER_X - 0.7), level, z), PI / 2.0)
-			for z in [-17.0, -9.0, -1.0, 6.5]:
-				mannequin(a, Vector3(s * (GALLERY_X + 1.0), level, z), -s * PI / 2.0, int(z + level) % 3)
-			for z in [-24.0, -15.0, -7.0, 1.0, 8.0]:
-				ST.sconce(a, Vector3(s * OUTER_X, level + 2.3, z), Vector3(-s, 0, 0), 0.0)
+			balustrade(a, Vector3(s * (GALLERY_X + 0.12), level, NORTH_Z), Vector3(s * (GALLERY_X + 0.12), level, SOUTH_Z))
+			# Finished underside: beams across the soffit between the recessed lights.
+			var z := NORTH_Z + 0.5
+			while z < SOUTH_Z:
+				_put(_box(width, 0.22, 0.24), _m("cream"), Vector3(cx, level - SLAB - 0.11, z), a)
+				z += 3.0
+			_put(_box(0.24, 0.22, depth), _m("cream"), Vector3(s * (OUTER_X - 0.12), level - SLAB - 0.11, mid_z), a)
+			# Dressing: racks against the back wall (clear of the escalators), mannequins at the rail.
+			var racks := [-21.0, -13.0, 3.0] if top else [-21.0, -13.0, -5.0]
+			for rz in racks:
+				rack(a, Vector3(s * (OUTER_X - 0.7), level, rz), PI / 2.0)
+			for mz in [-17.0, -9.0, -1.0, 6.5]:
+				mannequin(a, Vector3(s * (GALLERY_X + 1.0), level, mz), -s * PI / 2.0, int(mz + level) % 3)
+			for lz in [-24.0, -15.0, -7.0, 1.0, 8.0]:
+				ST.sconce(a, Vector3(s * OUTER_X, level + 2.3, lz), Vector3(-s, 0, 0), 0.0)
+
+
+## One rectangle of gallery floor (|x| from x0 to x1 on side s, z from z0 to z1): slab and carpet.
+static func _slab(a: Node3D, s: float, x0: float, x1: float, z0: float, z1: float, level: float) -> void:
+	var c := Vector3(s * (x0 + x1) * 0.5, level - SLAB * 0.5, (z0 + z1) * 0.5)
+	_put(_box(x1 - x0, SLAB, z1 - z0), _m("slab"), c, a)
+	_put(_box(maxf(x1 - x0 - 0.1, 0.05), 0.02, maxf(z1 - z0 - 0.1, 0.05)), _m("carpet"), Vector3(c.x, level + 0.01, c.z), a, false)
 
 
 static func _mezzanine(a: Node3D) -> void:
@@ -117,51 +152,79 @@ static func _mezzanine(a: Node3D) -> void:
 	# Mannequins along the rail, racks and palms behind, a counter in the middle.
 	for x in [-7.4, -3.0, 3.0, 7.4]:
 		mannequin(a, Vector3(x, level, MEZZ_Z - 1.0), 0.0, int(absf(x)) % 3)
-	for x in [-6.5, 6.5]:
+	for x in [-7.2, 7.2]:   # kept to the sides so the window reads from below
 		rack(a, Vector3(x, level, -23.4), 0.0)
-	for x in [-3.9, 3.9]:
-		palm(a, Vector3(x, level, -24.8))
+	for x in [-5.3, 5.3]:
+		palm(a, Vector3(x, level, -25.1))
 	Props.counter(a, Vector3(0, level, -21.5), Vector3(2.4, Props.WAIST, 0.8))
 
 
-## Cream fascia band along a floor edge (with brass trim), running `span` from `centre`.
+## A balcony edge with real depth: a cornice lip, two brass bands, a cream frieze with brass
+## rosettes every 3 m, and a dropped bottom moulding, 1 m deep in all, running `span` from
+## `centre` (centre sits at floor level on the edge line).
 static func _fascia(a: Node3D, centre: Vector3, span: Vector3) -> void:
 	var along_x := absf(span.x) > absf(span.z)
 	var length := span.length()
-	var size := Vector3(length, 0.75, 0.3) if along_x else Vector3(0.3, 0.75, length)
-	_put(_box(size.x, size.y, size.z), _m("cream"), centre + Vector3(0, -0.36, 0), a)
-	var trim := Vector3(length, 0.06, 0.34) if along_x else Vector3(0.34, 0.06, length)
-	for y in [-0.05, -0.68]:
-		_put(_box(trim.x, trim.y, trim.z), _m("brass"), centre + Vector3(0, y, 0), a)
+	var strip := func(y: float, h: float, d: float, m: Material) -> void:
+		var size := Vector3(length, h, d) if along_x else Vector3(d, h, length)
+		_put(_box(size.x, size.y, size.z), m, centre + Vector3(0, y, 0), a)
+	strip.call(-0.5, 1.0, 0.34, _m("cream"))          # the frieze
+	strip.call(-0.03, 0.07, 0.46, _m("cream"))        # cornice lip
+	strip.call(-0.1, 0.035, 0.4, _m("brass"))
+	strip.call(-0.86, 0.035, 0.4, _m("brass"))
+	strip.call(-0.97, 0.07, 0.42, _m("cream"))        # bottom moulding
+	var count := int(length / 3.0)
+	for i in count:
+		var t := -length * 0.5 + (i + 0.5) * length / count
+		for f in [-1.0, 1.0]:
+			var off := Vector3(t, -0.48, f * 0.18) if along_x else Vector3(f * 0.18, -0.48, t)
+			var ros := _put(_cyl(0.09, 0.09, 0.03, 16), _m("brass"), centre + off, a)
+			ros.rotation = Vector3(PI / 2.0, 0, 0) if along_x else Vector3(0, 0, PI / 2.0)
 
 
-## Brass-capped balustrade from `from` to `to` (axis-aligned, at floor height). The balusters
-## are one MultiMesh per run, so a long gallery rail is a single draw.
+## A substantial balustrade from `from` to `to` (axis-aligned, at floor height): square newel
+## posts every 2.4 m with brass caps, a walnut handrail capped in brass, a cream bottom rail
+## and turned cream balusters with a knop. The balusters are MultiMeshes, one draw per part.
 static func balustrade(a: Node3D, from: Vector3, to: Vector3, height := 1.0) -> void:
 	var length := from.distance_to(to)
+	if length < 0.2:
+		return
 	var along_x := absf(to.x - from.x) > absf(to.z - from.z)
 	var mid := (from + to) * 0.5
-	var top := Vector3(length, 0.07, 0.12) if along_x else Vector3(0.12, 0.07, length)
-	_put(_box(top.x, top.y, top.z), _m("brass"), mid + Vector3(0, height, 0), a)
-	var base := Vector3(length, 0.1, 0.14) if along_x else Vector3(0.14, 0.1, length)
-	_put(_box(base.x, base.y, base.z), _m("cream"), mid + Vector3(0, 0.05, 0), a)
-	var count := int(length / 0.26)
-	var mm := MultiMesh.new()
-	mm.transform_format = MultiMesh.TRANSFORM_3D
-	mm.mesh = _cyl(0.025, 0.035, height - 0.1, 8)
-	mm.instance_count = count
-	for i in count:
-		var t := (i + 0.5) / float(count)
-		mm.set_instance_transform(i, Transform3D(Basis(), from.lerp(to, t) + Vector3(0, height * 0.5 + 0.02, 0)))
-	var mmi := MultiMeshInstance3D.new()
-	mmi.multimesh = mm
-	mmi.material_override = _m("brass")
-	a.add_child(mmi)
+	var bar := func(y: float, h: float, d: float, m: Material) -> void:
+		var size := Vector3(length, h, d) if along_x else Vector3(d, h, length)
+		_put(_box(size.x, size.y, size.z), m, mid + Vector3(0, y, 0), a)
+	bar.call(0.07, 0.14, 0.18, _m("cream"))                 # bottom rail
+	bar.call(height - 0.05, 0.1, 0.17, _m("walnut"))        # handrail
+	bar.call(height + 0.01, 0.025, 0.12, _m("brass"))       # brass cap on the rail
+	var posts := maxi(1, int(round(length / 2.4)))
+	for i in posts + 1:
+		var p := from.lerp(to, i / float(posts))
+		_put(_box(0.17, height + 0.08, 0.17), _m("cream"), p + Vector3(0, (height + 0.08) * 0.5, 0), a)
+		_put(_box(0.22, 0.05, 0.22), _m("brass"), p + Vector3(0, height + 0.1, 0), a)
+		_put(_sphere(0.06, 12), _m("brass"), p + Vector3(0, height + 0.17, 0), a)
+	var count := int(length / 0.2)
+	var parts := [[_cyl(0.03, 0.042, height - 0.24, 10), 0.14 + (height - 0.24) * 0.5],
+			[_sphere(0.055, 12), height * 0.42], [_box(0.08, 0.06, 0.08), 0.17]]
+	for part in parts:
+		var mm := MultiMesh.new()
+		mm.transform_format = MultiMesh.TRANSFORM_3D
+		mm.mesh = part[0]
+		mm.instance_count = count
+		for i in count:
+			var t := (i + 0.5) / float(count)
+			mm.set_instance_transform(i, Transform3D(Basis(), from.lerp(to, t) + Vector3(0, part[1], 0)))
+		var mmi := MultiMeshInstance3D.new()
+		mmi.multimesh = mm
+		mmi.material_override = _m("cream")
+		a.add_child(mmi)
 
 
 ## An escalator rising north from `foot` to floor height `rise`, its top landing at `top_z`.
-## Stepped treads on a cream-clad truss, dark glass side panels and black handrails.
-static func escalator(a: Node3D, foot: Vector3, rise: float, top_z: float, width := 1.15) -> void:
+## Stepped treads with gold nosings, steel skirts and decks, a cream-clad truss with a brass
+## seam, smoked glass panels under a black handrail on a steel guide, curled newel ends on
+## solid housings, and brass-edged landing plates.
+static func escalator(a: Node3D, foot: Vector3, rise: float, top_z: float, width := 1.15, flush := false) -> void:
 	var run := foot.z - top_z
 	var length := sqrt(run * run + rise * rise)
 	var pitch := atan2(rise, run)
@@ -170,95 +233,177 @@ static func escalator(a: Node3D, foot: Vector3, rise: float, top_z: float, width
 	a.add_child(e)
 	var mid := Vector3(foot.x, rise * 0.5, (foot.z + top_z) * 0.5)
 	var up := Vector3(0, cos(pitch), sin(pitch))   # local "up" of the incline (rotation.x = pitch)
-	# Truss: the solid underside, clad in cream with a brass seam.
-	var truss := _put(_box(width + 0.36, 0.9, length + 0.6), _m("cream"), mid - up * 0.5, e)
-	truss.rotation.x = pitch
+	var incline := func(size: Vector3, m: Material, at: Vector3, cast := true) -> void:
+		var mi := _put(_box(size.x, size.y, size.z), m, at, e, cast)
+		mi.rotation.x = pitch
+	# Truss: the solid underside, clad in cream with a brass seam each side. Starting on an upper
+	# floor (`flush`), it is slimmer and stops at the foot so nothing pokes through the slab.
+	if flush:
+		incline.call(Vector3(width + 0.36, 0.5, length), _m("cream"), mid - up * 0.3)
+	else:
+		incline.call(Vector3(width + 0.36, 0.9, length + 0.6), _m("cream"), mid - up * 0.5)
 	for s in [-1.0, 1.0]:
-		var seam := _put(_box(0.02, 0.05, length + 0.6), _m("brass"), mid - up * 0.3 + Vector3(s * (width * 0.5 + 0.19), 0, 0), e)
-		seam.rotation.x = pitch
-	# Treads.
+		incline.call(Vector3(0.02, 0.05, length + 0.6), _m("brass"), mid - up * 0.3 + Vector3(s * (width * 0.5 + 0.19), 0, 0))
+	# Treads with a gold nosing on each step.
 	var n := int(run / 0.4)
 	var tread_d := run / n
 	var riser := rise / n
-	var steps := MultiMesh.new()
-	steps.transform_format = MultiMesh.TRANSFORM_3D
-	steps.mesh = _box(width, 0.3, tread_d)
-	steps.instance_count = n
-	for i in n:
-		var y := (i + 1) * riser - 0.15
-		steps.set_instance_transform(i, Transform3D(Basis(), Vector3(foot.x, y, foot.z - (i + 0.5) * tread_d)))
-	var mmi := MultiMeshInstance3D.new()
-	mmi.multimesh = steps
-	mmi.material_override = _m("steps")
-	e.add_child(mmi)
-	# Comb plates at both ends.
-	_put(_box(width, 0.05, 1.2), _m("steel"), Vector3(foot.x, 0.025, foot.z + 0.6), e)
-	_put(_box(width, 0.05, 0.8), _m("steel"), Vector3(foot.x, rise + 0.03, top_z - 0.4), e)
-	# Balustrades: smoked glass, black rubber handrail, curled newel ends.
+	for part in [[_box(width, 0.3, tread_d), _m("steps"), 0.0], [_box(width - 0.04, 0.012, 0.045), _m("nosing"), 1.0]]:
+		var mm := MultiMesh.new()
+		mm.transform_format = MultiMesh.TRANSFORM_3D
+		mm.mesh = part[0]
+		mm.instance_count = n
+		for i in n:
+			var y := (i + 1) * riser - 0.15
+			var z := foot.z - (i + 0.5) * tread_d
+			if part[2] > 0.0:
+				y = (i + 1) * riser + 0.006
+				z = foot.z - i * tread_d - 0.03
+			mm.set_instance_transform(i, Transform3D(Basis(), Vector3(foot.x, y, z)))
+		var mmi := MultiMeshInstance3D.new()
+		mmi.multimesh = mm
+		mmi.material_override = part[1]
+		e.add_child(mmi)
+	# Landing plates with brass edges, top and bottom.
+	for land in [[Vector3(foot.x, 0.02, foot.z + 0.75), 1.5], [Vector3(foot.x, rise + 0.025, top_z - 0.5), 1.0]]:
+		_put(_box(width + 0.3, 0.04, land[1]), _m("steel"), land[0], e)
+		for s in [-1.0, 1.0]:
+			_put(_box(0.03, 0.045, land[1]), _m("brass"), land[0] + Vector3(s * (width * 0.5 + 0.15), 0, 0), e)
+	# Each side: steel skirt, deck, glass, handrail on its guide, newel housings with curled ends.
 	for s in [-1.0, 1.0]:
 		var x: float = foot.x + s * (width * 0.5 + 0.08)
-		var glass := _put(_box(0.04, 0.85, length + 0.2), _m("glass"), Vector3(x, mid.y, mid.z) + up * 0.55, e, false)
-		glass.rotation.x = pitch
-		var rail := _put(_box(0.09, 0.07, length + 0.2), _m("rubber"), Vector3(x, mid.y, mid.z) + up * 1.0, e)
-		rail.rotation.x = pitch
-		for end in [Vector3(x, 0.55, foot.z + 0.15), Vector3(x, rise + 0.55, top_z - 0.15)]:
-			var newel := _put(_cyl(0.5, 0.5, 0.09, 20), _m("rubber"), end, e)
+		incline.call(Vector3(0.03, 0.32, length), _m("steel"), Vector3(foot.x + s * (width * 0.5 + 0.015), mid.y, mid.z) + up * 0.05)
+		incline.call(Vector3(0.16, 0.05, length + 0.2), _m("steel"), Vector3(x, mid.y, mid.z) + up * 0.17)
+		incline.call(Vector3(0.035, 0.8, length + 0.2), _m("glass"), Vector3(x, mid.y, mid.z) + up * 0.58, false)
+		incline.call(Vector3(0.04, 0.05, length + 0.2), _m("steel"), Vector3(x, mid.y, mid.z) + up * 0.96)
+		incline.call(Vector3(0.1, 0.075, length + 0.2), _m("rubber"), Vector3(x, mid.y, mid.z) + up * 1.02)
+		for end in [[Vector3(x, 0.55, foot.z + 0.15), 0.0], [Vector3(x, rise + 0.55, top_z - 0.15), rise]]:
+			var c: Vector3 = end[0]
+			_put(_box(0.16, 0.55, 0.9), _m("cream"), Vector3(x, float(end[1]) + 0.275, c.z + (0.35 if end[1] == 0.0 else -0.35)), e)
+			var newel := _put(_cyl(0.5, 0.5, 0.1, 24), _m("rubber"), c, e)
 			newel.rotation.z = PI / 2.0
-			_put(_cyl(0.46, 0.46, 0.05, 20), _m("glass"), end, e, false).rotation.z = PI / 2.0
+			_put(_cyl(0.46, 0.46, 0.04, 24), _m("glass"), c, e, false).rotation.z = PI / 2.0
 
 
 # ---------------------------------------------------------------- the window
 
 static func _window(a: Node3D) -> void:
-	var w := 6.8
+	var w := 9.0
 	var r := w * 0.5
-	var sill := 6.4
-	var spring := 12.0                 # where the arch starts
+	var sill := 5.8
+	var spring := 10.8                 # where the arch starts
 	var z := NORTH_Z + 0.02
 	var sky := QuadMesh.new()
 	sky.size = Vector2(w, spring + r - sill)
 	_put(sky, _sky_mat(), Vector3(0, (sill + spring + r) * 0.5, z), a, false)
-	# A city skyline at dusk, and a parasol on a rooftop terrace across the street.
-	var rng := RandomNumberGenerator.new()
-	rng.seed = 2002
-	var x := -r
-	while x < r:
-		var bw := rng.randf_range(0.35, 0.9)
-		var bh := rng.randf_range(0.6, 2.6)
-		_put(_box(minf(bw, r - x), bh, 0.02), _m("skyline"), Vector3(x + minf(bw, r - x) * 0.5, sill + bh * 0.5, z + 0.03), a, false)
-		x += bw
-	_put(_cyl(0.0, 0.8, 0.3, 16), _m("skyline"), Vector3(-0.6, sill + 3.0, z + 0.05), a, false)
-	_put(_box(0.04, 1.0, 0.02), _m("skyline"), Vector3(-0.6, sill + 2.4, z + 0.05), a, false)
+	_sunset_view(a, z, w, sill, spring + r)
 	# Stone fills outside the arch (stepped finely enough that the frame hides the steps).
-	var slices := 24
+	var slices := 30
 	for i in slices:
 		var y0 := spring + r * i / float(slices)
 		var y1 := spring + r * (i + 1) / float(slices)
 		var half := sqrt(maxf(r * r - pow(y1 - spring, 2.0), 0.0))
 		var fill := r - half + 0.02
 		for s in [-1.0, 1.0]:
-			_put(_box(fill, y1 - y0 + 0.01, 0.06), _m("stone"), Vector3(s * (r - fill * 0.5 + 0.01), (y0 + y1) * 0.5, z + 0.05), a, false)
-	# Frame: jambs, sill, arch voussoirs, keystone; glazing bars.
+			_put(_box(fill, y1 - y0 + 0.01, 0.08), _m("stone"), Vector3(s * (r - fill * 0.5 + 0.01), (y0 + y1) * 0.5, z + 0.12), a, false)
+	# Ivory surround: jambs, deep sill, arch voussoirs, keystone.
 	for s in [-1.0, 1.0]:
-		_put(_box(0.32, spring - sill, 0.3), _m("cream"), Vector3(s * (r + 0.1), (sill + spring) * 0.5, z + 0.12), a)
-	_put(_box(w + 0.8, 0.22, 0.45), _m("cream"), Vector3(0, sill - 0.05, z + 0.2), a)
-	var segs := 20
+		_put(_box(0.5, spring - sill, 0.4), _m("cream"), Vector3(s * (r + 0.2), (sill + spring) * 0.5, z + 0.18), a)
+	_put(_box(w + 1.2, 0.3, 0.6), _m("cream"), Vector3(0, sill - 0.1, z + 0.28), a)
+	_put(_box(w + 1.0, 0.05, 0.62), _m("brass"), Vector3(0, sill + 0.06, z + 0.28), a)
+	var segs := 28
 	for i in segs:
 		var t0 := PI * i / segs
 		var t1 := PI * (i + 1) / segs
-		var p0 := Vector2(cos(t0), sin(t0)) * (r + 0.1)
-		var p1 := Vector2(cos(t1), sin(t1)) * (r + 0.1)
-		var seg := _put(_box(p0.distance_to(p1) + 0.04, 0.32, 0.3), _m("cream"), Vector3((p0.x + p1.x) * 0.5, spring + (p0.y + p1.y) * 0.5, z + 0.12), a)
+		var p0 := Vector2(cos(t0), sin(t0)) * (r + 0.2)
+		var p1 := Vector2(cos(t1), sin(t1)) * (r + 0.2)
+		var seg := _put(_box(p0.distance_to(p1) + 0.05, 0.5, 0.4), _m("cream"), Vector3((p0.x + p1.x) * 0.5, spring + (p0.y + p1.y) * 0.5, z + 0.18), a)
 		seg.rotation.z = (t0 + t1) * 0.5 + PI / 2.0
-	_put(_box(0.5, 0.7, 0.36), _m("cream"), Vector3(0, spring + r + 0.22, z + 0.14), a)
-	for bx in [-r * 0.5, 0.0, r * 0.5]:
-		var top := spring + sqrt(r * r - bx * bx)
-		_put(_box(0.07, top - sill, 0.06), _m("brass"), Vector3(bx, (sill + top) * 0.5, z + 0.08), a)
-	for by in [8.3, 10.2, spring]:
-		_put(_box(w, 0.07, 0.06), _m("brass"), Vector3(0, by, z + 0.08), a)
-	# Plum banners flanking the window.
+	_put(_box(0.7, 0.95, 0.5), _m("cream"), Vector3(0, spring + r + 0.3, z + 0.22), a)
+	var key := _put(_cyl(0.18, 0.18, 0.04, 20), _m("brass"), Vector3(0, spring + r + 0.3, z + 0.48), a)
+	key.rotation.x = PI / 2.0
+	# Dark bronze framework: outer frame, mullions, transoms, a fan of bars and a ring in the arch.
+	var dark := _m("frame_dark")
+	var fz := z + 0.1
 	for s in [-1.0, 1.0]:
-		_banner(a, Vector3(s * (r + 1.6), 11.0, z + 0.1), Vector3(0, 0, 1), 1.2, 5.0)
+		_put(_box(0.16, spring - sill, 0.12), dark, Vector3(s * (r - 0.08), (sill + spring) * 0.5, fz), a)
+	_put(_box(w, 0.16, 0.12), dark, Vector3(0, sill + 0.08, fz), a)
+	for bx in [-r * 0.66, -r * 0.33, 0.0, r * 0.33, r * 0.66]:
+		_put(_box(0.1, spring - sill, 0.1), dark, Vector3(bx, (sill + spring) * 0.5, fz), a)
+	for by in [sill + 1.65, sill + 3.3, spring]:
+		_put(_box(w, 0.1, 0.1), dark, Vector3(0, by, fz), a)
+	for i in 7:
+		var ang := PI * (i + 1) / 8.0
+		var len := r - 0.1
+		var spoke := _put(_box(0.08, len, 0.1), dark, Vector3(cos(ang) * len * 0.5, spring + sin(ang) * len * 0.5, fz), a)
+		spoke.rotation.z = ang - PI / 2.0
+	for ring_r in [r * 0.42, r - 0.06]:
+		for i in 18:
+			var t0 := PI * i / 18.0
+			var t1 := PI * (i + 1) / 18.0
+			var p0: Vector2 = Vector2(cos(t0), sin(t0)) * ring_r
+			var p1: Vector2 = Vector2(cos(t1), sin(t1)) * ring_r
+			var seg := _put(_box(p0.distance_to(p1) + 0.03, 0.1, 0.1), dark, Vector3((p0.x + p1.x) * 0.5, spring + (p0.y + p1.y) * 0.5, fz), a)
+			seg.rotation.z = (t0 + t1) * 0.5 + PI / 2.0
+	# Fluted ivory pilasters with plum inset panels flank the window (no hanging cloth).
+	for s in [-1.0, 1.0]:
+		_pilaster(a, Vector3(s * (r + 1.5), LEVELS[0], z + 0.2), ROOF - 0.6 - LEVELS[0])
+
+
+## The view out: a low sun with a soft halo behind the far rooftops, wisps of cloud, two layers
+## of skyline (the near one with a few lit windows) and the rooftop parasol across the street.
+static func _sunset_view(a: Node3D, z: float, w: float, sill: float, top: float) -> void:
+	var glow := func(color: Color, energy: float) -> StandardMaterial3D:
+		var m := StandardMaterial3D.new()
+		m.albedo_color = Color.BLACK
+		m.emission_enabled = true
+		m.emission = color
+		m.emission_energy_multiplier = energy
+		return m
+	var sun := _put(_cyl(0.55, 0.55, 0.01, 32), glow.call(Color("ffe2b0"), 1.6), Vector3(1.3, sill + 1.7, z + 0.02), a, false)
+	sun.rotation.x = PI / 2.0
+	var halo_m: StandardMaterial3D = glow.call(Color("ffc29a"), 0.6)
+	halo_m.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	halo_m.albedo_color = Color(0, 0, 0, 0.45)
+	var halo := _put(_cyl(1.3, 1.3, 0.01, 32), halo_m, Vector3(1.3, sill + 1.7, z + 0.015), a, false)
+	halo.rotation.x = PI / 2.0
+	var cloud: StandardMaterial3D = glow.call(Color("e7a0a8"), 0.7)
+	for c in [[-2.2, top - 3.0, 2.4], [1.8, top - 4.2, 1.8], [-0.6, top - 5.2, 1.4], [2.6, sill + 3.0, 1.2]]:
+		var puff := _put(_sphere(0.5, 16), cloud, Vector3(c[0], c[1], z + 0.03), a, false)
+		puff.scale = Vector3(c[2], 0.22, 0.02)
+	var rng := RandomNumberGenerator.new()
+	rng.seed = 2002
+	var r := w * 0.5
+	for layer in [[_m("skyline_far"), 1.2, 3.4, 0.035], [_m("skyline"), 0.5, 2.2, 0.05]]:
+		var x := -r
+		while x < r:
+			var bw := minf(rng.randf_range(0.4, 1.0), r - x)
+			var bh := rng.randf_range(layer[1], layer[2])
+			_put(_box(bw, bh, 0.01), layer[0], Vector3(x + bw * 0.5, sill + bh * 0.5, z + layer[3]), a, false)
+			if layer[3] > 0.04:
+				for k in rng.randi_range(0, 3):
+					var lit := _put(_box(0.08, 0.1, 0.01), _m("window_lit"), Vector3(x + rng.randf_range(0.1, bw - 0.1), sill + rng.randf_range(0.3, bh - 0.2), z + 0.056), a, false)
+					lit.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+			x += bw
+	_put(_cyl(0.0, 0.8, 0.3, 16), _m("skyline"), Vector3(-0.8, sill + 2.7, z + 0.06), a, false)
+	_put(_box(0.04, 0.9, 0.01), _m("skyline"), Vector3(-0.8, sill + 2.2, z + 0.06), a, false)
+
+
+## A fluted ivory pilaster rising `h` from `base` against the back wall: stepped base, three
+## flutes, a framed plum inset panel with a brass fleur, a brass-banded capital.
+static func _pilaster(a: Node3D, base: Vector3, h: float) -> void:
+	var w := 1.0
+	_put(_box(w + 0.2, 0.4, 0.45), _m("cream"), base + Vector3(0, 0.2, 0.05), a)
+	_put(_box(w + 0.1, 0.05, 0.4), _m("brass"), base + Vector3(0, 0.42, 0.05), a)
+	_put(_box(w, h, 0.3), _m("cream"), base + Vector3(0, h * 0.5, 0), a)
+	for fx in [-0.28, 0.0, 0.28]:
+		_put(_box(0.06, h - 1.6, 0.02), _m("flute"), base + Vector3(fx, h * 0.5 - 0.2, 0.15), a)
+	var panel := base + Vector3(0, h * 0.42, 0.16)
+	_put(_box(0.66, 2.6, 0.04), _m("brass"), panel, a)
+	_put(_box(0.58, 2.52, 0.05), _m("plum"), panel, a)
+	fleur(a, panel + Vector3(0, 0.3, 0.04), Vector3(0, 0, 1), 0.42)
+	for cap in [[h - 0.5, w + 0.08, 0.06, "brass"], [h - 0.36, w + 0.16, 0.2, "cream"], [h - 0.12, w + 0.3, 0.24, "cream"]]:
+		_put(_box(cap[1], cap[2], 0.42), _m(cap[3]), base + Vector3(0, cap[0], 0.06), a)
 
 
 static func _sky_mat() -> StandardMaterial3D:
@@ -308,32 +453,135 @@ static func _roof(a: Node3D) -> void:
 
 
 static func _lower_hall(a: Node3D) -> void:
-	var under: float = LEVELS[0] - SLAB
-	# A lit archway into the next department beneath the mezzanine.
+	# Lilies at the head of the aisle, perfume counters and palms along its edges.
+	Props.place(a, "flower_display", Vector3(0, 0, -14.2))
+	for side in [-1.0, 1.0]:
+		Props.place(a, "perfume_counter", Vector3(side * 3.45, 0, -11.6), 0.0, 1 if side > 0 else 2)
+		palm(a, Vector3(side * 3.9, 0, -9.9))
+		rack(a, Vector3(side * 3.35, 0, -16.6), 0.0)
+		mannequin(a, Vector3(side * 6.9, 0, -12.5), 0.0, 1)
+		mannequin(a, Vector3(side * 6.9, 0, -16.0), 0.0, 2)
+
+
+## A pillar: stepped stone base with a brass torus, brass bands at rail height on every floor,
+## and a moulded capital with brass medallions under each balcony it carries and under the
+## roof. `brackets` (+1/-1 = toward +x/-x, 0 = none) adds short corbels tying it into the
+## balcony edge at each floor. Used by the court's columns and the atrium's own.
+static func pillar(a: Node3D, x: float, z: float, top: float = ROOF, brackets := 0.0, reach := 0.0) -> void:
+	var at := Vector3(x, 0, z)
+	_put(_box(1.08, 0.24, 1.08), _m("cream"), at + Vector3(0, 0.12, 0), a)
+	_put(_box(0.94, 0.07, 0.94), _m("brass"), at + Vector3(0, 0.275, 0), a)
+	_put(_box(0.86, 0.3, 0.86), _m("cream"), at + Vector3(0, 0.46, 0), a)
+	_put(_box(0.7, top - 0.6, 0.7), _m("cream"), at + Vector3(0, 0.6 + (top - 0.6) * 0.5, 0), a)
+	var bands := [1.12]
+	var caps := []
+	for level in LEVELS:
+		if level - SLAB < top - 0.3:
+			caps.append(level - SLAB)
+			if level + 1.12 < top:
+				bands.append(level + 1.12)
+	caps.append(top)
+	for y in bands:
+		_put(_box(0.76, 0.06, 0.76), _m("brass"), at + Vector3(0, y, 0), a)
+	for cy in caps:
+		_put(_box(0.76, 0.05, 0.76), _m("brass"), at + Vector3(0, cy - 0.42, 0), a)
+		_put(_box(0.86, 0.18, 0.86), _m("cream"), at + Vector3(0, cy - 0.27, 0), a)
+		_put(_box(1.0, 0.12, 1.0), _m("cream"), at + Vector3(0, cy - 0.06, 0), a)
+		for f in [Vector3(1, 0, 0), Vector3(-1, 0, 0), Vector3(0, 0, 1), Vector3(0, 0, -1)]:
+			var med := _put(_cyl(0.07, 0.07, 0.03, 16), _m("brass"), at + Vector3(0, cy - 0.62, 0) + f * 0.36, a)
+			med.rotation = Vector3(PI / 2.0, 0, 0) if absf(f.z) > 0.5 else Vector3(0, 0, PI / 2.0)
+		if brackets != 0.0 and cy < top and reach > 0.0:
+			_put(_box(reach, 0.32, 0.5), _m("cream"), at + Vector3(brackets * (0.35 + reach * 0.5), cy - 0.16, 0), a)
+			_put(_box(reach, 0.04, 0.52), _m("brass"), at + Vector3(brackets * (0.35 + reach * 0.5), cy - 0.3, 0), a)
+
+
+## The atrium's own columns: the rest of the gallery colonnade north of the court, and a row
+## carrying the mezzanine's front edge, so every upper floor visibly stands on something.
+static func _colonnade(a: Node3D) -> void:
+	for s in [-1.0, 1.0]:
+		for z in [-12.6, -17.2, -22.0]:
+			pillar(a, s * 8.25, z, ROOF, s, 0.0)
+	for x in [-7.2, -2.2, 2.2, 7.2]:
+		pillar(a, x, MEZZ_Z + 0.25, LEVELS[0] - SLAB + 0.02)
+
+
+## The broad central aisle: a lighter runner with ivory borders from the court to the mezzanine.
+static func _aisle(a: Node3D) -> void:
+	var z0 := -9.35
+	var z1 := MEZZ_Z + 0.4
+	var cz := (z0 + z1) * 0.5
+	var len := z0 - z1
+	_put(_box(4.2, 0.02, len), _m("runner"), Vector3(0, 0.012, cz), a, false)
+	for s in [-1.0, 1.0]:
+		_put(_box(0.12, 0.022, len), _m("cream"), Vector3(s * 2.0, 0.013, cz), a, false)
+		_put(_box(0.04, 0.023, len), _m("brass"), Vector3(s * 1.86, 0.014, cz), a, false)
+
+
+## Recessed shop entrances beneath the balconies: along both side aisles and under the mezzanine.
+static func _shops(a: Node3D) -> void:
+	var names := [["MILLINERY", "GLOVES  ·  HOSIERY", "FOOTWEAR"], ["TAILORING", "LEATHER GOODS", "PERFUMERY"]]
+	for side in 2:
+		var s := -1.0 if side == 0 else 1.0
+		var zs := [-12.0, 0.5, 6.6]
+		for i in 3:
+			shop_front(a, Vector3(s * OUTER_X, 0, zs[i]), -s * PI / 2.0, names[side][i])
+	shop_front(a, Vector3(0, 0, NORTH_Z), 0.0, "GENTLEMEN'S OUTFITTERS")
+
+
+## One shop front built out from a wall: pilasters, a fascia with its name plaque, two display
+## windows with mannequins on plum plinths, and a recessed, lit entrance with open doors.
+## Local frame: origin on the wall face at floor level, +z out toward the atrium.
+static func shop_front(a: Node3D, at: Vector3, yaw: float, name: String) -> void:
+	var f := Node3D.new()
+	f.position = at
+	f.rotation.y = yaw
+	a.add_child(f)
+	var depth := 0.9
+	var door_w := 2.0
+	var win_w := 1.5
+	var pier := 0.3
+	var total := door_w + 2.0 * (win_w + pier) + 2.0 * pier
+	var h := 3.0
+	# Back of the recess: a warm lit interior with shelving silhouettes.
 	var glow := StandardMaterial3D.new()
 	glow.albedo_color = Color("2a1a14")
 	glow.emission_enabled = true
-	glow.emission = Color("ffcf94")
-	glow.emission_energy_multiplier = 0.55
-	_put(_box(3.4, 3.2, 0.05), glow, Vector3(0, 1.6, NORTH_Z + 0.03), a, false)
-	for s in [-1.0, 1.0]:
-		_put(_box(0.4, 3.6, 0.4), _m("cream"), Vector3(s * 1.9, 1.8, NORTH_Z + 0.2), a)
-		for y in [0.5, 1.3, 2.1]:
-			_put(_box(1.0, 0.04, 0.3), _m("wood"), Vector3(s * 1.05, y, NORTH_Z + 0.2), a)
-			for i in 4:
-				_put(_box(0.16, 0.22, 0.2), _m("plum" if i % 2 else "cream"), Vector3(s * (0.68 + i * 0.24), y + 0.13, NORTH_Z + 0.22), a)
-	_put(_box(4.2, 0.4, 0.45), _m("cream"), Vector3(0, 3.6, NORTH_Z + 0.2), a)
-	_put(_box(OUTER_X * 2.0, 0.3, 0.3), _m("brass"), Vector3(0, under - 0.15, NORTH_Z + 0.2), a)
-	# Lilies between the escalators, perfume counters either side.
-	Props.place(a, "flower_display", Vector3(0, 0, -13.5))
-	for side in [-1.0, 1.0]:
-		Props.place(a, "perfume_counter", Vector3(side * 3.0, 0, -12.2), 0.0, 1 if side > 0 else 2)
-	# Suit racks and mannequins on the lower floor beyond the balustrade.
-	for s in [-1.0, 1.0]:
-		rack(a, Vector3(s * 3.2, 0, -16.5), 0.0)
-		mannequin(a, Vector3(s * 7.4, 0, -12.5), 0.0, 1)
-		mannequin(a, Vector3(s * 7.4, 0, -16.0), 0.0, 2)
-		palm(a, Vector3(s * 2.6, 0, -10.6))
+	glow.emission = Color("ffd2a0")
+	glow.emission_energy_multiplier = 0.45
+	_put(_box(door_w, 2.6, 0.04), glow, Vector3(0, 1.3, 0.03), f, false)
+	for y in [0.6, 1.3, 2.0]:
+		_put(_box(door_w - 0.3, 0.04, 0.1), _m("wood"), Vector3(0, y, 0.08), f)
+	for sx in [-1.0, 1.0]:
+		_put(_box(0.04, 2.6, depth), _m("cream"), Vector3(sx * door_w * 0.5, 1.3, depth * 0.5), f)   # recess cheeks
+		Props.door_leaf(f, Vector3(sx * door_w * 0.5, 0, 0.1), door_w * 0.5 - 0.05, 2.5, PI if sx > 0 else 0.0, sx * -1.2, true)
+	_put(_box(door_w, 0.04, depth), _m("cream"), Vector3(0, 2.62, depth * 0.5), f)   # recess soffit
+	_put(_box(door_w + 0.04, 0.02, depth), _m("brass"), Vector3(0, 0.01, depth * 0.5), f)
+	# Piers, display windows and their mannequins.
+	var piers := [door_w * 0.5 + pier * 0.5, door_w * 0.5 + pier + win_w + pier * 0.5]
+	for sx in [-1.0, 1.0]:
+		for px in piers:
+			_put(_box(pier, h, depth + 0.1), _m("cream"), Vector3(sx * px, h * 0.5, depth * 0.5), f)
+			_put(_box(pier + 0.06, 0.06, depth + 0.16), _m("brass"), Vector3(sx * px, 0.3, depth * 0.5), f)
+		var wx: float = sx * (door_w * 0.5 + pier + win_w * 0.5)
+		_put(_box(win_w, 0.5, depth), _m("plum"), Vector3(wx, 0.25, depth * 0.5), f)            # plinth
+		_put(_box(win_w + 0.02, 0.04, depth + 0.02), _m("brass"), Vector3(wx, 0.51, depth * 0.5), f)
+		_put(_box(win_w, h - 0.5, 0.04), glow, Vector3(wx, 0.5 + (h - 0.5) * 0.5, 0.03), f, false)
+		var glass := _put(_box(win_w, 2.1, 0.03), _m("glass_clear"), Vector3(wx, 1.6, depth - 0.05), f, false)
+		glass.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+		_put(_box(win_w, 0.05, 0.08), _m("brass"), Vector3(wx, 2.67, depth - 0.05), f)
+		var m := Props.place(f, "mannequin", Vector3(wx, 0.53, depth * 0.45), 0.0, int(absf(wx) * 3.0 + name.length()) % 4)
+		m.scale = Vector3.ONE * 0.92
+	# Fascia with the shop's name, a cornice above it.
+	_put(_box(total, 0.7, depth + 0.15), _m("cream"), Vector3(0, h + 0.35, depth * 0.5), f)
+	_put(_box(total + 0.2, 0.08, depth + 0.3), _m("cream"), Vector3(0, h + 0.74, depth * 0.5), f)
+	_put(_box(total + 0.04, 0.04, depth + 0.2), _m("brass"), Vector3(0, h + 0.02, depth * 0.5), f)
+	Props.plaque(f, Vector3(0, h + 0.36, depth + 0.08), minf(total - 1.0, 3.6), name)
+	var light := OmniLight3D.new()
+	light.light_color = Color("ffd8b0")
+	light.light_energy = 0.4
+	light.omni_range = 3.0
+	light.position = Vector3(0, 2.0, depth + 0.4)
+	f.add_child(light)
 
 
 ## The aisle beyond the court's east rail: perfume counters facing the fight, mannequins between
@@ -584,6 +832,24 @@ static func _m(name: String) -> StandardMaterial3D:
 			m = StandardMaterial3D.new()
 			m.albedo_color = Color("2e2140")
 			m.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+		"skyline_far":
+			m = StandardMaterial3D.new()
+			m.albedo_color = Color("6d4f74")
+			m.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+		"window_lit":
+			m = StandardMaterial3D.new()
+			m.albedo_color = Color("ffd59a")
+			m.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+		"frame_dark": m = ST.plastic(Color("2b2420"), 0.45, 0.35)
+		"flute": m = ST.plastic(Color("d6ccb8"), 0.7, 0.0)
+		"walnut": m = ST.plastic(Color("5e3a22"), 0.5, 0.0)
+		"nosing": m = ST.plastic(Color("c9a64a"), 0.5, 0.3)
+		"runner": m = ST.textured("carpet_sage", 0.5, ST.plastic(Color("3a5650"), 0.9, 0.0))
+		"glass_clear":
+			m = StandardMaterial3D.new()
+			m.albedo_color = Color(0.85, 0.88, 0.9, 0.18)
+			m.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+			m.roughness = 0.05
 		"glass":
 			m = StandardMaterial3D.new()
 			m.albedo_color = Color(0.12, 0.13, 0.16, 0.55)

@@ -348,18 +348,16 @@ static func _build_hall(arena_root: Node3D) -> void:
 			Vector2(-4, -8.85), Vector2(4, -8.85)]:
 		var on_side: bool = absf(spot.x) > 7.0
 		var face := Vector3(-signf(spot.x), 0, 0) if on_side else Vector3(0, 0, 1)
-		put(box(0.7, Atrium.ROOF, 0.7), cream, Vector3(spot.x, Atrium.ROOF * 0.5, spot.y), root)
-		put(box(0.8, 0.18, 0.8), brass(), Vector3(spot.x, 0.09, spot.y), root)
-		for level in Atrium.LEVELS:
-			put(box(0.8, 0.18, 0.8), brass(), Vector3(spot.x, level - 0.5, spot.y), root)
-		put(box(0.9, 0.3, 0.9), cream, Vector3(spot.x, Atrium.ROOF - 0.6, spot.y), root)
-		# Lower banner, and a long one between the galleries.
-		for b in [[3.9, 2.0], [7.7, 3.4]]:
+		# Stepped base, brass bands at rail height, capitals under each balcony; side columns
+		# carry the balcony edge on short brackets.
+		var reach := (Atrium.GALLERY_X - absf(spot.x) - 0.35) if on_side else 0.0
+		Atrium.pillar(root, spot.x, spot.y, Atrium.ROOF, signf(spot.x) if on_side else 0.0, reach)
+		# Banners hang between the bands and capitals on each upper storey.
+		for b in [[7.8, 2.6], [13.2, 2.8]]:
 			var bb := put(box(0.75 if not on_side else 0.06, b[1], 0.06 if not on_side else 0.75), banner, Vector3(spot.x, b[0], spot.y) + face * 0.4, root)
 			put(box(0.79 if not on_side else 0.07, 0.08, 0.07 if not on_side else 0.79), brass(), bb.position + Vector3(0, b[1] * 0.5, 0), root)
 			Atrium.fleur(root, bb.position + Vector3(0, b[1] * 0.12, 0) + face * 0.05, face, 0.36)
 		ST.sconce(root, Vector3(spot.x, 2.3, spot.y) + face * 0.35, face, 0.8, 5.5)
-		ST.sconce(root, Vector3(spot.x, 12.3, spot.y) + face * 0.35, face, 0.0)   # upper: fixture only
 	# Chandeliers on long drops from the roof: pools of light down the court and over the bell.
 	for z in [5.0, 0.0, -5.0]:
 		put(cyl(0.02, 0.02, Atrium.ROOF - 5.6, 6), brass(), Vector3(0, (Atrium.ROOF + 5.6) * 0.5, z), root, false)
