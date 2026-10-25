@@ -655,10 +655,10 @@ static func counter(parent: Node3D, at: Vector3, size: Vector3, top := "cream", 
 	var h := size.y
 	var d := size.z
 	_put(rounded_block(w - 0.1, 0.1, d - 0.1, r * 0.6), _m("plinth"), Vector3.ZERO, c)
-	_put(rounded_block(w, 0.34, d, r), _m("plum"), Vector3(0, 0.1, 0), c)
-	_put(rounded_block(w + 0.02, 0.04, d + 0.02, r + 0.01), _m("brass"), Vector3(0, 0.44, 0), c)
+	_put(rounded_block(w, 0.34, d, r), _m("counter_plum"), Vector3(0, 0.1, 0), c)
+	_put(rounded_block(w + 0.02, 0.04, d + 0.02, r + 0.01), _m("counter_brass"), Vector3(0, 0.44, 0), c)
 	_put(rounded_block(w - 0.02, h - 0.6, d - 0.02, r), _m("cream"), Vector3(0, 0.48, 0), c)
-	_put(rounded_block(w + 0.03, 0.035, d + 0.03, r + 0.015), _m("brass"), Vector3(0, h - 0.125, 0), c)
+	_put(rounded_block(w + 0.03, 0.035, d + 0.03, r + 0.015), _m("counter_brass"), Vector3(0, h - 0.125, 0), c)
 	_put(rounded_block(w + 0.04, 0.014, d + 0.04, r + 0.02), _m("walnut_dark"), Vector3(0, h - 0.094, 0), c)
 	var tops := {"cream": "counter_top", "walnut": "walnut", "plum": "plum"}
 	_put(rounded_block(w + 0.1, 0.08, d + 0.1, r + 0.05, 0.03), _m(tops[top]), Vector3(0, h - 0.08, 0), c)
@@ -699,8 +699,8 @@ static func _panelled_face(f: Node3D, along: float, h: float) -> void:
 ## A thin brass bead framing a rectangle `size` centred on `at` (face-local).
 static func _bead(f: Node3D, at: Vector3, size: Vector2) -> void:
 	for s in [-1.0, 1.0]:
-		_put(_box(size.x + 0.012, 0.012, 0.01), _m("brass"), at + Vector3(0, s * size.y * 0.5, 0), f)
-		_put(_box(0.012, size.y, 0.01), _m("brass"), at + Vector3(s * size.x * 0.5, 0, 0), f)
+		_put(_box(size.x + 0.012, 0.012, 0.01), _m("counter_brass"), at + Vector3(0, s * size.y * 0.5, 0), f)
+		_put(_box(0.012, size.y, 0.01), _m("counter_brass"), at + Vector3(s * size.x * 0.5, 0, 0), f)
 
 
 ## The staff side: bays of two drawers over a cupboard door, with an open stock shelf in the
@@ -718,7 +718,7 @@ static func _service_face(f: Node3D, along: float, h: float) -> void:
 		var dh := (h - 0.14 - y0 - 0.02) * 0.5
 		for k in 2:
 			_front(f, Vector3(cx, y0 + dh * 0.5 + k * (dh + 0.02), 0), Vector2(bay - 0.05, dh), "cream", true)
-		_front(f, Vector3(cx, 0.27, 0.01), Vector2(bay - 0.05, 0.28), "plum", false)   # on the plum base, 1 cm further out
+		_front(f, Vector3(cx, 0.27, 0.01), Vector2(bay - 0.05, 0.28), "counter_plum", false)   # on the plum base, 1 cm further out
 
 
 ## A drawer or door front over a dark shadow gap. Drawers get a brass bar pull; doors a knob
@@ -728,16 +728,16 @@ static func _front(f: Node3D, at: Vector3, size: Vector2, mat: String, drawer: b
 	_put(_box(size.x, size.y, 0.018), _m(mat), at + Vector3(0, 0, 0.009), f)
 	if drawer:
 		var length := minf(0.16, size.x * 0.4)
-		var bar := _put(_cyl(0.007, 0.007, length, 8), _m("brass"), at + Vector3(0, 0, 0.034), f)
+		var bar := _put(_cyl(0.007, 0.007, length, 8), _m("counter_brass"), at + Vector3(0, 0, 0.034), f)
 		bar.rotation.z = PI / 2.0
 		for s in [-1.0, 1.0]:
-			var post := _put(_cyl(0.005, 0.006, 0.016, 6), _m("brass"), at + Vector3(s * length * 0.4, 0, 0.026), f)
+			var post := _put(_cyl(0.005, 0.006, 0.016, 6), _m("counter_brass"), at + Vector3(s * length * 0.4, 0, 0.026), f)
 			post.rotation.x = PI / 2.0
 	else:
 		var knob := at + Vector3(size.x * 0.36, size.y * 0.2, 0)
-		var plate := _put(_box(0.03, 0.06, 0.004), _m("brass"), knob + Vector3(0, 0, 0.02), f)
+		var plate := _put(_box(0.03, 0.06, 0.004), _m("counter_brass"), knob + Vector3(0, 0, 0.02), f)
 		plate.position.y -= 0.01
-		_put(_sphere(0.014, 8), _m("brass"), knob + Vector3(0, 0, 0.032), f)
+		_put(_sphere(0.014, 8), _m("counter_brass"), knob + Vector3(0, 0, 0.032), f)
 
 
 ## An open bay on the staff side: shadowed interior, two walnut shelves, brass-beaded opening,
@@ -755,7 +755,7 @@ static func _stock_shelf(f: Node3D, cx: float, w: float, h: float) -> void:
 	for k in 3:   # folded tissue, then the ledger on top
 		_put(_box(w * 0.4, 0.022, 0.04), _m("shirt"), Vector3(cx - w * 0.2, mid + 0.031 + k * 0.024, 0.034), f)
 	_put(_box(w * 0.34, 0.2, 0.034), _m("walnut_dark"), Vector3(cx + w * 0.24, mid + 0.12, 0.035), f)
-	_put(_box(w * 0.34, 0.03, 0.036), _m("brass"), Vector3(cx + w * 0.24, mid + 0.16, 0.035), f)   # the ledger's label band
+	_put(_box(w * 0.34, 0.03, 0.036), _m("counter_brass"), Vector3(cx + w * 0.24, mid + 0.16, 0.035), f)   # the ledger's label band
 
 
 ## A tube between two points.
@@ -1343,7 +1343,11 @@ static func _m(name: String) -> Material:
 		"walnut": m = ST.plastic(Color("5e3a22"), 0.55, 0.0)
 		"walnut_dark": m = ST.plastic(Color("40261a"), 0.6, 0.0)
 		"plinth": m = ST.plastic(Color("2a1420"), 0.7, 0.0)
-		"counter_top": m = ST.textured("marble_cream", 0.8, ST.plastic(Color("ece3d1"), 0.45, 0.0))
+		"counter_top":   # the user's marble, quietened to ivory (tools/counter_textures.py); veins drawn larger
+			m = ST.textured("counter_ivory", 0.8, ST.plastic(Color("ece3d1"), 0.45, 0.0))
+			m.uv1_scale = Vector3.ONE / 3.0
+		"counter_plum": m = ST.textured("counter_plum", 1.0, ST.plastic(Color("5c2341"), 0.56, 0.0))
+		"counter_brass": m = ST.textured("counter_brass", 2.0, ST.plastic(Color("c4a86a"), 0.4, 0.7), 0.7)
 		"door_glass":
 			m = StandardMaterial3D.new()
 			m.albedo_color = Color(0.85, 0.75, 0.6, 0.35)
