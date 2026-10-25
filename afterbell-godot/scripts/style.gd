@@ -8,11 +8,14 @@ extends RefCounted
 
 ## "cg95": the 90s promo render (the user's reference): glossy lacquer with hard white hotspots,
 ## a crisp sun, blue sky-fill in the shade, saturated colour, deep bump, no tone mapping.
+## "deco": golden-hour department store (the user's in-game reference): warm amber fill, glowing
+## globe lamps, soft warm shadows, satin cream and plum, gentle bloom.
 ## "store": the previous soft, filmic closing-time look. Switch here; nothing else changes.
-const LOOK := "cg95"
+const LOOK := "deco"
 const CG := LOOK == "cg95"
+const DECO := LOOK == "deco"
 
-const SATURATION := 1.22 if CG else 1.08   # push colours toward the bold primaries of the era
+const SATURATION := 1.22 if CG else (1.12 if DECO else 1.08)   # push colours toward the bold primaries of the era
 const SEGMENTS := 32         # round things need dense tessellation for clean highlights
 
 
@@ -34,6 +37,14 @@ static func plastic(color: Color, rough: float, metal: float) -> StandardMateria
 		else:
 			m.roughness = clampf(0.18 + rough * 0.5, 0.18, 0.72)
 			m.metallic_specular = 0.65
+		return m
+	if DECO:   # satin: cream lacquer and polished counters take a soft sheen, cloth stays matte
+		if metal >= 0.5:
+			m.roughness = clampf(rough * 0.5, 0.12, 0.35)
+			m.metallic_specular = 0.6
+		else:
+			m.roughness = clampf(0.32 + rough * 0.5, 0.32, 0.85)
+			m.metallic_specular = 0.5
 		return m
 	if metal >= 0.5:
 		m.roughness = clampf(rough * 0.6, 0.15, 0.45)
@@ -111,14 +122,16 @@ static func textured(name: String, _legacy_scale: float, fallback: StandardMater
 	m.albedo_texture = load(dir + "albedo.png")
 	m.normal_enabled = true
 	m.normal_texture = load(dir + "normal.png")
-	m.roughness = 0.62 if CG else 1.0   # scales the roughness map: polished, catching the key
+	m.roughness = 0.62 if CG else (0.8 if DECO else 1.0)   # scales the roughness map
 	if CG:
 		m.normal_scale = 1.7   # the deep, chunky bump of 90s procedural shaders
+	elif DECO:
+		m.normal_scale = 1.15
 	m.roughness_texture = load(dir + "roughness.png")
 	m.roughness_texture_channel = BaseMaterial3D.TEXTURE_CHANNEL_GRAYSCALE
 	m.metallic = metal
 	m.metallic_specular = (0.7 if metal >= 0.5 else 0.6) if CG else (0.5 if metal >= 0.5 else 0.35)
-	if CG:
+	if CG or DECO:
 		m.albedo_color = Color(1.06, 1.02, 0.98)   # a touch warmer and brighter
 	m.uv1_triplanar = true
 	m.uv1_scale = Vector3.ONE / TEXTURE_TILE_M
@@ -189,9 +202,60 @@ static func environment() -> Environment:
 	e.adjustment_enabled = true
 	e.adjustment_saturation = 1.05
 	e.adjustment_contrast = 1.1
+	grade_environment(e)
+	return e
+
+
+## Applies the active LOOK's grade (nothing for "store").
+static func grade_environment(e: Environment) -> void:
 	if CG:
 		cg_environment(e)
-	return e
+	elif DECO:
+		deco_environment(e)
+
+
+static func grade_key(key: DirectionalLight3D) -> void:
+	if CG:
+		cg_key(key)
+	elif DECO:
+		deco_key(key)
+
+
+## Golden hour indoors: a warm amber fill so shade stays honey-brown (never blue), filmic roll-off
+## so cream and brass hold their colour, bloom that lets the globe lamps glow, a faint warm haze.
+static func deco_environment(e: Environment) -> void:
+	e.tonemap_mode = Environment.TONE_MAPPER_FILMIC
+	e.tonemap_exposure = 1.0
+	e.tonemap_white = 5.0
+	e.ambient_light_color = Color("e6cfb2")
+	e.ambient_light_energy = 0.3
+	e.ssao_intensity = 1.8
+	e.ssao_power = 1.4
+	e.glow_enabled = true
+	e.glow_intensity = 0.45
+	e.glow_strength = 0.95
+	e.glow_bloom = 0.03
+	e.glow_hdr_threshold = 0.9
+	e.glow_blend_mode = Environment.GLOW_BLEND_MODE_SOFTLIGHT
+	e.fog_enabled = true
+	e.fog_light_color = Color("c99a6c")
+	e.fog_light_energy = 0.5
+	e.fog_density = 0.0022
+	e.fog_aerial_perspective = 0.1
+	e.adjustment_enabled = true
+	e.adjustment_saturation = 1.12
+	e.adjustment_contrast = 1.16
+	e.adjustment_brightness = 1.0
+
+
+## A warm late-afternoon key: honey-coloured, soft-edged shadows, a gentle sheen on lacquer.
+static func deco_key(key: DirectionalLight3D) -> void:
+	key.light_color = Color("ffd9a8")
+	key.light_energy = 0.75
+	key.light_specular = 0.45
+	key.shadow_blur = 2.5
+	key.light_angular_distance = 2.0
+	key.shadow_opacity = 0.75
 
 
 ## The promo-render grade: no tone mapping (highlights clip to white), shade filled by a blue
@@ -233,8 +297,7 @@ static func sun() -> DirectionalLight3D:
 	key.shadow_bias = 0.04
 	key.directional_shadow_max_distance = 25.0
 	key.rotation = Vector3(deg_to_rad(-78), deg_to_rad(-20), 0)
-	if CG:
-		cg_key(key)
+	grade_key(key)
 	return key
 
 
@@ -281,6 +344,10 @@ static func globe(parent: Node3D, at: Vector3, radius := 0.14) -> MeshInstance3D
 		_lamp_glass.emission_enabled = true
 		_lamp_glass.emission = Color("ff9448")
 		_lamp_glass.emission_energy_multiplier = 0.3
+		if DECO:   # lit frosted globes: cream-white glass glowing into the bloom
+			_lamp_glass.albedo_color = Color("f7e6c4")
+			_lamp_glass.emission = Color("ffd89c")
+			_lamp_glass.emission_energy_multiplier = 2.4
 		_lamp_cap = StandardMaterial3D.new()
 		_lamp_cap.albedo_color = Color("b39a5c")
 		_lamp_cap.metallic = 0.85

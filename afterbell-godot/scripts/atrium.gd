@@ -662,6 +662,11 @@ static func light_environment(e: Environment, key: DirectionalLight3D) -> void:
 		ST.cg_key(key)
 		key.light_energy = 0.95
 		key.light_specular = 0.6   # escalator glass would streak at full specular
+	elif ST.DECO:   # golden hour (Style.LOOK); same sun direction and reach
+		ST.deco_environment(e)
+		ST.deco_key(key)
+		key.light_energy = 0.6
+		key.light_specular = 0.3
 
 
 static func _lights(a: Node3D) -> void:

@@ -56,7 +56,14 @@ Ren's idle, run, guard, reflect, light and heavy attacks, and hit reaction are M
 - One strong sun with crisp shadows, a vivid blue sky that lights and reflects into the scene, and a mirror-still pool.
 - **No tone mapping**: colours stay pure and highlights clip, as those renderers did.
 
-The active grade is `Style.LOOK = "cg95"`, matched to the user's 90s promo-render reference:
+The active grade is `Style.LOOK = "deco"`, matched to the user's in-game department-store reference:
+- warm amber fill;
+- a soft honey key;
+- glowing cream globe lamps;
+- satin cream and plum;
+- filmic roll-off and gentle bloom.
+
+`"cg95"` is the 90s promo-render grade, matched to the user's earlier reference:
 - blue sky fill in the shade;
 - one crisp warm sun;
 - lacquer-gloss materials with clipped white hotspots, and a clear coat on Ren's plates;

@@ -58,6 +58,16 @@ small stock (price cards, perfume clusters, window stock) no longer casts shadow
 frames, portals, plaques, door leaves, sconces and glimpses merged per material; each room's
 loose static meshes merged (`Atrium.merge_direct`).
 
+## Look: golden-hour department store (current, user's in-game reference)
+`Style.LOOK = "deco"`:
+- warm amber ambient instead of the blue sky fill;
+- a soft honey key;
+- satin materials;
+- frosted globe lamps that glow into the bloom;
+- filmic tone mapping, saturation 1.12 and contrast 1.16.
+
+Checked with Forward+ renders of Cosmetics, the court, the aisle and the east gallery; all six test suites pass. The "cg95" grade below is kept as an option.
+
 ## Look: 90s promo render (user request, reference image)
 `Style.LOOK = "cg95"` (style.gd) restyles the game toward the 90s promo render the user picked:
 - no tone mapping, so highlights clip;
