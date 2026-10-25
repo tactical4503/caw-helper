@@ -284,7 +284,7 @@ func reset_attempt(keep: bool) -> void:
 	if not keep:
 		bells = 0
 		phase = 1
-	m_pos = MARK + Vector2(0, -2)
+	m_pos = Vector2(2.9, -3.9)   # waits off the aisle axis, so the bell reads on arrival; he rolls to his mark
 	mark = MARK
 	m_yaw = PI
 	chair_yaw = PI
@@ -1060,4 +1060,4 @@ func _render(dt: float) -> void:
 	var facing := look.normalized() if look.length() > 0.5 else Vector2(0, -1)
 	shake = maxf(0.0, shake - dt)
 	var court := Rect2(-6.8, MIN_Z - 1.0, 13.6, MAX_Z - MIN_Z + 1.2)
-	ShoulderCam.place(camera, p_pos, facing, dt, court, 66.0 if portrait else 55.0, wide, shake * 0.4)
+	ShoulderCam.place(camera, p_pos, facing, dt, court, 66.0 if portrait else 58.0, wide * 1.18, shake * 0.4)   # Ren about half the frame, as in the reference

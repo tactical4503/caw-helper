@@ -162,9 +162,10 @@ static func _mezzanine(a: Node3D) -> void:
 		rack(a, Vector3(x, level, -23.4), 0.0)
 	for x in [-5.3, 5.3]:
 		palm(a, Vector3(x, level, -25.1))
-	Props.counter(a, Vector3(0, level, -21.5), Vector3(2.4, Props.WAIST, 0.8), "cream", 0.08, Vector3(0, 0, -1))
-	Props.place(a, "perfume_boxes", Vector3(0, level + Props.WAIST, -21.55), 0.0, 3)
-	price(a, Vector3(0.75, level + Props.WAIST, -21.12), 0.0, "18.00")
+	# The centre of the mezzanine front is kept for the great service bell (builders.gd), framed
+	# by a palm each side.
+	for x in [-2.05, 2.05]:
+		palm(a, Vector3(x, level, MEZZ_Z - 1.4))
 	# Ferns at the rail's ends and where it breaks for the escalators.
 	for x in [-GALLERY_X + 0.6, -ESC_X - 1.25, ESC_X + 1.25, GALLERY_X - 0.6]:
 		Props.place(a, "planter", Vector3(x, level, MEZZ_Z - 0.55))
@@ -773,7 +774,7 @@ static func _under_balconies(a: Node3D) -> void:
 static func _window_shafts(a: Node3D) -> void:
 	var g := Gradient.new()
 	g.offsets = PackedFloat32Array([0.0, 0.35, 1.0])
-	g.colors = PackedColorArray([Color(1.0, 0.72, 0.55, 0.0), Color(1.0, 0.72, 0.55, 0.16), Color(1.0, 0.72, 0.55, 0.0)])
+	g.colors = PackedColorArray([Color(1.0, 0.72, 0.55, 0.0), Color(1.0, 0.72, 0.55, 0.06), Color(1.0, 0.72, 0.55, 0.0)])   # faint: stacked edge-on they clipped to a white line
 	var tex := GradientTexture2D.new()
 	tex.gradient = g
 	tex.fill_from = Vector2(0, 0)
@@ -914,7 +915,7 @@ static func _m(name: String) -> StandardMaterial3D:
 		"lily": m = ST.plastic(Color("f6f1e6"), 0.5, 0.0)
 		"vase": m = ST.plastic(Color("1d2b2a"), 0.2, 0.3)
 		"steps": m = ST.textured("metal_charcoal", 1.0, ST.plastic(Color("3a3c40"), 0.45, 0.6), 0.6)
-		"steel": m = ST.plastic(Color("9aa0a6"), 0.35, 0.8)
+		"steel": m = ST.plastic(Color("8e9399"), 0.62, 0.45)   # brushed, not mirrored: a glossy strip clipped to a white line at grazing angles
 		"rubber": m = ST.plastic(Color("141316"), 0.45, 0.0)
 		"skyline":
 			m = StandardMaterial3D.new()

@@ -32,7 +32,7 @@ func _initialize() -> void:
 			only = Array(arg.substr(7).split(","))
 	DirAccess.make_dir_recursive_absolute(out_dir)
 	Engine.set_meta("afterbell_testing", true)
-	root.size = Vector2i(1280, 720)
+	root.size = Vector2i(1280, 960)
 	_next()
 
 

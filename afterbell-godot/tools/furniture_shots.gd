@@ -33,7 +33,7 @@ func _initialize() -> void:
 		if arg.begins_with("--out="):
 			out_dir = arg.substr(6)
 	DirAccess.make_dir_recursive_absolute(out_dir)
-	root.size = Vector2i(1280, 720)
+	root.size = Vector2i(1280, 960)
 	var w := Node3D.new()
 	root.add_child(w)
 	var env := WorldEnvironment.new()
