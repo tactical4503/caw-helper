@@ -132,6 +132,11 @@ loose static meshes merged (`Atrium.merge_direct`).
 - Escalators: 1.45 m wide, with lighter blue-grey treads.
 - MENSWEAR floor: a walnut-framed glazed shopfront with an open centre doorway under the mezzanine.
 
+- MENSWEAR floor, continued:
+  - walnut panelling on its back wall and soffit;
+  - frosted globe pendants in place of the enamel shades.
+- Past the table: suit forms in dark suits, and the brass jacket rack turned to the aisle.
+
 **Checks:** all six test suites pass; the court costs 3272 draws.
 
 **Not identical:** the reference is a painting. The atrium is deeper than it shows, the court's side columns sit outside the frame, the shop under the mezzanine is less lit, and Ren is the game's model.

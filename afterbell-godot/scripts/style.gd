@@ -412,6 +412,23 @@ static func lantern(parent: Node3D, at: Vector3, face: Vector3, energy := 1.0, r
 	return light
 
 
+## A frosted glass globe pendant on a brass rod (the reference's lamps under the mezzanine).
+static func globe_pendant(parent: Node3D, at: Vector3, ceiling_y: float, energy := 1.0, reach := 6.0) -> OmniLight3D:
+	var rod := maxf(ceiling_y - at.y - 0.2, 0.05)
+	_fx_put(_fx_cyl(0.01, 0.01, rod, 6), _fx_mat("brass"), Vector3(at.x, at.y + 0.2 + rod * 0.5, at.z), parent)
+	_fx_put(_fx_cyl(0.06, 0.1, 0.06, 16), _fx_mat("brass"), at + Vector3(0, 0.19, 0), parent)
+	var g := globe(parent, at, 0.2)
+	g.scale = Vector3(1.0, 0.8, 1.0)
+	var light := OmniLight3D.new()
+	light.light_color = Color("ffd2a4")
+	light.light_energy = energy
+	light.light_specular = 0.1
+	light.omni_range = reach
+	light.position = at - Vector3(0, 0.25, 0)
+	parent.add_child(light)
+	return light
+
+
 static var _fx := {}
 
 

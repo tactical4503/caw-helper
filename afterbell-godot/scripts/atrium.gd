@@ -482,8 +482,8 @@ static func _lower_hall(a: Node3D) -> void:
 	# of the aisle, a brass rack of jackets, and racks along the escalator feet.
 	for p in [[Vector3(-1.4, 0, -11.4), 0.3, 0], [Vector3(1.5, 0, -11.8), -0.3, 2], [Vector3(-0.8, 0, -13.3), 0.1, 2],
 			[Vector3(0.9, 0, -13.7), -0.1, 0], [Vector3(-4.7, 0, -11.6), 0.4, 2], [Vector3(4.8, 0, -12.0), -0.4, 0]]:
-		Props.place(a, "mannequin", p[0], p[1], p[2] + 4 * ([1, 2, 1, 3, 2, 1][int(absf(p[0].x * 10.0)) % 6]))
-	Props.place(a, "rack", Vector3(2.05, 0, -8.4), PI / 2.0 - 0.15, 0)   # the brass jacket rack by the lily table
+		Props.place(a, "mannequin", p[0], p[1], 0 + 4 * ([1, 2, 1, 3, 2, 1][int(absf(p[0].x * 10.0)) % 6]))   # dark suits
+	Props.place(a, "rack", Vector3(2.15, 0, -8.6), -0.55, 0)   # the brass jacket rack by the lily table, turned to the aisle
 	rack(a, Vector3(-5.3, 0, -15.0), 0.15)
 	rack(a, Vector3(5.4, 0, -15.4), -0.15)
 	for side in [-1.0, 1.0]:
@@ -548,7 +548,11 @@ static func _colonnade(a: Node3D) -> void:
 		_put(_box(2.0, 0.6, 0.2), _m("walnut"), Vector3(x, 0.3, fz), a)                     # stall risers under the glass
 		_put(_box(2.04, 0.04, 0.24), _m("brass"), Vector3(x, 0.61, fz), a)
 	# Under the mezzanine, the MENSWEAR floor glows: a pendant, warm light and stocked shelving.
-	_amber(ST.pendant(a, Vector3(0, 3.7, MEZZ_Z - 1.6), LEVELS[0] - SLAB, 1.4, 8.0))
+	_amber(ST.globe_pendant(a, Vector3(0, 3.6, MEZZ_Z - 1.6), LEVELS[0] - SLAB, 1.4, 8.0))
+	# Dark walnut cladding on the back wall and soffit under the mezzanine: the reference's
+	# MENSWEAR floor is a warm, dark-panelled room seen through the glass.
+	_put(_box(GALLERY_X * 2.0, LEVELS[0] - SLAB, 0.06), _m("walnut_dark"), Vector3(0, (LEVELS[0] - SLAB) * 0.5, NORTH_Z + 0.04), a)
+	_put(_box(GALLERY_X * 2.0, 0.04, MEZZ_Z - NORTH_Z), _m("walnut"), Vector3(0, LEVELS[0] - SLAB - 0.02, (MEZZ_Z + NORTH_Z) * 0.5), a, false)
 	var shop_glow := OmniLight3D.new()
 	shop_glow.light_color = AMBER
 	shop_glow.light_energy = 3.2
@@ -566,7 +570,7 @@ static func _colonnade(a: Node3D) -> void:
 	rack(a, Vector3(-6.0, 0, -24.0), 0.0)
 	rack(a, Vector3(6.0, 0, -24.0), 0.0)
 	for x in [-4.5, 4.5]:
-		_amber(ST.pendant(a, Vector3(x, 3.7, -22.6), LEVELS[0] - SLAB, 1.0, 6.0))
+		_amber(ST.globe_pendant(a, Vector3(x, 3.6, -22.6), LEVELS[0] - SLAB, 1.0, 6.0))
 
 
 ## The broad central aisle: a lighter runner with ivory borders from the court to the mezzanine.
@@ -1026,6 +1030,7 @@ static func _m(name: String) -> StandardMaterial3D:
 		"frame_dark": m = ST.plastic(Color("2b2420"), 0.45, 0.35)
 		"flute": m = ST.plastic(Color("d6ccb8"), 0.7, 0.0)
 		"walnut": m = ST.plastic(Color("5e3a22"), 0.5, 0.0)
+		"walnut_dark": m = ST.plastic(Color("3a2216"), 0.55, 0.0)
 		"nosing": m = ST.plastic(Color("c9a64a"), 0.5, 0.3)
 		"runner": m = ST.textured("carpet_sage", 0.5, ST.plastic(Color("3a5650"), 0.9, 0.0))
 		"glass_clear":
