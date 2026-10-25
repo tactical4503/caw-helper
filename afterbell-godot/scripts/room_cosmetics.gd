@@ -122,6 +122,14 @@ func _ready() -> void:
 	gauge.set_biscuits(2)
 	gauge.set_objective("Return the sale sign to the receiver")
 	_build_hud()
+	var shell := get_node_or_null("/root/Game")
+	if shell == null or not shell.flag("opened"):
+		# The chapter's opening (Installment 002, section 1): the stopped clock, the goal in view.
+		say("", "Bellwether's Department Store. Outside, the tower clock has stopped at 5:59.", 3.2)
+		say("MIKA", "The store thinks it closes at six. So we have a minute — forever.", 3.0)
+		say("NELL", "The service bell's up past the atrium. Through that gate.", 2.8)
+		if shell:
+			shell.set_flag("opened")
 	say("NELL", "It keeps doing that. Over and over.", 2.6)
 	say("MIKA", "It's feeding the gate release. Catch the sign with the flat of Knock — send it to the receiver over the west door.", 4.2)
 	say("", "Tap guard (K) just as the bordered sign reaches you.", 3.0)
@@ -334,7 +342,8 @@ func _build_room() -> void:
 	mirror.name = "Mirror"
 	B.put(B.cyl(0.06, 0.07, 0.2), ST.plastic(Color("d4b0e0"), 0.1, 0.0), Vector3(3.2, 1.15, 0.6), self)
 	B.put(B.box(0.25, 0.16, 0.02), B.mat(B.CREAM, 0.5), Vector3(-3.2, 1.12, 0.6), self)
-	interactables = [[Vector2(-3.2, -1.7), "mirror"], [Vector2(3.2, 1.3), "atomizer"], [Vector2(-3.2, 1.3), "price"]]
+	interactables = [[Vector2(-3.2, -1.7), "mirror"], [Vector2(3.2, 1.3), "atomizer"], [Vector2(-3.2, 1.3), "price"],
+			[Vector2(3.5, -0.85), "attendant"]]
 
 
 func _build_hud() -> void:
@@ -424,7 +433,7 @@ func _update_player(dt: float) -> void:
 		if p_pos.x < -HALF_W - 0.6 and not leaving:
 			_leave()
 	elif near != "":
-		gauge.show_prompt("interact", {"mirror": "Look in the mirror", "atomizer": "Try the atomizer", "price": "Read the price card"}[near])
+		gauge.show_prompt("interact", {"mirror": "Look in the mirror", "atomizer": "Try the atomizer", "price": "Read the price card", "attendant": "Watch the attendant"}[near])
 		if pressed.get("eat", false):
 			_interact(near)
 	elif hinted and not gate_open:
@@ -442,6 +451,15 @@ func _interact(what: String) -> void:
 			sfx.noise(0.25, 0.12)
 		"price":
 			say("", "\"Travel flask: keeps soup warm; lid sold with flask.\"", 2.8)
+		"attendant":
+			if gate_open:
+				# Its errand is done, so it tends the counter: one tester, set exactly square.
+				attendant_arm.rotation.x = -1.3
+				say("", "The attendant sets a toppled tester upright, turns its label to face the aisle, and bows a fraction.", 3.2)
+				if used.has("attendant"):
+					say("NELL", "It did that one already. It's doing it again, better.", 2.4)
+			else:
+				say("", "Its head follows the placard, not you. The sale sign is the only customer it can see.", 3.0)
 	if not used.has(what):
 		used[what] = true
 
@@ -552,6 +570,7 @@ func _open_gate() -> void:
 	sfx.spring()
 	sfx.chime_errand()
 	_toast("Errand complete  ·  the hats gate is open")
+	_flag("cosmetics_done")
 	say("", "The receiver tilts. Its linkage rises. The hats gate rolls into the wall.", 2.6)
 	say("", "Notebook: \"Return marked signs with the flat of the blade.\"", 3.0)
 	say("MIKA", "That cable runs to the escalators. West, through Hats.", 2.8)
@@ -585,3 +604,14 @@ func _toast(text: String) -> void:
 	var game := get_node_or_null("/root/Game")
 	if game:
 		game.toast(text)
+
+
+func _flag(key: String) -> void:
+	var game := get_node_or_null("/root/Game")
+	if game:
+		game.set_flag(key)
+
+
+func _has_flag(key: String) -> bool:
+	var game := get_node_or_null("/root/Game")
+	return game != null and bool(game.flag(key))

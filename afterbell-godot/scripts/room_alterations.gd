@@ -71,6 +71,7 @@ var leaving := false
 var next_scene := "res://main.tscn"
 var solids: Array = []
 var interactables: Array = []             # [Vector2, id]
+var used := {}                            # ids already examined (second looks get a second line)
 
 var camera: Camera3D
 var sfx
@@ -109,6 +110,8 @@ func _ready() -> void:
 	gauge.set_objective("Open the gate to the atrium")
 	_build_hud()
 	say("MIKA", "Alterations. The atrium gate's on the east wall — and its crank has snapped.", 3.2)
+	if _has_flag("hats_cleared"):
+		say("NELL", "Hats is quiet now. Those two looked almost relieved to sit down.", 2.8)
 	_place_camera(1.0)
 	var game := get_node_or_null("/root/Game")
 	if game:
@@ -304,7 +307,7 @@ func _build_rooms() -> void:
 	interactables = [
 		[Vector2(STALL.x, STALL.y + 1.5), "tailor"], [Vector2(DOOR_X + 0.65, -4.3), "sleeve"],
 		[SOCKET, "socket"], [Vector2(0.6, -11.2), "tins"], [Vector2(2.8, -7.5), "len"], [Vector2(-0.9, -8.9), "hesta"],
-		[Vector2(-4.0, -1.4), "pincushion"],
+		[Vector2(-4.0, -1.4), "pincushion"], [Vector2(-2.6, 0.5), "cutting"],
 	]
 
 
@@ -472,6 +475,11 @@ func _use(id: String) -> void:
 			say("HESTA", "Count them first. Then promise.", 2.2)
 		"pincushion":
 			say("", "A pincushion in a saucer. Someone left in a hurry mid-hem.", 2.4)
+		"cutting":
+			say("", "The cutting table: a waistcoat pattern pinned to plum wool, the chalk line stopped halfway along the hem.", 3.2)
+			if used.has("cutting"):
+				say("TAILOR", "Leave the chalk. I know where I was.", 2.0)
+	used[id] = true
 
 
 func _hesta_scene() -> void:
@@ -486,6 +494,8 @@ func _hesta_scene() -> void:
 	say("HESTA", "Ask how many before you promise.", 2.4)
 	say("REN", "How many?", 1.4)
 	say("HESTA", "Two. In Toys. And the fitter won't leave her counter. I don't know whether she counts as one of mine yet.", 4.4)
+	if _has_flag("souvenir_sv01"):
+		say("HESTA", "That pin on your collar is from the rooftop lunchroom. Keep it. Nobody's eating up there tonight.", 3.6)
 
 
 func _start_crank() -> void:
@@ -583,3 +593,14 @@ func _toast(text: String) -> void:
 	var game := get_node_or_null("/root/Game")
 	if game:
 		game.toast(text)
+
+
+func _flag(key: String) -> void:
+	var game := get_node_or_null("/root/Game")
+	if game:
+		game.set_flag(key)
+
+
+func _has_flag(key: String) -> bool:
+	var game := get_node_or_null("/root/Game")
+	return game != null and bool(game.flag(key))

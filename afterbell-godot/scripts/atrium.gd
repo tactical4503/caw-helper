@@ -547,6 +547,11 @@ static func _shops(a: Node3D) -> void:
 ## One shop front built out from a wall: pilasters, a fascia with its name plaque, two display
 ## windows with mannequins on plum plinths, and a recessed, lit entrance with open doors.
 ## Local frame: origin on the wall face at floor level, +z out toward the atrium.
+## Which window_stock arrangement each department's windows show (Props.window_stock).
+const DEPARTMENT_STOCK := {"LEATHER GOODS": 0, "PERFUMERY": 1, "MILLINERY": 2, "FOOTWEAR": 3,
+		"GLOVES  ·  HOSIERY": 4, "TAILORING": 5, "GENTLEMEN'S OUTFITTERS": 6}
+
+
 static func shop_front(a: Node3D, at: Vector3, yaw: float, name: String) -> void:
 	var f := Node3D.new()
 	f.position = at
@@ -587,6 +592,9 @@ static func shop_front(a: Node3D, at: Vector3, yaw: float, name: String) -> void
 		_put(_box(win_w, 0.05, 0.08), _m("brass"), Vector3(wx, 2.67, depth - 0.05), f)
 		var m := Props.place(f, "mannequin", Vector3(wx, 0.53, depth * 0.45), 0.0, int(absf(wx) * 3.0 + name.length() + sx) % 16)
 		m.scale = Vector3.ONE * 0.92
+		# The department's own stock either side of the mannequin.
+		var stock := Props.place(f, "window_stock", Vector3(wx, 0.53, depth * 0.45), 0.0, DEPARTMENT_STOCK.get(name, 6))
+		stock.scale = Vector3.ONE * 0.95
 	# Fascia with the shop's name, a cornice above it.
 	_put(_box(total, 0.7, depth + 0.15), _m("cream"), Vector3(0, h + 0.35, depth * 0.5), f)
 	_put(_box(total + 0.2, 0.08, depth + 0.3), _m("cream"), Vector3(0, h + 0.74, depth * 0.5), f)
@@ -606,6 +614,10 @@ static func _dress_aisles(a: Node3D) -> void:
 	var prices := ["24.00", "6.25", "32.50"]
 	for i in 3:
 		var z: float = [-6.5, -1.5, 3.5][i]
+		if i == 1:   # in front of LEATHER GOODS: its own table of bags, wallets, belts and cases
+			Props.place(a, "leather_table", Vector3(10.6, 0, z), -PI / 2.0, 0)
+			price(a, Vector3(10.36, Props.WAIST * 0.82, z - 0.5), -PI / 2.0, prices[i])
+			continue
 		Props.place(a, "perfume_counter", Vector3(10.6, 0, z), -PI / 2.0, int(z) & 3)
 		price(a, Vector3(10.32, Props.WAIST, z - 0.6), -PI / 2.0, prices[i])
 	# The wall between the first two shop fronts: three bays of the same stock lines.

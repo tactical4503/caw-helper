@@ -20,6 +20,8 @@ const VIEWS := [
 	["poses", Vector3(-14.5, 1.5, 3.4), Vector3(-14.5, 1.1, 0)],
 	["shelves", Vector3(-21.2, 1.4, 3.6), Vector3(-21.2, 1.1, -1.0)],
 	["plants", Vector3(-27.0, 2.1, 3.6), Vector3(-27.0, 1.3, -0.6)],
+	["stock_a", Vector3(19.4, 1.5, 2.6), Vector3(19.4, 0.6, -0.6)],
+	["stock_b", Vector3(24.4, 1.5, 2.6), Vector3(24.4, 0.6, -0.6)],
 ]
 
 var out_dir := "user://furniture"
@@ -72,6 +74,17 @@ func _initialize() -> void:
 	Props.place(w, "planter", Vector3(-29.0, 0, 0), 0.0, 0)
 	Props.place(w, "centrepiece", Vector3(-27.0, 0, -1.0))
 	Props.place(w, "planter", Vector3(-25.0, 0, 0), 0.0, 1)
+	for k in 7:   # each department's window stock on a plum plinth, and the leather table
+		var x := 17.0 + k * 1.65
+		var plinth := MeshInstance3D.new()
+		var pb := BoxMesh.new()
+		pb.size = Vector3(1.5, 0.5, 0.9)
+		plinth.mesh = pb
+		plinth.material_override = Props._m("plum")
+		plinth.position = Vector3(x, 0.25, -0.4)
+		w.add_child(plinth)
+		Props.place(w, "window_stock", Vector3(x, 0.5, -0.4), 0.0, k)
+	Props.place(w, "leather_table", Vector3(23.6, 0, 1.0), 0.0, 0)
 	for x in [1.5, 6.1, -4.8, 8.2, -17.2, -28.2]:   # Ren's height
 		var post := MeshInstance3D.new()
 		var c := CylinderMesh.new()
@@ -82,7 +95,7 @@ func _initialize() -> void:
 		post.position = Vector3(x, Props.REN_HEIGHT * 0.5, 0.6)
 		post.material_override = ST.plastic(Color("b0302a"), 0.6, 0.0)
 		w.add_child(post)
-	for lx in [-27.0, -21.0, -15.0, -4.0, 0.0, 5.0, 10.0]:
+	for lx in [-27.0, -21.0, -15.0, -4.0, 0.0, 5.0, 10.0, 19.0, 25.0]:
 		ST.ceiling_light(w, Vector3(lx, 3.6, 1.2), 1.2, 9.0)
 	cam = Camera3D.new()
 	cam.fov = 45

@@ -48,6 +48,7 @@ class Arena:
 	var cabinet_door: Node3D
 	var lever: Node3D
 	var bell_dome: MeshInstance3D
+	var bell_glow: OmniLight3D
 	var lane_marks: Node3D
 	var aim_arrow: Node3D
 
@@ -343,6 +344,12 @@ static func build_arena(parent: Node3D) -> Arena:
 	dome_mat.emission_enabled = true
 	dome_mat.emission = Color("4a3010")
 	a.bell_dome = put(dome, dome_mat, Vector3(0, g_top + 0.14, 0), grand)
+	a.bell_glow = OmniLight3D.new()   # flares when the bell is rung (main.gd)
+	a.bell_glow.light_color = Color("ffcf8a")
+	a.bell_glow.light_energy = 0.0
+	a.bell_glow.omni_range = 5.0
+	a.bell_glow.position = Vector3(0, g_top + 1.4, 1.2)
+	grand.add_child(a.bell_glow)
 	put(cyl(1.06, 1.12, 0.07, 56), dome_mat, Vector3(0, 0.0, 0), a.bell_dome)                # flared lip
 	put(cyl(0.2, 0.27, 0.08, 24), dome_mat, Vector3(0, 0.95, 0), a.bell_dome)                # crown boss
 	put(cyl(0.055, 0.055, 0.24, 12), brass(), Vector3(0, 1.1, 0), a.bell_dome)               # plunger

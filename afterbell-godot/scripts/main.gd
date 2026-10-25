@@ -64,6 +64,8 @@ var first_exposure := true
 var signs_said := 0
 var victory_t := 0.0
 var reward_shown := false
+var bell_glow := 0.0
+var intro_t := 0.0          # arrival: the camera holds the aisle view of the bell, then joins Ren
 
 # Ren
 var p_pos := ENTRY
@@ -217,6 +219,7 @@ func _ready() -> void:
 	if game and not Engine.has_meta("afterbell_testing"):
 		Engine.set_meta("afterbell_skip_title", true)
 		game.enter_room(game.COURT, "Menswear Court")
+	intro_t = 2.6
 	if Engine.has_meta("afterbell_skip_title"):
 		Engine.remove_meta("afterbell_skip_title")
 		_on_start.call_deferred()
@@ -327,7 +330,11 @@ func reset_attempt(keep: bool) -> void:
 		r.dir = 1
 	arena.lane_marks.visible = phase >= 2
 	dialogue.clear()
-	say("MIKA", "Bell's behind him. Get his brake open and we can reach the governor.", 3.0)
+	say("MIKA", "The bell's up behind him. Get his brake open and steer him into the lever.", 3.0)
+	var game := get_node_or_null("/root/Game")
+	if game and game.flag("souvenir_sv01") and bells == 0:
+		say("NELL", "You wore the lunchroom pin to a boss fight.", 2.2)
+		say("REN", "It's a uniform.", 1.6)
 	_update_hud()
 
 
@@ -793,6 +800,7 @@ func _bell_collision() -> void:
 	bells += 1
 	freeze = HIT_FREEZE
 	sfx.bell()
+	bell_glow = 1.0   # the great bell answers: a warm flare under the mezzanine fixture
 	_add_shake(0.12)
 	m_state = "bell_scene"
 	m_pos -= m_dir * 0.4
@@ -1044,6 +1052,8 @@ func _render(dt: float) -> void:
 	lever_kick = maxf(0.0, lever_kick - dt * 3.0)
 	arena.lever.rotation.x = -lever_kick * 0.25
 	arena.bell_dome.rotation.z = sin(time * 60.0) * 0.02 * lever_kick
+	bell_glow = maxf(0.0, bell_glow - dt * 0.8)
+	arena.bell_glow.light_energy = 3.0 * bell_glow * bell_glow
 	for f in tab_falls:
 		var tab: MeshInstance3D = f[0]
 		if tab.position.y > -3.0:
@@ -1080,3 +1090,10 @@ func _render(dt: float) -> void:
 	shake = maxf(0.0, shake - dt)
 	var court := Rect2(-6.8, MIN_Z - 1.0, 13.6, MAX_Z - MIN_Z + 1.2)
 	ShoulderCam.place(camera, p_pos, facing, dt, court, 66.0 if portrait else 58.0, wide * 1.18, shake * 0.4)   # Ren about half the frame, as in the reference
+	if intro_t > 0.0 and mode == "play":
+		# Arrival: open on the aisle and the bell on the mezzanine, then ease into the follow camera.
+		intro_t = maxf(0.0, intro_t - dt)
+		var k := smoothstep(0.0, 1.0, clampf(intro_t / 1.6, 0.0, 1.0))
+		var est := Transform3D(Basis.IDENTITY, Vector3(0.0, 2.3, 8.0)).looking_at(Vector3(0.0, 4.6, -19.8), Vector3.UP)
+		camera.global_transform = camera.global_transform.interpolate_with(est, k)
+		camera.fov = lerpf(camera.fov, 56.0, k)

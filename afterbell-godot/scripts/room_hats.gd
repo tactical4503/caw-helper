@@ -33,6 +33,7 @@ const HALF_W := 5.0
 const HALF_D := 9.0
 const ENTRY := Vector2(4.2, 5.0)           # from Cosmetics, through the east wall
 const EXIT_X := 0.9                         # north door half-width
+const NOTICE_AT := Vector2(3.3, 1.9)          # in front of the easel by the east wall
 const PARTITION_Z := -3.3                   # hat shelving across the room with the aisle gap
 const RACK_Z := -2.4                        # rack guide, just south of the shelving
 const RACK_START := 0.0
@@ -98,6 +99,7 @@ var pin_taken := false
 var pin_node: Node3D
 var leaving := false
 var next_scene := "res://rooms/alterations.tscn"
+var read_notice := false
 var solids: Array = []    # Rect2 footprints in (x, z)
 var trees: Array = []     # Vector2 centres, radius 0.35
 
@@ -388,9 +390,18 @@ func _update_player(dt: float) -> void:
 		act_t = REFLECT_DODGE
 		sfx.swing()
 	var near_pin := not pin_taken and p_pos.distance_to(PIN_AT + Vector2(0, 0.6)) < 0.9
+	var near_notice := p_pos.distance_to(NOTICE_AT) < 1.0
 	if pressed.get("eat", false) and free:
 		if near_pin:
 			_take_pin()
+		elif near_notice:
+			sfx.interact()
+			if not read_notice:
+				say("", "A notice in a very tidy hand: \"Staff will not leave their counters. Hats are tried with clean hands. — F.M.\"", 3.6)
+				say("MIKA", "The Floor Manager. He's been writing rules for a store with no customers.", 2.8)
+			else:
+				say("", "Someone has added, in pencil, very small: \"breaks?\"", 2.4)
+			read_notice = true
 		elif biscuits > 0 and hp < 6:
 			biscuits -= 1
 			act = "eat"
@@ -442,6 +453,8 @@ func _update_player(dt: float) -> void:
 	var near_handle := absf(p_pos.y - RACK_Z) < 0.75 and (absf(p_pos.x - (rack_x - RACK_HALF.x)) < 0.8 or absf(p_pos.x - (rack_x + RACK_HALF.x)) < 0.8)
 	if near_pin:
 		gauge.show_prompt("interact", "Take the souvenir pin")
+	elif near_notice:
+		gauge.show_prompt("interact", "Read the notice")
 	elif near_handle:
 		gauge.show_prompt("guard", "Hold guard and walk — PUSH")
 	elif charging and charge_t >= HEAVY_CHARGE:
@@ -678,6 +691,7 @@ func _check_clear() -> void:
 	gauge.set_objective("North — to Alterations")
 	sfx.chime_errand()
 	_toast("The etiquette guards are sitting down  ·  the aisle is clear")
+	_flag("hats_cleared")
 	say("MIKA", "They'll be fine. Breaks were overdue.", 2.4)
 	for g in guards:
 		var gg: Guard = g
@@ -695,9 +709,7 @@ func _take_pin() -> void:
 	sfx.pip()
 	Engine.set_meta("afterbell_sv01", true)
 	_toast("Souvenir pin SV-01 found")
-	var game := get_node_or_null("/root/Game")
-	if game:
-		game.set_flag("souvenir_sv01")
+	_flag("souvenir_sv01")
 	say("", "Souvenir pin SV-01: a tiny cream umbrella — the rooftop lunchroom's.", 3.0)
 
 
@@ -764,3 +776,14 @@ func _toast(text: String) -> void:
 	var game := get_node_or_null("/root/Game")
 	if game:
 		game.toast(text)
+
+
+func _flag(key: String) -> void:
+	var game := get_node_or_null("/root/Game")
+	if game:
+		game.set_flag(key)
+
+
+func _has_flag(key: String) -> bool:
+	var game := get_node_or_null("/root/Game")
+	return game != null and bool(game.flag(key))

@@ -3,6 +3,10 @@ extends RefCounted
 ##
 ##   Props.place(parent, "rack", Vector3(x, 0, z), yaw, variant)
 ##
+## Department stock: window_stock (a shop-window arrangement per department: 0 leather goods,
+## 1 perfumery, 2 millinery, 3 footwear, 4 gloves and hosiery, 5 tailoring, 6 outfitters) and
+## leather_table (handbags, wallets, belts and a suitcase stack on a walnut table).
+##
 ## Kinds: rack (0 suits, 1 dresses), mannequin (look = variant % 4: 0 navy suit + fedora,
 ## 1 cream dress + cloche, 2 brown suit, 3 plum dress; pose = variant / 4: 0 presenting,
 ## 1 hand on hip, 2 hands clasped, 3 hand to the hat brim), perfume_counter, perfume_tower,
@@ -32,6 +36,7 @@ const HALF := {
 	"perfume_tower": Vector2(0.6, 0.6), "flower_display": Vector2(0.66, 0.66), "easel": Vector2(0.36, 0.32),
 	"folded_table": Vector2(0.68, 0.38), "mannequin_group": Vector2(0.88, 0.88),
 	"centrepiece": Vector2(1.25, 1.25), "shelf_unit": Vector2(0.64, 0.24), "planter": Vector2(0.34, 0.34),
+	"leather_table": Vector2(0.68, 0.38),
 }
 
 static var _cache := {}
@@ -179,6 +184,8 @@ static func _build(kind: String, v: int) -> Node3D:
 		"centrepiece": _centrepiece(n)
 		"shelf_unit": _shelf_unit(n, v)
 		"planter": _planter(n, v)
+		"window_stock": _window_stock(n, v)
+		"leather_table": _leather_table(n, v)
 		"hanging_sign": _hanging_sign(n)
 	return n
 
@@ -366,13 +373,7 @@ static func _bottle_at(n: Node3D, at: Vector3, glass: String, h: float, r: float
 ## A walnut display table of folded knitwear: three neat stacks, one colour each.
 static func _folded_table(n: Node3D, v: int) -> void:
 	var h := WAIST * 0.82
-	_put(rounded_block(1.3, 0.05, 0.7, 0.06, 0.012), _m("walnut"), Vector3(0, h - 0.05, 0), n)
-	_put(rounded_block(1.2, 0.09, 0.6, 0.04), _m("walnut_dark"), Vector3(0, h - 0.14, 0), n)   # apron
-	_put(_box(1.24, 0.014, 0.64), _m("brass"), Vector3(0, h - 0.05, 0), n)
-	for x in [-0.55, 0.55]:
-		for z in [-0.25, 0.25]:
-			_put(_cyl(0.025, 0.018, h - 0.14, 10), _m("walnut"), Vector3(x, (h - 0.14) * 0.5, z), n)
-			_put(_cyl(0.022, 0.022, 0.03, 10), _m("brass"), Vector3(x, 0.015, z), n)
+	_folded_table_frame(n)
 	var stacks: Array = [["suit_navy", "suit_charcoal", "dress_cream"], ["dress_rose", "plum", "dress_cream"],
 			["dress_sage", "dress_cream", "suit_brown"], ["box_lilac", "plum", "box_pink"]][v % 4]
 	for k in 3:
@@ -385,6 +386,18 @@ static func _folded_table(n: Node3D, v: int) -> void:
 	_put(_box(0.12, 0.01, 0.05), _m("brass"), Vector3(0.0, h + 0.005, 0.3), n)
 	var card := _put(_box(0.16, 0.1, 0.006), _m("sale_red"), Vector3(0.0, h + 0.06, 0.3), n)
 	card.rotation.x = -0.3
+
+
+## The walnut display table under the folded stock: top, apron, brass edge, four legs.
+static func _folded_table_frame(n: Node3D) -> void:
+	var h := WAIST * 0.82
+	_put(rounded_block(1.3, 0.05, 0.7, 0.06, 0.012), _m("walnut"), Vector3(0, h - 0.05, 0), n)
+	_put(rounded_block(1.2, 0.09, 0.6, 0.04), _m("walnut_dark"), Vector3(0, h - 0.14, 0), n)   # apron
+	_put(_box(1.24, 0.014, 0.64), _m("brass"), Vector3(0, h - 0.05, 0), n)
+	for x in [-0.55, 0.55]:
+		for z in [-0.25, 0.25]:
+			_put(_cyl(0.025, 0.018, h - 0.14, 10), _m("walnut"), Vector3(x, (h - 0.14) * 0.5, z), n)
+			_put(_cyl(0.022, 0.022, 0.03, 10), _m("brass"), Vector3(x, 0.015, z), n)
 
 
 ## Two mannequins posed toward each other on a shared round platform.
@@ -606,6 +619,189 @@ static func _price_card(n: Node3D) -> void:
 	_put(_box(0.135, 0.075, 0.004), _m("shirt"), Vector3(0, 0.105, 0), n)
 	_put(_box(0.145, 0.085, 0.002), _m("brass"), Vector3(0, 0.105, -0.003), n)
 	_put(_box(0.02, 0.012, 0.008), _m("brass"), Vector3(0, 0.067, 0), n)   # clip
+
+
+
+# ---------------------------------------------------------------- department stock
+
+const LEATHERS := ["suit_brown", "plum", "dress_cream", "shoe", "leather_tan"]
+
+
+## A structured handbag standing on its base, front +z: body with a softened top, a front flap
+## with a brass clasp, a rolled top handle on brass lugs and four small brass feet.
+static func handbag(n: Node3D, at: Vector3, yaw: float, leather: Material, scale := 1.0) -> void:
+	var b := Node3D.new()
+	b.position = at
+	b.rotation.y = yaw
+	b.scale = Vector3.ONE * scale
+	n.add_child(b)
+	_put(rounded_block(0.32, 0.22, 0.12, 0.035, 0.02), leather, Vector3(0, 0.008, 0), b)
+	var flap := _put(rounded_block(0.33, 0.1, 0.02, 0.03, 0.008), leather, Vector3(0, 0.13, 0.058), b)
+	flap.rotation.x = -0.05
+	_put(_box(0.04, 0.03, 0.012), _m("brass"), Vector3(0, 0.13, 0.072), b)                # clasp
+	var prev := Vector3(-0.1, 0.22, 0)
+	for k in range(1, 7):
+		var a := PI * k / 6.0
+		var q := Vector3(-0.1 * cos(a), 0.22 + 0.11 * sin(a), 0)
+		_tube(b, prev, q, 0.011, leather, 6)
+		prev = q
+	for sx in [-0.1, 0.1]:
+		_put(_box(0.03, 0.02, 0.025), _m("brass"), Vector3(sx, 0.225, 0), b)          # handle lugs
+		for sz in [-0.04, 0.04]:
+			_put(_sphere(0.008, 6), _m("brass"), Vector3(sx * 1.3, 0.004, sz), b)       # feet
+
+
+## A hard-sided suitcase lying flat, handle toward +z: body, two leather straps with brass
+## buckles, brass corner caps, a carry handle and a cream luggage tag.
+static func suitcase(n: Node3D, at: Vector3, yaw: float, shell: Material, w := 0.62, d := 0.42, h := 0.2) -> void:
+	var c := Node3D.new()
+	c.position = at
+	c.rotation.y = yaw
+	n.add_child(c)
+	_put(rounded_block(w, h, d, 0.04, 0.012), shell, Vector3.ZERO, c)
+	_put(_box(w + 0.006, 0.012, d + 0.006), _m("walnut_dark"), Vector3(0, h * 0.5, 0), c)   # lid seam
+	for sx in [-w * 0.28, w * 0.28]:
+		_put(_box(0.05, h + 0.012, d + 0.012), _m("suit_brown"), Vector3(sx, h * 0.5 - 0.003, 0), c)
+		_put(_box(0.06, 0.04, 0.012), _m("brass"), Vector3(sx, h * 0.62, d * 0.5 + 0.008), c)
+	for cx in [-1.0, 1.0]:
+		for cz in [-1.0, 1.0]:
+			_put(_sphere(0.022, 8), _m("brass"), Vector3(cx * (w * 0.5 - 0.02), h - 0.02, cz * (d * 0.5 - 0.02)), c)
+	var prev := Vector3(-0.08, h * 0.55, d * 0.5)
+	for k in range(1, 6):
+		var a := PI * k / 5.0
+		var q := Vector3(-0.08 * cos(a), h * 0.55 + 0.035 * sin(a), d * 0.5 + 0.045 * sin(a))
+		_tube(c, prev, q, 0.012, _m("shoe"), 6)
+		prev = q
+	var tag := _put(_box(0.07, 0.004, 0.045), _m("dress_cream"), Vector3(0.12, h + 0.002, d * 0.38), c)
+	tag.rotation.y = 0.4
+
+
+## A wallet lying open-fanned: two leaves and a stitched edge.
+static func wallet(n: Node3D, at: Vector3, yaw: float, leather: Material) -> void:
+	var w := Node3D.new()
+	w.position = at
+	w.rotation.y = yaw
+	n.add_child(w)
+	_put(rounded_block(0.11, 0.018, 0.085, 0.01), leather, Vector3.ZERO, w)
+	var leaf := _put(rounded_block(0.105, 0.008, 0.08, 0.01), leather, Vector3(0.01, 0.02, 0.0), w)
+	leaf.rotation.z = -0.25
+	_put(_box(0.1, 0.002, 0.003), _m("dress_cream"), Vector3(0, 0.019, 0.036), w)       # stitching
+
+
+## A belt coiled flat with its brass buckle on top.
+static func belt_coil(n: Node3D, at: Vector3, leather: Material) -> void:
+	for k in 3:
+		var ring := TorusMesh.new()
+		ring.inner_radius = 0.045 + k * 0.012
+		ring.outer_radius = 0.052 + k * 0.012
+		ring.rings = 24
+		ring.ring_segments = 6
+		var mi := _put(ring, leather, at + Vector3(0, 0.012, 0), n)
+		mi.scale = Vector3(1, 3.2, 1)
+	_put(_box(0.045, 0.006, 0.035), _m("brass"), at + Vector3(0.07, 0.028, 0), n)
+	_put(_box(0.03, 0.007, 0.02), _m("walnut_dark"), at + Vector3(0.07, 0.029, 0), n)
+
+
+## A pair of short cream gloves laid crossed.
+static func glove_pair(n: Node3D, at: Vector3, yaw: float, leather: Material) -> void:
+	for k in 2:
+		var g := Node3D.new()
+		g.position = at + Vector3(k * 0.05, k * 0.012, k * 0.02)
+		g.rotation.y = yaw + (k - 0.5) * 0.5
+		n.add_child(g)
+		_put(rounded_block(0.08, 0.015, 0.11, 0.03), leather, Vector3.ZERO, g)            # palm
+		_put(rounded_block(0.07, 0.014, 0.07, 0.02), leather, Vector3(0, 0, -0.085), g)   # cuff
+		for f in 4:
+			_put(_capsule(0.009, 0.06), leather, Vector3(-0.027 + f * 0.018, 0.007, 0.08), g).rotation.x = PI / 2.0
+		_put(_capsule(0.01, 0.05), leather, Vector3(0.045, 0.007, 0.025), g).rotation = Vector3(PI / 2.0, 0, -0.7)
+
+
+## A rolled bolt of cloth lying on its side, with the paper core showing.
+static func cloth_bolt(n: Node3D, at: Vector3, yaw: float, cloth: Material, length := 0.5) -> void:
+	var b := _put(_cyl(0.07, 0.07, length, 16), cloth, at + Vector3(0, 0.07, 0), n)
+	b.rotation = Vector3(0, yaw, PI / 2.0)
+	var core := _put(_cyl(0.02, 0.02, length + 0.02, 10), _m("carton"), at + Vector3(0, 0.07, 0), n)
+	core.rotation = Vector3(0, yaw, PI / 2.0)
+
+
+## A low cream riser block for lifting one item in a display.
+static func _riser_block(n: Node3D, at: Vector3, w: float, h: float, d: float) -> void:
+	_put(rounded_block(w, h, d, 0.02, 0.008), _m("cream"), at, n)
+
+
+## Shop-window stock for one department, arranged across a 1.5 m plinth top (origin at its
+## centre, the mannequin standing at x = 0 in the window): items sit either side of it.
+static func _window_stock(n: Node3D, v: int) -> void:
+	var L := func(i: int) -> Material: return _m(LEATHERS[i % LEATHERS.size()])
+	match v % 7:
+		0:   # leather goods: handbags on risers, a suitcase pair, wallets and a belt
+			_riser_block(n, Vector3(-0.5, 0, 0.05), 0.36, 0.12, 0.26)
+			handbag(n, Vector3(-0.5, 0.12, 0.05), 0.3, L.call(1))
+			handbag(n, Vector3(-0.38, 0.0, 0.25), -0.2, L.call(0), 0.8)
+			suitcase(n, Vector3(0.5, 0.0, 0.0), -0.15, L.call(4), 0.5, 0.36, 0.16)
+			suitcase(n, Vector3(0.5, 0.16, 0.02), 0.1, L.call(2), 0.4, 0.28, 0.13)
+			wallet(n, Vector3(0.36, 0.0, 0.3), 0.3, L.call(3))
+			belt_coil(n, Vector3(0.6, 0.0, 0.32), L.call(0))
+		1:   # perfumery: two pyramids of boxed scent with testers
+			_perfume_boxes(n, Vector3(-0.48, 0, 0.05), Vector2(0.42, 0.34), 0)
+			_perfume_boxes(n, Vector3(0.48, 0, 0.05), Vector2(0.42, 0.34), 2)
+		2:   # millinery: hats on stands at two heights
+			for k in 2:
+				var x := -0.48 + k * 0.96
+				var h := 0.32 if k == 0 else 0.22
+				_put(_cyl(0.07, 0.09, 0.015, 16), _m("brass"), Vector3(x, 0.008, 0.05), n)
+				_put(_cyl(0.012, 0.012, h, 8), _m("brass"), Vector3(x, h * 0.5, 0.05), n)
+				_put(_sphere(0.08, 12), _m("ivory"), Vector3(x, h + 0.05, 0.05), n).scale = Vector3(1, 0.8, 1)
+				var hat := Node3D.new()
+				hat.position = Vector3(x, h + 0.15, 0.05)
+				n.add_child(hat)
+				_hat(hat, ["fedora", "cloche"][k], _m(["suit_charcoal", "plum"][k]), _m(["plum", "dress_cream"][k]))
+			_hat_box_pair(n, Vector3(0.48, 0, 0.32))
+		3:   # footwear: shoes on stepped risers
+			_riser_block(n, Vector3(-0.5, 0, 0.0), 0.36, 0.14, 0.32)
+			shoe_pair(n, Vector3(-0.5, 0.14, 0.0), 0.3, L.call(0))
+			shoe_pair(n, Vector3(-0.42, 0.0, 0.3), -0.2, L.call(3))
+			_riser_block(n, Vector3(0.5, 0, 0.0), 0.36, 0.08, 0.32)
+			shoe_pair(n, Vector3(0.5, 0.08, 0.0), -0.3, L.call(2))
+		4:   # gloves and hosiery: gloves on a velvet pad, folded stockings
+			_put(rounded_block(0.36, 0.04, 0.26, 0.03), _m("velvet"), Vector3(-0.48, 0, 0.08), n)
+			glove_pair(n, Vector3(-0.5, 0.04, 0.08), 0.2, _m("dress_cream"))
+			glove_pair(n, Vector3(0.45, 0.0, 0.1), -0.3, _m("plum"))
+			for k in 3:
+				_put(_box(0.2, 0.02, 0.12), _m(["dress_rose", "shirt", "suit_charcoal"][k]), Vector3(0.5, 0.06 + k * 0.021, -0.12), n)
+		5:   # tailoring: cloth bolts and a pattern-paper roll
+			for k in 3:   # two bolts side by side, the third resting in the groove between them
+				var at: Vector3 = [Vector3(-0.5, 0, -0.075), Vector3(-0.5, 0, 0.075), Vector3(-0.5, 0.12, 0.0)][k]
+				cloth_bolt(n, at, 0.0, _m(["suit_navy", "suit_brown", "suit_charcoal"][k]), 0.42)
+			cloth_bolt(n, Vector3(0.5, 0, 0.05), -0.3, _m("dress_cream"), 0.44)
+			cloth_bolt(n, Vector3(0.48, 0.14, 0.05), -0.25, _m("plum"), 0.4)
+		6:   # outfitters: folded shirts with ties, and a hat box
+			for k in 3:
+				_put(_box(0.26, 0.04, 0.2), _m("shirt"), Vector3(-0.48, 0.02 + k * 0.041, 0.05), n)
+				_put(_box(0.03, 0.002, 0.14), _m(["plum", "suit_navy", "sale_red"][k]), Vector3(-0.48, 0.042 + k * 0.041, 0.07), n)
+			_hat_box_pair(n, Vector3(0.48, 0, 0.05))
+
+
+static func _hat_box_pair(n: Node3D, at: Vector3) -> void:
+	_put(_cyl(0.15, 0.15, 0.16, 20), _m("box_pink"), at + Vector3(0, 0.08, 0), n)
+	_put(_cyl(0.155, 0.155, 0.035, 20), _m("plum"), at + Vector3(0, 0.175, 0), n)
+	_put(_cyl(0.11, 0.11, 0.12, 18), _m("dress_cream"), at + Vector3(0.02, 0.25, 0.01), n)
+	_put(_cyl(0.115, 0.115, 0.03, 18), _m("suit_navy"), at + Vector3(0.02, 0.32, 0.01), n)
+
+
+## A walnut display table of leather goods: handbags, wallets in a fan, belts, a suitcase pair
+## at one end and a price card. Variant shifts the colours.
+static func _leather_table(n: Node3D, v: int) -> void:
+	_folded_table_frame(n)
+	var h := WAIST * 0.82
+	var L := func(i: int) -> Material: return _m(LEATHERS[(i + v) % LEATHERS.size()])
+	handbag(n, Vector3(-0.42, h, -0.08), 0.2, L.call(0))
+	handbag(n, Vector3(-0.08, h, -0.1), -0.1, L.call(1), 0.9)
+	for k in 3:
+		wallet(n, Vector3(-0.38 + k * 0.12, h, 0.2), -0.3 + k * 0.3, L.call(k + 2))
+	belt_coil(n, Vector3(0.05, h, 0.18), L.call(3))
+	suitcase(n, Vector3(0.4, h, 0.0), 0.1, L.call(4), 0.42, 0.32, 0.14)
+	suitcase(n, Vector3(0.4, h + 0.14, 0.0), -0.08, L.call(2), 0.34, 0.26, 0.12)
 
 
 static func _easel(n: Node3D, v: int) -> void:
@@ -1387,6 +1583,7 @@ static func _m(name: String) -> Material:
 		"pollen": m = ST.plastic(Color("e2a43a"), 0.8, 0.0)
 		"sale_red": m = ST.plastic(Color("9e1b22"), 0.7, 0.0)
 		"fern": m = ST.plastic(Color("4d7a38"), 0.75, 0.0)
+		"leather_tan": m = ST.plastic(Color("a8743e"), 0.55, 0.0)
 		"straw": m = ST.plastic(Color("d6bd86"), 0.85, 0.0)
 		"steel": m = ST.plastic(Color("a9abae"), 0.3, 0.85)
 		"tape": m = ST.plastic(Color("e9dcae"), 0.75, 0.0)
