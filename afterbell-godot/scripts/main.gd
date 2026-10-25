@@ -24,8 +24,9 @@ const COUNTER_LINES := ["Testers in rose glass, every stopper turned the same wa
 		"Gift boxes stacked three-two-one, ribbons squared. The SALE card has been held up since five.",
 		"The price cards were written in the same careful hand. Nothing here has been touched since closing."]
 const COURT_FOV := 54.0       # court follow camera: lens, height scale, extra distance
-const COURT_LIFT := 1.32
-const COURT_REACH := 0.92
+const COURT_LIFT := 1.11
+const COURT_REACH := 1.03
+const COURT_FEET := 6.5      # degrees of carpet kept below Ren's boots
 
 # Section 11 timing table.
 const SIGN_TELL := 1.0
@@ -178,6 +179,7 @@ func _ready() -> void:
 	paddle_mat = (boss.get_node("Chair/Paddle") as MeshInstance3D).material_override
 	ren = REN_RIG.instantiate()
 	add_child(ren)
+	B.Atrium.Props.contact_shadow(ren, Vector2(1.0, 0.8))   # a soft pool under his boots, as in the reference
 	ren_anim = ren.get_node("AnimationPlayer")
 	ren_ring_mat = StandardMaterial3D.new()
 	ren_ring_mat.albedo_color = Color(B.CREAM, 0.0)
@@ -1005,7 +1007,7 @@ func _update_player(dt: float) -> void:
 func _near_counter() -> int:
 	for s in [-1, 1]:
 		var inner: float = s * (B.COUNTER_X - B.COUNTER_W * 0.5)
-		if absf(p_pos.x - inner) < 0.75 and p_pos.y < B.COUNTER_Z1 + 0.4:
+		if absf(p_pos.x - inner) < 1.3 and p_pos.y < B.COUNTER_Z1 + 0.4:
 			return s
 	return 0
 
@@ -1127,7 +1129,7 @@ func _render(dt: float) -> void:
 	var court := Rect2(-6.8, MIN_Z - 1.0, 13.6, MAX_Z - MIN_Z + 1.2)
 	# A long lens from further back, as in the reference: Ren about half the frame height, and the
 	# counters, lily table, escalators and the bell on the mezzanine stacked up behind him.
-	ShoulderCam.place(camera, p_pos, facing, dt, court, (COURT_FOV + 8.0) if portrait else COURT_FOV, wide * COURT_LIFT, shake * 0.4, COURT_REACH)
+	ShoulderCam.place(camera, p_pos, facing, dt, court, (COURT_FOV + 8.0) if portrait else COURT_FOV, wide * COURT_LIFT, shake * 0.4, COURT_REACH, COURT_FEET)
 	if intro_t > 0.0 and mode == "play":
 		# Arrival: open on the aisle and the bell on the mezzanine, then ease into the follow camera.
 		intro_t = maxf(0.0, intro_t - dt)

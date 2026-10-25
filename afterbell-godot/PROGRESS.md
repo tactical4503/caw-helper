@@ -89,6 +89,26 @@ loose static meshes merged (`Atrium.merge_direct`).
 - Ren:
   - idle uses the keyframed clip (sword held low in the right hand, as in the reference) instead of the Mixamo great-sword idle, which carries the sword up over the shoulder.
 
+**Polish pass:**
+- Camera:
+  - matched by solving the reference's projection (Ren about 46% of the frame height, his boots at 87%, horizon at 38%);
+  - result: 54° lens, eye at 1.95 m, about 3.9 m back, with 6.5° of carpet below his boots (`COURT_FEET`).
+- Hall, from the window forward:
+  - square-grid arched window, plus a window terrace with a balustrade and palms;
+  - the great bell at 62% scale on a plum dais, so the B shows over the rail;
+  - blue-grey escalator treads;
+  - a lit MENSWEAR floor under the mezzanine: a pendant, warm light and stocked shelving;
+  - the north court columns moved in to (±5.2, −7.0), beyond the play area, with banners and globe lanterns that frame the view.
+- Counters and stock:
+  - plain cream counter fronts with a broad brass band;
+  - gift-box heaps alternating with perfume risers;
+  - a full lily bouquet on the table.
+- Ren: a soft contact shadow under him.
+- HUD:
+  - smaller and lower, in the corners;
+  - controller glyphs follow the active device.
+- Grade: exposure 0.94, contrast 1.2.
+
 **Not identical:** the reference is a painting. The atrium is deeper than it shows, the court's side columns sit outside the frame, the shop under the mezzanine is less lit, and Ren is the game's model.
 
 **Checks:** all six test suites pass, and the fight and door views were re-rendered.

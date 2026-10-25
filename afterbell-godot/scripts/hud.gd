@@ -167,7 +167,7 @@ func _process(delta: float) -> void:
 
 func _draw_all() -> void:
 	var size := _c.size
-	var s := clampf(size.y / 720.0, 0.7, 1.8)
+	var s := clampf(size.y / 860.0, 0.6, 1.7)   # the reference keeps its HUD small at the corners
 	_draw_health(s)
 	if objective != "":
 		_draw_objective(size, s)
@@ -283,7 +283,7 @@ func _draw_prompt(size: Vector2, s: float) -> void:
 	var w := _text_width(text, font_size) + 80 * s
 	var h := 50 * s * pop
 	var x := size.x - 28 * s - w
-	var y := size.y - 120 * s - h + (1.0 - k) * 20 * s
+	var y := size.y - 44 * s - h + (1.0 - k) * 20 * s   # low in the corner, as in the reference
 	var a := k
 	_c.draw_rect(Rect2(x, y, w, h), Color(INK, 0.82 * a))
 	_c.draw_rect(Rect2(x, y, w, h), Color(BRASS, a), false, 2 * s)

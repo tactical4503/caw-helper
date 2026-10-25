@@ -23,6 +23,8 @@ const Atrium := preload("res://scripts/atrium.gd")
 const RACK_HOME := [Vector2(-4.9, 0.6), Vector2(4.9, 0.6)]
 const BELL_POS := Vector3(0, 0, -7.0)
 ## The long perfume counters down the court's north end (the reference's foreground).
+const GRAND_SCALE := 0.62     # the great bell and its pedestal, at the reference's size...
+const GRAND_DAIS := 0.55      # ...raised so the B on the pedestal shows over the mezzanine rail
 const COUNTER_X := 3.75       # centre line; inner face at 3.2, so the lane between is 6.4 m
 const COUNTER_W := 1.1
 const COUNTER_Z0 := -9.3
@@ -185,7 +187,7 @@ static func build_arena(parent: Node3D) -> Arena:
 
 	put(box(18, 0.1, 20), ST.textured("tile_cream", 0.6, ST.procedural(Color("b9a98a"), TILE, "marble")), Vector3(0, -0.05, 0), root, false)
 	var field := ST.textured("carpet_forest", 0.5, ST.procedural(Color("1f3a2a"), CARPET_LIGHT, "carpet", 1.5))
-	field.albedo_color = Color(0.86, 1.12, 1.16)   # toward the reference's blue-teal
+	field.albedo_color = Color(0.92, 1.1, 1.22)   # toward the reference's blue-teal
 	put(box(16, 0.02, 18), field, Vector3(0, 0.01, 0), root, false)
 	# The carpet as in the reference: a deep teal field, and round every counter and the court a
 	# border of a broad cream band, a dark teal band and a fine cream line.
@@ -205,18 +207,20 @@ static func build_arena(parent: Node3D) -> Arena:
 		var cx: float = s * COUNTER_X
 		var len := COUNTER_Z1 - COUNTER_Z0
 		var cz := (COUNTER_Z0 + COUNTER_Z1) * 0.5
-		var c: Node3D = P.counter(root, Vector3(cx, 0, cz), Vector3(COUNTER_W, P.WAIST, len), "cream", 0.1)
+		var c: Node3D = P.counter(root, Vector3(cx, 0, cz), Vector3(COUNTER_W, P.WAIST, len), "cream", 0.14, Vector3.ZERO, true, false)
 		c.name = "RefCounter"
 		var top_y: float = P.WAIST
-		var n := int(len / 1.15)
-		for k in n:
+		var n := int(len / 0.95)
+		for k in n:   # dense stock, as in the reference: gift-box stacks, risers and testers end to end
 			var z := COUNTER_Z0 + (k + 0.5) * len / n
-			P.place(root, "perfume_boxes", Vector3(cx, top_y, z), -s * PI / 2.0, k + (0 if s < 0 else 2))
+			if k % 2 == 0:
+				P.place(root, "gift_boxes", Vector3(cx, top_y, z), -s * PI / 2.0, k + (0 if s < 0 else 3))
+			else:
+				P.place(root, "perfume_boxes", Vector3(cx, top_y, z), -s * PI / 2.0, k + (0 if s < 0 else 2)).scale = Vector3.ONE * 1.3
 		# A glass case of boxed scent behind each counter, and the clerk between case and counter.
-		if s < 0.0:   # a vitrine of boxed scent behind the west clerk; the east side stays open
-			for k in 2:
-				P.place(root, "shelf_unit", Vector3(s * (COUNTER_X + 1.45), 0, COUNTER_Z0 + 1.6 + k * 1.25), -s * PI / 2.0, 2)
-		var clerk: Node3D = P.place(root, "clerk", Vector3(s * (COUNTER_X + 0.72), 0, COUNTER_Z1 - (2.9 if s < 0 else 4.6)), -s * 1.2, 0 if s < 0 else 1)
+		if s < 0.0:   # a vitrine of boxed scent behind the west clerk, against the column
+			P.place(root, "shelf_unit", Vector3(s * (COUNTER_X + 1.2), 0, COUNTER_Z1 - 1.75), -s * PI / 2.0, 2)
+		var clerk: Node3D = P.place(root, "clerk", Vector3(s * (COUNTER_X + 0.72), 0, COUNTER_Z1 - (3.2 if s < 0 else 5.9)), -s * 1.2, 0 if s < 0 else 1)
 		clerk.scale = Vector3.ONE * 1.08
 		a.plinths.append(Rect2(Vector2(cx - COUNTER_W * 0.5, COUNTER_Z0), Vector2(COUNTER_W, len)))
 	P.place(root, "price_card", Vector3(-COUNTER_X + 0.35, P.WAIST, COUNTER_Z0 + 2.4), PI / 2.0, 0, "9.50")
@@ -278,7 +282,7 @@ static func build_arena(parent: Node3D) -> Arena:
 	put(cyl(0.82, 0.79, 0.1, 48), Atrium.Props._m("cream"), Vector3(0, 0.88, 0), stage)
 	put(cyl(0.86, 0.86, 0.06, 48), Atrium.Props._m("counter_top"), Vector3(0, 0.96, 0), stage)
 	var crown := 0.99
-	P.place(stage, "flower_display", Vector3(0, crown - 0.73, 0), 0.0)   # its vase and lilies rise from the top
+	P.place(stage, "bouquet", Vector3(0, crown, 0), 0.0)   # a dark vase heaped with white lilies
 	for k in 6:
 		var ang := TAU * k / 6.0 + 0.3
 		P.place(stage, "perfume_boxes", Vector3(sin(ang) * 0.56, crown, cos(ang) * 0.56), ang, k).scale = Vector3.ONE * 0.4
@@ -290,13 +294,15 @@ static func build_arena(parent: Node3D) -> Arena:
 	a.lever.position = Vector3(0, 0.42, 0.4)
 	bell.add_child(a.lever)
 	put(box(0.1, 0.08, 0.75), mat(Color("3b3430"), 0.5, 0.5), Vector3(0, 0, 0.35), a.lever)
-	put(box(0.5, 0.36, 0.12), mat(RED, 0.8), Vector3(0, 0, 0.75), a.lever)  # padded striking plate faces south
+	put(box(0.5, 0.36, 0.12), brass(), Vector3(0, 0, 0.74), a.lever)  # padded striking plate faces south:
+	put(box(0.44, 0.3, 0.13), mat(PLUM, 0.8), Vector3(0, 0, 0.75), a.lever)   # plum leather in a brass rim
 	# The governor cabinet hangs from the mezzanine fascia under the great bell ("behind the
 	# service bell, upstairs"), the B on its door; its tabs count the rings. The stand stays
 	# low, so the flowers in the lower hall rise over it.
 	# Its door, with the B, is the front of the great bell's pedestal; tabs below count the rings.
 	var cabinet := Node3D.new()
-	cabinet.position = Vector3(0, Atrium.LEVELS[0] + 0.78, Atrium.MEZZ_Z - 1.35 + 0.64)
+	cabinet.position = Vector3(0, Atrium.LEVELS[0] + GRAND_DAIS, Atrium.MEZZ_Z - 1.35) + Vector3(0, 0.78, 0.64) * GRAND_SCALE
+	cabinet.scale = Vector3.ONE * GRAND_SCALE
 	root.add_child(cabinet)
 	put(box(1.2, 1.1, 0.5), mat(CREAM, 0.55), Vector3.ZERO, cabinet)
 	put(box(1.28, 0.06, 0.56), brass(), Vector3(0, 0.58, 0), cabinet)
@@ -313,8 +319,11 @@ static func build_arena(parent: Node3D) -> Arena:
 	# The great bell on the mezzanine front: cream pedestal with the B, lacquered base, a broad
 	# brass dome with a flared lip and a plunger. Only the dome moves (it shivers when rung).
 	var grand := Node3D.new()
-	grand.position = Vector3(0, Atrium.LEVELS[0], Atrium.MEZZ_Z - 1.35)
+	grand.position = Vector3(0, Atrium.LEVELS[0] + GRAND_DAIS, Atrium.MEZZ_Z - 1.35)
+	grand.scale = Vector3.ONE * GRAND_SCALE
 	root.add_child(grand)
+	put(box(1.7, GRAND_DAIS, 1.7), Atrium.Props._m("counter_plum"), Vector3(0, Atrium.LEVELS[0] + GRAND_DAIS * 0.5, Atrium.MEZZ_Z - 1.35), root)
+	put(box(1.76, 0.04, 1.76), brass(), Vector3(0, Atrium.LEVELS[0] + GRAND_DAIS - 0.02, Atrium.MEZZ_Z - 1.35), root)
 	var gstage := Node3D.new()
 	grand.add_child(gstage)
 	put(P.rounded_block(2.2, 0.1, 2.2, 0.18, 0.025), stone, Vector3.ZERO, gstage)
@@ -451,7 +460,9 @@ static func _build_hall(arena_root: Node3D) -> void:
 	arena_root.add_child(root)
 	# Columns along the court, each running up past both galleries to the roof.
 	var banner := ST.textured("plaster_plum", 0.8, mat(PLUM, 0.6))
-	for spot in [Vector2(-7.75, -6), Vector2(-7.75, -1), Vector2(-7.75, 4), Vector2(7.95, -6), Vector2(7.95, -1), Vector2(7.95, 4)]:
+	# The north pair stand in, beyond the court's play area, to frame the view up the hall as the
+	# reference's big banner-and-lantern pillars do.
+	for spot in [Vector2(-5.2, -7.0), Vector2(-7.75, -1), Vector2(-7.75, 4), Vector2(5.2, -7.0), Vector2(7.95, -1), Vector2(7.95, 4)]:
 		var on_side: bool = absf(spot.x) > 7.0
 		var face := Vector3(-signf(spot.x), 0, 0) if on_side else Vector3(0, 0, 1)
 		# Stepped base, brass bands at rail height, capitals under each balcony; side columns

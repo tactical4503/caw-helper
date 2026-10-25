@@ -41,7 +41,7 @@ const HALF := {
 
 ## Small or recessed stock that doesn't need to cast real-time shadows (measured: shadow
 ## passes were most of the court's draw calls).
-const NO_SHADOW := ["price_card", "sale_card", "perfume_boxes", "window_stock", "hanging_sign"]
+const NO_SHADOW := ["price_card", "sale_card", "perfume_boxes", "gift_boxes", "window_stock", "hanging_sign"]
 
 static var _cache := {}
 static var _mats := {}
@@ -201,6 +201,8 @@ static func _build(kind: String, v: int) -> Node3D:
 		"leather_table": _leather_table(n, v)
 		"hanging_sign": _hanging_sign(n)
 		"clerk": _clerk(n, v)
+		"gift_boxes": _gift_boxes(n, v)
+		"bouquet": _bouquet(n)
 	return n
 
 
@@ -283,6 +285,29 @@ static func _mannequin(n: Node3D, v: int) -> void:
 			_put(_cyl(0.22, 0.22, 0.012, 24), _m("dress_cream"), Vector3(0, 1.93, 0), n)
 			_put(_cyl(0.11, 0.12, 0.09, 18), _m("dress_cream"), Vector3(0, 1.98, 0), n)
 			_put(_cyl(0.122, 0.122, 0.025, 18), _m("plum"), Vector3(0, 1.95, 0), n)
+
+
+## A heaped display of wrapped scent boxes along a counter top (the reference's foreground):
+## big and small boxes in a colour family, stacked two and three high, each with a ribbon.
+static func _gift_boxes(n: Node3D, v: int) -> void:
+	var fams := [["box_pink", "box_lilac", "plum"], ["suit_navy", "box_rose", "cream"], ["box_lilac", "box_pink", "brass"],
+			["plum", "cream", "box_rose"]]
+	var fam: Array = fams[v % fams.size()]
+	var rng := RandomNumberGenerator.new()
+	rng.seed = 40 + v
+	var x := -0.42
+	while x < 0.42:
+		var w := rng.randf_range(0.14, 0.26)
+		var y := 0.0
+		for level in rng.randi_range(1, 3):
+			var bw := w * (1.0 - level * 0.12)
+			var bh := rng.randf_range(0.09, 0.18)
+			var col: String = fam[(level + int(x * 10.0)) % fam.size()]
+			var z := rng.randf_range(-0.08, 0.08)
+			_put(_box(bw, bh, bw * 0.85), _m(col), Vector3(x + w * 0.5, y + bh * 0.5, z), n)
+			_put(_box(bw + 0.004, bh + 0.004, 0.014), _m("brass" if col != "brass" else "cream"), Vector3(x + w * 0.5, y + bh * 0.5, z), n)
+			y += bh
+		x += w + 0.02
 
 
 ## Where the sale clerk's cap front and raised card sit (for their SALE lettering).
@@ -525,6 +550,31 @@ static func _flower_display(n: Node3D) -> void:
 		_lily(n, tip, dir)
 		if i % 2 == 0:
 			var leaf := _put(_sphere(0.07, 8), _m("leaf"), base + dir * length * 0.45 + Vector3(0, 0, 0.02), n)
+			leaf.basis = _aim_y(dir.rotated(Vector3.UP, 0.6)) * Basis.from_scale(Vector3(0.35, 1.8, 0.12))
+
+
+## The reference's table arrangement: a dark glazed vase (base at the origin) heaped with white
+## lilies in a broad dome, with leaves tucked between the blooms.
+static func _bouquet(n: Node3D) -> void:
+	_put(_cyl(0.12, 0.1, 0.06, 20), _m("vase"), Vector3(0, 0.03, 0), n)
+	_put(_sphere(0.19, 20), _m("vase"), Vector3(0, 0.22, 0), n).scale = Vector3(1, 0.95, 1)
+	_put(_cyl(0.11, 0.15, 0.2, 20), _m("vase"), Vector3(0, 0.45, 0), n)
+	_put(_cyl(0.13, 0.13, 0.03, 20), _m("brass"), Vector3(0, 0.55, 0), n)
+	var base := Vector3(0, 0.53, 0)
+	var rng := RandomNumberGenerator.new()
+	rng.seed = 11
+	for i in 26:
+		var ring := 0 if i < 3 else (1 if i < 12 else 2)
+		var a: float = TAU * i / [3.0, 9.0, 14.0][ring] + rng.randf_range(-0.25, 0.25)
+		var tilt: float = [0.1, 0.55, 1.0][ring] + rng.randf_range(-0.12, 0.12)
+		var length: float = [0.62, 0.55, 0.45][ring] + rng.randf_range(-0.06, 0.06)
+		var dir := Vector3(sin(tilt) * cos(a), cos(tilt), sin(tilt) * sin(a))
+		var tip := base + dir * length
+		var stem := _put(_cyl(0.008, 0.01, length, 6), _m("leaf"), (base + tip) * 0.5, n)
+		stem.basis = _aim_y(dir)
+		_lily(n, tip, dir)
+		if i % 2 == 1:
+			var leaf := _put(_sphere(0.08, 8), _m("leaf"), base + dir * length * 0.6, n)
 			leaf.basis = _aim_y(dir.rotated(Vector3.UP, 0.6)) * Basis.from_scale(Vector3(0.35, 1.8, 0.12))
 
 
@@ -1028,7 +1078,7 @@ static func _hanging_sign(n: Node3D) -> void:
 ## panels with brass beading. `service` (a local axis: ±x or ±z; zero for none) is the staff
 ## side: drawers with brass pulls over cupboard doors, and on long runs an open stock shelf.
 ## `merge` bakes the parts together; pass false when the caller bakes the counter itself.
-static func counter(parent: Node3D, at: Vector3, size: Vector3, top := "cream", r := 0.08, service := Vector3.ZERO, merge := true) -> Node3D:
+static func counter(parent: Node3D, at: Vector3, size: Vector3, top := "cream", r := 0.08, service := Vector3.ZERO, merge := true, panels := true) -> Node3D:
 	var c := Node3D.new()
 	c.position = at
 	parent.add_child(c)
@@ -1053,8 +1103,10 @@ static func counter(parent: Node3D, at: Vector3, size: Vector3, top := "cream", 
 		c.add_child(f)
 		if face.is_equal_approx(service):
 			_service_face(f, along, h)
-		else:
+		elif panels:
 			_panelled_face(f, along, h)
+	if not panels:   # plain cream front: a broad brass band under the top instead (the reference's counters)
+		_put(rounded_block(w + 0.035, 0.07, d + 0.035, r + 0.018), _m("counter_brass"), Vector3(0, h - 0.25, 0), c)
 	contact_shadow(c, Vector2(w + 0.45, d + 0.45))
 	if merge:
 		Atrium_merge(c)

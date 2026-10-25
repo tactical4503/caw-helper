@@ -22,7 +22,7 @@ const FEET_MARGIN := 4.0   # degrees of floor kept below Ren's feet
 ## scales the distance alone: with a narrower lens it keeps Ren the same size while the far
 ## end of the room comes forward (the long-lens look of the court).
 static func place(cam: Camera3D, p: Vector2, forward: Vector2, dt: float, bounds: Rect2,
-		base_fov: float, lift := 1.0, shake := 0.0, reach := 1.0) -> void:
+		base_fov: float, lift := 1.0, shake := 0.0, reach := 1.0, feet_margin := FEET_MARGIN) -> void:
 	forward = forward.normalized() if forward.length() > 0.01 else Vector2(0, -1)
 	var right := Vector2(-forward.y, forward.x)
 	var want := p - forward * BACK * lift * reach + right * SIDE * reach
@@ -38,7 +38,7 @@ static func place(cam: Camera3D, p: Vector2, forward: Vector2, dt: float, bounds
 	var eye := Vector2(cam.position.x, cam.position.z)
 	var to_aim := maxf(eye.distance_to(aim), 0.5)
 	var to_feet := maxf(eye.distance_to(p), 0.3)
-	var need := atan(cam.position.y / to_feet) - deg_to_rad(cam.fov * 0.5 - FEET_MARGIN)
+	var need := atan(cam.position.y / to_feet) - deg_to_rad(cam.fov * 0.5 - feet_margin)
 	var aim_h := minf(AIM_HEIGHT, cam.position.y - to_aim * tan(maxf(need, 0.0)))
 	var j := Vector3((randf() - 0.5) * shake, (randf() - 0.5) * shake, 0.0) if shake > 0.0 else Vector3.ZERO
 	cam.look_at(Vector3(aim.x, aim_h, aim.y) + j, Vector3.UP)

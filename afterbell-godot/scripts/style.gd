@@ -227,7 +227,7 @@ static func grade_key(key: DirectionalLight3D) -> void:
 ## so cream and brass hold their colour, bloom that lets the globe lamps glow, a faint warm haze.
 static func deco_environment(e: Environment) -> void:
 	e.tonemap_mode = Environment.TONE_MAPPER_FILMIC
-	e.tonemap_exposure = 1.0
+	e.tonemap_exposure = 0.94
 	e.tonemap_white = 5.0
 	e.ambient_light_color = Color("e6cfb2")
 	e.ambient_light_energy = 0.3
@@ -245,8 +245,8 @@ static func deco_environment(e: Environment) -> void:
 	e.fog_density = 0.0022
 	e.fog_aerial_perspective = 0.1
 	e.adjustment_enabled = true
-	e.adjustment_saturation = 1.12
-	e.adjustment_contrast = 1.16
+	e.adjustment_saturation = 1.1
+	e.adjustment_contrast = 1.2
 	e.adjustment_brightness = 1.0
 
 

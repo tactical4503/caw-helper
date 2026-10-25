@@ -336,23 +336,30 @@ static func _window(a: Node3D) -> void:
 	for s in [-1.0, 1.0]:
 		_put(_box(0.16, spring - sill, 0.12), dark, Vector3(s * (r - 0.08), (sill + spring) * 0.5, fz), a)
 	_put(_box(w, 0.16, 0.12), dark, Vector3(0, sill + 0.08, fz), a)
-	for bx in [-r * 0.66, -r * 0.33, 0.0, r * 0.33, r * 0.66]:
-		_put(_box(0.1, spring - sill, 0.1), dark, Vector3(bx, (sill + spring) * 0.5, fz), a)
-	for by in [sill + 1.65, sill + 3.3, spring]:
-		_put(_box(w, 0.1, 0.1), dark, Vector3(0, by, fz), a)
-	for i in 7:
-		var ang := PI * (i + 1) / 8.0
-		var len := r - 0.1
-		var spoke := _put(_box(0.08, len, 0.1), dark, Vector3(cos(ang) * len * 0.5, spring + sin(ang) * len * 0.5, fz), a)
-		spoke.rotation.z = ang - PI / 2.0
-	for ring_r in [r * 0.42, r - 0.06]:
-		for i in 18:
-			var t0 := PI * i / 18.0
-			var t1 := PI * (i + 1) / 18.0
-			var p0: Vector2 = Vector2(cos(t0), sin(t0)) * ring_r
-			var p1: Vector2 = Vector2(cos(t1), sin(t1)) * ring_r
-			var seg := _put(_box(p0.distance_to(p1) + 0.03, 0.1, 0.1), dark, Vector3((p0.x + p1.x) * 0.5, spring + (p0.y + p1.y) * 0.5, fz), a)
-			seg.rotation.z = (t0 + t1) * 0.5 + PI / 2.0
+	# A square grid of glazing bars, as in the reference: six bays across, rows every 1.1 m, each
+	# bar running up into the arch and stopping at its curve; the arch's own ring frames them.
+	var arch_y := func(x: float) -> float:
+		return spring + sqrt(maxf(r * r - x * x, 0.0))
+	for k in range(-2, 3):
+		var bx := r * k / 3.0
+		var top: float = arch_y.call(absf(bx)) - 0.05
+		_put(_box(0.08, top - sill, 0.1), dark, Vector3(bx, (sill + top) * 0.5, fz), a)
+	var by := sill + 1.1
+	while by < spring + r - 0.3:
+		var half := r if by <= spring else sqrt(maxf(r * r - pow(by - spring, 2.0), 0.0))
+		_put(_box(half * 2.0 - 0.1, 0.07, 0.1), dark, Vector3(0, by, fz), a)
+		by += 1.1
+	for i in 18:
+		var t0 := PI * i / 18.0
+		var t1 := PI * (i + 1) / 18.0
+		var p0: Vector2 = Vector2(cos(t0), sin(t0)) * (r - 0.06)
+		var p1: Vector2 = Vector2(cos(t1), sin(t1)) * (r - 0.06)
+		var seg := _put(_box(p0.distance_to(p1) + 0.03, 0.12, 0.1), dark, Vector3((p0.x + p1.x) * 0.5, spring + (p0.y + p1.y) * 0.5, fz), a)
+		seg.rotation.z = (t0 + t1) * 0.5 + PI / 2.0
+	# The window terrace: a low balustrade at the glass with a palm either side of the parasol view.
+	balustrade(a, Vector3(-r - 0.3, LEVELS[0], NORTH_Z + 0.9), Vector3(r + 0.3, LEVELS[0], NORTH_Z + 0.9), 0.85)
+	for x in [-2.6, 2.6]:
+		palm(a, Vector3(x, LEVELS[0], NORTH_Z + 1.5))
 	# Fluted ivory pilasters with plum inset panels flank the window (no hanging cloth).
 	for s in [-1.0, 1.0]:
 		_pilaster(a, Vector3(s * (r + 1.5), LEVELS[0], z + 0.2), ROOF - 0.6 - LEVELS[0])
@@ -516,6 +523,16 @@ static func _colonnade(a: Node3D) -> void:
 	for x in [-7.2, -2.2, 2.2, 7.2]:
 		pillar(a, x, MEZZ_Z + 0.25, LEVELS[0] - SLAB + 0.02)
 		_amber(ST.lantern(a, Vector3(x, 2.9, MEZZ_Z + 0.61), Vector3(0, 0, 1), 0.7, 5.0))   # globes framing MENSWEAR below
+	# Under the mezzanine, the MENSWEAR floor glows: a pendant, warm light and stocked shelving.
+	_amber(ST.pendant(a, Vector3(0, 3.7, MEZZ_Z - 1.6), LEVELS[0] - SLAB, 1.4, 8.0))
+	var shop_glow := OmniLight3D.new()
+	shop_glow.light_color = AMBER
+	shop_glow.light_energy = 1.6
+	shop_glow.omni_range = 9.0
+	shop_glow.position = Vector3(0, 3.0, NORTH_Z + 3.0)
+	a.add_child(shop_glow)
+	for x in [-6.2, -4.9, -3.6, 3.6, 4.9, 6.2]:
+		Props.place(a, "shelf_unit", Vector3(x, 0, NORTH_Z + 0.25), 0.0, [1, 0, 1, 0, 1, 0][int(absf(x) * 2.0) % 6])
 
 
 ## The broad central aisle: a lighter runner with ivory borders from the court to the mezzanine.
@@ -954,7 +971,9 @@ static func _m(name: String) -> StandardMaterial3D:
 		"leaf": m = ST.plastic(Color("2f5a2c"), 0.6, 0.0)
 		"lily": m = ST.plastic(Color("f6f1e6"), 0.5, 0.0)
 		"vase": m = ST.plastic(Color("1d2b2a"), 0.2, 0.3)
-		"steps": m = ST.textured("metal_charcoal", 1.0, ST.plastic(Color("3a3c40"), 0.45, 0.6), 0.6)
+		"steps":   # blue-grey treads, as in the reference
+			m = ST.textured("metal_charcoal", 1.0, ST.plastic(Color("3a3c40"), 0.45, 0.6), 0.6)
+			m.albedo_color = Color(1.7, 1.85, 2.15)
 		"steel": m = ST.plastic(Color("8e9399"), 0.62, 0.45)   # brushed, not mirrored: a glossy strip clipped to a white line at grazing angles
 		"rubber": m = ST.plastic(Color("141316"), 0.45, 0.0)
 		"skyline":

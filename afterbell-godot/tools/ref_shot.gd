@@ -47,6 +47,7 @@ func _process(_d: float) -> bool:
 		for i in 60:
 			room._render(1.0 / 30.0)
 		room.boss.visible = show_boss
+		room.gauge.gamepad = true   # the reference shows controller glyphs
 		wait = 20
 		return false
 	wait -= 1
