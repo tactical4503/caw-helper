@@ -194,14 +194,21 @@ func _draw_health(s: float) -> void:
 	var a := panel_alpha
 	var shake := Vector2(randf_range(-1, 1), randf_range(-1, 1)) * hurt_t * 9.0 * s
 	var c := Vector2(54, 54) * s + shake
-	# Portrait: Ren's red helmet with the sweeping black visor, silver ridge and cream chin plate.
-	_c.draw_circle(c, 34 * s, Color(INK, 0.9 * a))
+	# Portrait: Ren's red helmet with the sweeping black visor, silver ridge and cream chin plate,
+	# on a dark octagonal plate in a brass frame (as in the reference).
+	var oct := PackedVector2Array()
+	for i in 8:
+		var ang := TAU * (i + 0.5) / 8.0
+		oct.append(c + Vector2(cos(ang), sin(ang)) * 40 * s)
+	_c.draw_colored_polygon(oct, Color(INK, 0.92 * a))
+	var ring := oct.duplicate()
+	ring.append(oct[0])
+	_c.draw_polyline(ring, Color(BRASS, a), 3 * s)
 	_c.draw_circle(c, 30 * s, Color(RED.lerp(CREAM, hurt_t), a))
 	_c.draw_colored_polygon(PackedVector2Array([c + Vector2(-26, -2) * s, c + Vector2(26, -2) * s, c + Vector2(20, 12) * s,
 		c + Vector2(-20, 12) * s]), Color(INK, a))
 	_c.draw_rect(Rect2(c + Vector2(-2, -26) * s, Vector2(4, 24) * s), Color("b8bec4", a))
 	_c.draw_rect(Rect2(c + Vector2(-9, 15) * s, Vector2(18, 8) * s), Color(CREAM, a))
-	_c.draw_arc(c, 34 * s, 0, TAU, 48, Color(BRASS, a), 3 * s)
 	# Bar plate.
 	var x0 := c.x + 44 * s
 	var y0 := c.y - 16 * s
@@ -210,8 +217,11 @@ func _draw_health(s: float) -> void:
 	var gap := 5 * s
 	var skew := 7 * s
 	var plate_w := max_hp * (seg_w + gap) + 18 * s
-	_c.draw_colored_polygon(_skewed(x0 - 8 * s, y0 - 6 * s, plate_w, seg_h + 12 * s, skew), Color(INK, 0.75 * a))
-	_text(Vector2(x0, y0 - 10 * s), "REN", 12 * s, Color(BRASS, a))
+	var plate := _skewed(x0 - 8 * s, y0 - 6 * s, plate_w, seg_h + 12 * s, skew)
+	_c.draw_colored_polygon(plate, Color(INK, 0.85 * a))
+	var rim := plate.duplicate()
+	rim.append(plate[0])
+	_c.draw_polyline(rim, Color(BRASS, a), 2.5 * s)
 	var low := hp <= 2
 	var pulse := 0.5 + 0.5 * sin(time * 8.0)
 	for i in max_hp:
@@ -230,8 +240,8 @@ func _draw_health(s: float) -> void:
 		var outline := poly.duplicate()
 		outline.append(poly[0])
 		_c.draw_polyline(outline, Color(CREAM, 0.35 * a), 1.2 * s)
-	# Biscuits: red tins with cream paper sleeves.
-	for i in biscuits:
+	# Biscuits: red tins with cream paper sleeves, shown only while Ren is hurt (when they matter).
+	for i in (biscuits if hp < max_hp else 0):
 		var bx := x0 + i * 26 * s
 		var by := y0 + seg_h + 12 * s
 		_c.draw_rect(Rect2(Vector2(bx, by), Vector2(20, 13) * s), Color(RED, a))
@@ -249,10 +259,14 @@ func _draw_objective(size: Vector2, s: float) -> void:
 	var flash := clampf((objective_in < 0.4 and not done) as int * (0.4 - objective_in) * 2.5, 0.0, 1.0)
 	_c.draw_rect(Rect2(x, y, w, h), Color(CREAM.lerp(BRASS, flash), 0.93))
 	_c.draw_rect(Rect2(x, y, w, h), Color(BRASS, 1.0), false, 2 * s)
+	_c.draw_rect(Rect2(x + 4 * s, y + 4 * s, w - 8 * s, h - 8 * s), Color(BRASS, 0.7), false, 1 * s)   # inner rule
+	# A quatrefoil of four small diamonds, as on the reference's plaque.
 	var d := Vector2(x + 24 * s, y + h / 2.0)
-	var r := 8 * s
-	_c.draw_colored_polygon(PackedVector2Array([d + Vector2(0, -r), d + Vector2(r, 0), d + Vector2(0, r), d + Vector2(-r, 0)]),
-		GREEN if done else PLUM)
+	var r := 4.2 * s
+	for off in [Vector2(0, -1), Vector2(1, 0), Vector2(0, 1), Vector2(-1, 0)]:
+		var q: Vector2 = d + off * 5.5 * s
+		_c.draw_colored_polygon(PackedVector2Array([q + Vector2(0, -r), q + Vector2(r, 0), q + Vector2(0, r), q + Vector2(-r, 0)]),
+			GREEN if done else INK)
 	var ink := Color(INK, 0.45 if done else 1.0)
 	_c.draw_string(_font, Vector2(x + 44 * s, y + h / 2.0 + font_size * 0.35), objective, HORIZONTAL_ALIGNMENT_LEFT, -1, int(font_size), ink)
 	if done:

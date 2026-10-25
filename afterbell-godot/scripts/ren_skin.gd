@@ -34,7 +34,6 @@ const HIP_REST_Y := 0.92  # greybox pelvis rest height (metres)
 const MOCAP_DIR := "res://assets/anim/great_sword/"
 const MOCAP := {
 	# game clip: [file, loops, play length in seconds (0 = natural length)]
-	"idle": ["great_sword_idle", true, 0.0],
 	"run": ["great_sword_run", true, 0.0],
 	"guard": ["great_sword_blocking", false, 0.35],
 	"reflect": ["great_sword_blocking_2", false, 0.3],

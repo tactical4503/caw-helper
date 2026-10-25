@@ -141,14 +141,15 @@ static func _mezzanine(a: Node3D) -> void:
 		balustrade(a, Vector3(x0, level, MEZZ_Z - 0.1), Vector3(x1, level, MEZZ_Z - 0.1))
 	var label := Label3D.new()
 	label.text = "M E N S W E A R"
-	label.font_size = 96
-	label.pixel_size = 0.0055
+	label.font_size = 112
+	label.pixel_size = 0.0042
 	label.outline_size = 0
-	label.modulate = Color("4a2238")
-	label.position = Vector3(0, level - 0.28, MEZZ_Z + 0.17)
+	label.modulate = Color("3a1a2c")
+	label.shaded = false
+	label.position = Vector3(0, level - 0.5, MEZZ_Z + 0.2)
 	a.add_child(label)
 	for s in [-1.0, 1.0]:
-		var gem := _put(_box(0.16, 0.16, 0.04), _m("brass"), Vector3(s * 2.2, level - 0.28, MEZZ_Z + 0.17), a)
+		var gem := _put(_box(0.16, 0.16, 0.04), _m("brass"), Vector3(s * 1.75, level - 0.5, MEZZ_Z + 0.19), a)
 		gem.rotation.z = PI / 4.0
 	# Mannequins along the rail, racks and palms behind, a counter in the middle.
 	for x in [-7.4, -3.0, 3.0, 7.4]:
@@ -201,7 +202,7 @@ static func balustrade(a: Node3D, from: Vector3, to: Vector3, height := 1.0) -> 
 	var bar := func(y: float, h: float, d: float, m: Material) -> void:
 		var size := Vector3(length, h, d) if along_x else Vector3(d, h, length)
 		_put(_box(size.x, size.y, size.z), m, mid + Vector3(0, y, 0), a)
-	bar.call(0.07, 0.14, 0.18, _m("cream"))                 # bottom rail
+	bar.call(0.07, 0.14, 0.18, _m("walnut"))                # bottom rail
 	bar.call(height - 0.05, 0.1, 0.17, _m("walnut"))        # handrail
 	bar.call(height + 0.01, 0.025, 0.12, _m("brass"))       # brass cap on the rail
 	var posts := maxi(1, int(round(length / 2.4)))
@@ -223,7 +224,7 @@ static func balustrade(a: Node3D, from: Vector3, to: Vector3, height := 1.0) -> 
 			mm.set_instance_transform(i, Transform3D(Basis(), from.lerp(to, t) + Vector3(0, part[1], 0)))
 		var mmi := MultiMeshInstance3D.new()
 		mmi.multimesh = mm
-		mmi.material_override = _m("cream")
+		mmi.material_override = _m("walnut")   # dark turned balusters, as in the reference
 		a.add_child(mmi)
 
 
@@ -460,18 +461,18 @@ static func _roof(a: Node3D) -> void:
 
 
 static func _lower_hall(a: Node3D) -> void:
-	# The grand arrangement at the head of the aisle; along each edge, in a row with walkable
-	# gaps of 1.3 m or more: perfume counter, folded-knitwear table, rack. Palms at the corners.
-	Props.place(a, "centrepiece", Vector3(0, 0, -14.2))
+	# Past the court's lily table, as in the reference: gentlemen's suits in fedoras either side
+	# of the aisle, a brass rack of jackets, and racks along the escalator feet.
+	for p in [[Vector3(-1.9, 0, -10.9), 0.35, 0], [Vector3(-2.7, 0, -11.9), 0.2, 2], [Vector3(-1.4, 0, -12.8), 0.0, 0],
+			[Vector3(1.8, 0, -11.2), -0.3, 2], [Vector3(2.6, 0, -12.4), -0.15, 0], [Vector3(1.3, 0, -13.4), 0.0, 2]]:
+		Props.place(a, "mannequin", p[0], p[1], p[2] + 4 * ([1, 2, 1, 3, 2, 1][int(absf(p[0].x * 10.0)) % 6]))
+	Props.place(a, "rack", Vector3(2.75, 0, -9.9), PI / 2.0 - 0.2, 0)
+	rack(a, Vector3(-3.0, 0, -14.0), 0.15)
+	rack(a, Vector3(3.2, 0, -14.6), -0.15)
 	for side in [-1.0, 1.0]:
-		Props.place(a, "perfume_counter", Vector3(side * 3.45, 0, -11.6), 0.0, 1 if side > 0 else 2)
-		price(a, Vector3(side * 3.45 + 0.6, Props.WAIST, -11.32), 0.0, "12.50" if side > 0 else "8.75")
-		Props.place(a, "folded_table", Vector3(side * 3.45, 0, -14.1), 0.0, 2 if side > 0 else 0)
-		palm(a, Vector3(side * 3.9, 0, -9.9))
-		rack(a, Vector3(side * 3.35, 0, -16.6), 0.0)
-		mannequin(a, Vector3(side * 6.9, 0, -12.5), 0.0, 1)
+		Props.place(a, "folded_table", Vector3(side * 3.3, 0, -16.4), 0.0, 2 if side > 0 else 0)
+		mannequin(a, Vector3(side * 6.9, 0, -12.5), 0.0, 0)
 		mannequin(a, Vector3(side * 6.9, 0, -16.0), 0.0, 2)
-	Props.place(a, "easel", Vector3(-6.9, 0, -14.25), 0.25, 1, "SALE")
 
 
 ## A pillar: stepped stone base with a brass torus, brass bands at rail height on every floor,
@@ -514,6 +515,7 @@ static func _colonnade(a: Node3D) -> void:
 			pillar(a, s * 8.25, z, ROOF, s, 0.0)
 	for x in [-7.2, -2.2, 2.2, 7.2]:
 		pillar(a, x, MEZZ_Z + 0.25, LEVELS[0] - SLAB + 0.02)
+		_amber(ST.lantern(a, Vector3(x, 2.9, MEZZ_Z + 0.61), Vector3(0, 0, 1), 0.7, 5.0))   # globes framing MENSWEAR below
 
 
 ## The broad central aisle: a lighter runner with ivory borders from the court to the mezzanine.

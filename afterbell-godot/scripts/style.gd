@@ -131,8 +131,10 @@ static func textured(name: String, _legacy_scale: float, fallback: StandardMater
 	m.roughness_texture_channel = BaseMaterial3D.TEXTURE_CHANNEL_GRAYSCALE
 	m.metallic = metal
 	m.metallic_specular = (0.7 if metal >= 0.5 else 0.6) if CG else (0.5 if metal >= 0.5 else 0.35)
-	if CG or DECO:
+	if CG:
 		m.albedo_color = Color(1.06, 1.02, 0.98)   # a touch warmer and brighter
+	elif DECO:
+		m.albedo_color = Color(1.0, 0.94, 0.84) if name.begins_with("plaster") else Color(1.03, 1.0, 0.95)   # warm cream walls
 	m.uv1_triplanar = true
 	m.uv1_scale = Vector3.ONE / TEXTURE_TILE_M
 	m.texture_filter = BaseMaterial3D.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS_ANISOTROPIC   # no shimmer at grazing angles
@@ -376,6 +378,35 @@ static func globe(parent: Node3D, at: Vector3, radius := 0.14) -> MeshInstance3D
 	cap.position = at + Vector3(0, radius * 0.85, 0)
 	parent.add_child(cap)
 	return g
+
+
+## A globe lantern on a brass bracket, as on the reference's pillars: a backplate on the face at
+## `at`, a scrolled arm reaching out along `face`, and a large frosted globe hanging from it in a
+## brass collar, glowing, with a warm light.
+static func lantern(parent: Node3D, at: Vector3, face: Vector3, energy := 1.0, reach := 6.0) -> OmniLight3D:
+	var brass := _fx_mat("brass")
+	var f := face.normalized()
+	var plate := _fx_put(_fx_cyl(0.07, 0.07, 0.02, 18), brass, at, parent)
+	plate.basis = Basis.looking_at(-f, Vector3.UP) * Basis(Vector3.RIGHT, PI / 2.0)
+	plate.scale = Vector3(1.0, 1.0, 1.6)
+	var arm_end := at + f * 0.5 + Vector3(0, 0.1, 0)
+	var arm := _fx_put(_fx_cyl(0.018, 0.018, 0.52, 8), brass, (at + arm_end) * 0.5, parent)
+	arm.basis = Basis.looking_at(arm_end - at, Vector3.UP) * Basis(Vector3.RIGHT, PI / 2.0)
+	var brace := _fx_put(_fx_cyl(0.012, 0.012, 0.42, 8), brass, at + f * 0.22 - Vector3(0, 0.12, 0), parent)
+	brace.basis = Basis.looking_at(f + Vector3(0, 0.75, 0), Vector3.UP) * Basis(Vector3.RIGHT, PI / 2.0)
+	_fx_put(_fx_cyl(0.05, 0.08, 0.08, 16), brass, arm_end - Vector3(0, 0.06, 0), parent)   # collar
+	var g := globe(parent, arm_end - Vector3(0, 0.3, 0), 0.2)
+	g.scale = Vector3(1.0, 1.12, 1.0)
+	_fx_put(_fx_cyl(0.03, 0.05, 0.05, 12), brass, arm_end - Vector3(0, 0.55, 0), parent)  # finial
+	var light := OmniLight3D.new()
+	light.light_color = Color("ffd2a4")
+	light.light_energy = energy
+	light.light_specular = 0.15
+	light.omni_range = reach
+	light.omni_attenuation = 1.2
+	light.position = arm_end - Vector3(0, 0.3, 0) + f * 0.15
+	parent.add_child(light)
+	return light
 
 
 static var _fx := {}

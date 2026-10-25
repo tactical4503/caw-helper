@@ -18,6 +18,14 @@ const MAX_X := 7.6
 const MIN_Z := -5.6
 const MAX_Z := 8.6
 const RACK_LANE_Z := 3.6
+## What Ren notices at the perfume counters (west, west again, east, east again).
+const COUNTER_LINES := ["Testers in rose glass, every stopper turned the same way. Someone kept this counter all day.",
+		"The clerk's hand is still held out over the counter, waiting to offer a spritz.",
+		"Gift boxes stacked three-two-one, ribbons squared. The SALE card has been held up since five.",
+		"The price cards were written in the same careful hand. Nothing here has been touched since closing."]
+const COURT_FOV := 54.0       # court follow camera: lens, height scale, extra distance
+const COURT_LIFT := 1.32
+const COURT_REACH := 0.92
 
 # Section 11 timing table.
 const SIGN_TELL := 1.0
@@ -351,8 +359,10 @@ func _update_hud() -> void:
 	hud.set_tabs(bells)
 	gauge.set_health(hp, 6)
 	gauge.set_biscuits(biscuits)
-	if m_state != "defeated":
+	if m_state != "defeated" and seen.has("valued"):   # the bar arrives once he speaks
 		gauge.set_boss("THE FLOOR MANAGER", 3 - bells)
+	elif not seen.has("valued"):
+		gauge.clear_boss()
 
 
 func _process(delta: float) -> void:
@@ -661,6 +671,7 @@ func _update_manager(dt: float) -> void:
 				m_state = "roll"
 				if not seen.has("valued"):
 					seen["valued"] = true
+					_update_hud()
 					say("FLOOR MANAGER", "Valued— … Valued customers. The court is closed for fitting.", 3.0)
 		"roll":
 			var d := m_pos.distance_to(mark)
@@ -910,7 +921,11 @@ func _update_player(dt: float) -> void:
 		act_t = 0.28
 		dodge_cd = 0.55
 		sfx.swing()
-	if was_pressed("eat") and free and biscuits > 0 and hp < 6:
+	var at_counter := _near_counter()
+	if at_counter != 0 and was_pressed("eat") and free:   # E at a perfume counter examines it
+		say("", COUNTER_LINES[(at_counter + 1) + int(seen.get("counter_looks", 0)) % 2], 2.6)
+		seen["counter_looks"] = int(seen.get("counter_looks", 0)) + 1
+	elif was_pressed("eat") and free and biscuits > 0 and hp < 6:
 		biscuits -= 1
 		act = "eat"
 		act_t = 0.9
@@ -934,6 +949,16 @@ func _update_player(dt: float) -> void:
 	knock = knock.lerp(Vector2.ZERO, 1.0 - exp(-8.0 * dt))
 	p_pos.x = clampf(p_pos.x + vel.x * dt, MIN_X, MAX_X)
 	p_pos.y = clampf(p_pos.y + vel.y * dt, MIN_Z, MAX_Z)
+	for c in arena.plinths:   # the Manager's chair glances off the counters too, never through them
+		var rc: Rect2 = c
+		var mo := m_pos - rc.get_center()
+		var mx := rc.size.x / 2.0 + 0.5 - absf(mo.x)
+		var mz := rc.size.y / 2.0 + 0.5 - absf(mo.y)
+		if mx > 0.0 and mz > 0.0:
+			if mx < mz:
+				m_pos.x += signf(mo.x) * mx
+			else:
+				m_pos.y += signf(mo.y) * mz
 	var solids: Array = arena.plinths.duplicate()
 	for r in racks:
 		var rack: B.Rack = r
@@ -970,8 +995,19 @@ func _update_player(dt: float) -> void:
 			say("", "Retreated to the service passage.", 1.8)
 	elif charging and charge_t >= HEAVY_CHARGE:
 		gauge.show_prompt("attack", "Wound — release")
+	elif _near_counter() != 0:
+		gauge.show_prompt("interact", "Examine")
 	else:
 		gauge.hide_prompt()
+
+
+## -1 / +1 when Ren stands at the west / east perfume counter (within reach of its long face).
+func _near_counter() -> int:
+	for s in [-1, 1]:
+		var inner: float = s * (B.COUNTER_X - B.COUNTER_W * 0.5)
+		if absf(p_pos.x - inner) < 0.75 and p_pos.y < B.COUNTER_Z1 + 0.4:
+			return s
+	return 0
 
 
 func _face_target(dt: float) -> void:
@@ -1089,7 +1125,9 @@ func _render(dt: float) -> void:
 	var facing := look.normalized() if look.length() > 0.5 else Vector2(0, -1)
 	shake = maxf(0.0, shake - dt)
 	var court := Rect2(-6.8, MIN_Z - 1.0, 13.6, MAX_Z - MIN_Z + 1.2)
-	ShoulderCam.place(camera, p_pos, facing, dt, court, 66.0 if portrait else 58.0, wide * 1.18, shake * 0.4)   # Ren about half the frame, as in the reference
+	# A long lens from further back, as in the reference: Ren about half the frame height, and the
+	# counters, lily table, escalators and the bell on the mezzanine stacked up behind him.
+	ShoulderCam.place(camera, p_pos, facing, dt, court, (COURT_FOV + 8.0) if portrait else COURT_FOV, wide * COURT_LIFT, shake * 0.4, COURT_REACH)
 	if intro_t > 0.0 and mode == "play":
 		# Arrival: open on the aisle and the bell on the mezzanine, then ease into the follow camera.
 		intro_t = maxf(0.0, intro_t - dt)

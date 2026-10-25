@@ -18,15 +18,17 @@ const FEET_MARGIN := 4.0   # degrees of floor kept below Ren's feet
 
 
 ## Places `cam` behind `p` facing `forward` (world XZ). `bounds` keeps the camera inside the room.
-## `lift` scales height and distance (wide shots). `shake` jitters the aim point.
+## `lift` scales height and distance (wide shots). `shake` jitters the aim point. `reach`
+## scales the distance alone: with a narrower lens it keeps Ren the same size while the far
+## end of the room comes forward (the long-lens look of the court).
 static func place(cam: Camera3D, p: Vector2, forward: Vector2, dt: float, bounds: Rect2,
-		base_fov: float, lift := 1.0, shake := 0.0) -> void:
+		base_fov: float, lift := 1.0, shake := 0.0, reach := 1.0) -> void:
 	forward = forward.normalized() if forward.length() > 0.01 else Vector2(0, -1)
 	var right := Vector2(-forward.y, forward.x)
-	var want := p - forward * BACK * lift + right * SIDE
+	var want := p - forward * BACK * lift * reach + right * SIDE * reach
 	var at := Vector2(clampf(want.x, bounds.position.x, bounds.end.x),
 			clampf(want.y, bounds.position.y, bounds.end.y))
-	var squeeze := clampf(want.distance_to(at) / BACK, 0.0, 1.0)   # how much a wall cut the pull-back
+	var squeeze := clampf(want.distance_to(at) / (BACK * reach), 0.0, 1.0)   # how much a wall cut the pull-back
 	var k := 1.0 - exp(-FOLLOW * dt) if dt > 0.0 else 1.0
 	cam.position = cam.position.lerp(Vector3(at.x, HEIGHT * lift + squeeze * SQUEEZE_RISE, at.y), k)
 	cam.fov = lerpf(cam.fov, base_fov + squeeze * SQUEEZE_FOV, k)

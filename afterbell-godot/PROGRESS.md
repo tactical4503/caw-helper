@@ -58,6 +58,41 @@ small stock (price cards, perfume clusters, window stock) no longer casts shadow
 frames, portals, plaques, door leaves, sconces and glimpses merged per material; each room's
 loose static meshes merged (`Atrium.merge_direct`).
 
+## Court matched to the user's in-game reference (layout, not just lighting)
+`tools/ref_shot.gd` renders the court's gameplay frame (Ren at the court's north end, facing the bell) beside the reference image.
+
+**Changes**
+- Camera:
+  - the court follow camera (`COURT_FOV`, `COURT_LIFT`, `COURT_REACH` in main.gd) uses a 54° lens, sits higher, and is set back the reference's distance;
+  - the two court columns that blocked the lane are gone;
+  - the two chandeliers that hung into the top of the frame are gone, but their light stays.
+- Court floor and centre:
+  - the white court lines are replaced by teal carpet with cream / dark-teal / cream border bands;
+  - the striking stand is a round plum lily table, and the lever still comes out of its south face;
+  - the governor cabinet, with the B on its door, is now the front of the great bell's pedestal on the mezzanine.
+- Counters and figures:
+  - a long perfume counter runs down each side of the court's north end; they are solid for Ren and the Manager;
+  - the clerk mannequins are a white uniform with a peaked cap and an arm held out, and a cream dress with a red SALE cap and a raised SALE card;
+  - past the table: suit mannequins in fedoras and a brass jacket rack.
+- Lighting and finishes:
+  - globe lanterns on brass brackets on the court columns and under the mezzanine;
+  - plum fleur-de-lis banners on the court columns' ground storey;
+  - walnut balustrades;
+  - warmer cream plaster;
+  - a larger MENSWEAR sign.
+- HUD:
+  - octagonal brass-framed portrait, a brass rim on the health plate, and no "REN" label;
+  - biscuits are shown only while Ren is hurt;
+  - the objective plaque has a quatrefoil icon and an inner rule;
+  - the boss bar appears only once the Floor Manager speaks;
+  - an "Examine" prompt appears at the perfume counters (E examines there instead of eating a biscuit).
+- Ren:
+  - idle uses the keyframed clip (sword held low in the right hand, as in the reference) instead of the Mixamo great-sword idle, which carries the sword up over the shoulder.
+
+**Not identical:** the reference is a painting. The atrium is deeper than it shows, the court's side columns sit outside the frame, the shop under the mezzanine is less lit, and Ren is the game's model.
+
+**Checks:** all six test suites pass, and the fight and door views were re-rendered.
+
 ## Look: golden-hour department store (current, user's in-game reference)
 `Style.LOOK = "deco"`:
 - warm amber ambient instead of the blue sky fill;

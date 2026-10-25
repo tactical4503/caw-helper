@@ -36,7 +36,7 @@ const HALF := {
 	"perfume_tower": Vector2(0.6, 0.6), "flower_display": Vector2(0.66, 0.66), "easel": Vector2(0.36, 0.32),
 	"folded_table": Vector2(0.68, 0.38), "mannequin_group": Vector2(0.88, 0.88),
 	"centrepiece": Vector2(1.25, 1.25), "shelf_unit": Vector2(0.64, 0.24), "planter": Vector2(0.34, 0.34),
-	"leather_table": Vector2(0.68, 0.38),
+	"leather_table": Vector2(0.68, 0.38), "clerk": Vector2(0.3, 0.3),
 }
 
 ## Small or recessed stock that doesn't need to cast real-time shadows (measured: shadow
@@ -69,6 +69,10 @@ static func place(parent: Node3D, kind: String, at: Vector3, yaw := 0.0, variant
 			_label(node, text if text != "" else "SALE", Vector3(0, 0.3, 0.012), 0.0022, Color("eee6d4"), 48)
 		"price_card":
 			_label(node, text, Vector3(0, 0.105, 0.006), 0.0006, Color("4a2238"), 64)
+		"clerk":
+			if variant % 2 == 1:   # the sale clerk's cap and the card she holds up
+				_label(node, "SALE", CLERK_CAP + Vector3(0, 0.0, 0.005), 0.0011, Color("f3e7cf"), 48)
+				_label(node, "SALE", CLERK_CARD + Vector3(0, 0.1, 0.018), 0.0034, Color("f3e7cf"), 56)
 		"hanging_sign":
 			# Scale the lettering so the whole name fits inside the 2 m panel.
 			_label(node, text, Vector3(0, 0, 0.035), minf(0.0045, 1.8 / (maxf(text.length(), 1) * 0.55 * 64.0)), Color("4a2238"), 64)
@@ -196,6 +200,7 @@ static func _build(kind: String, v: int) -> Node3D:
 		"window_stock": _window_stock(n, v)
 		"leather_table": _leather_table(n, v)
 		"hanging_sign": _hanging_sign(n)
+		"clerk": _clerk(n, v)
 	return n
 
 
@@ -270,10 +275,79 @@ static func _mannequin(n: Node3D, v: int) -> void:
 			cloche.scale = Vector3(1.05, 0.75, 1.05)
 			_put(_cyl(0.16, 0.17, 0.02, 20), _m("plum"), Vector3(0, 1.88, 0), n)
 			_put(_sphere(0.03, 8), _m("dress_cream"), Vector3(0.12, 1.92, 0.06), n)   # flower pin
+		2:   # brown suit in a charcoal fedora
+			_put(_cyl(0.2, 0.2, 0.014, 24), _m("suit_charcoal"), Vector3(0, 1.94, 0), n)
+			_put(_cyl(0.1, 0.125, 0.14, 18), _m("suit_charcoal"), Vector3(0, 2.02, 0), n)
+			_put(_cyl(0.127, 0.127, 0.035, 18), _m("rubber"), Vector3(0, 1.97, 0), n)
 		3:
 			_put(_cyl(0.22, 0.22, 0.012, 24), _m("dress_cream"), Vector3(0, 1.93, 0), n)
 			_put(_cyl(0.11, 0.12, 0.09, 18), _m("dress_cream"), Vector3(0, 1.98, 0), n)
 			_put(_cyl(0.122, 0.122, 0.025, 18), _m("plum"), Vector3(0, 1.95, 0), n)
+
+
+## Where the sale clerk's cap front and raised card sit (for their SALE lettering).
+const CLERK_CAP := Vector3(0, 1.985, 0.15)
+const CLERK_CARD := Vector3(0.5, 1.92, 0.12)
+
+
+## A life-size counter clerk mannequin (the reference's foreground pair), standing behind a
+## counter and presenting it: 0 a white uniform with a black bow tie and a peaked cap, one arm
+## held out over the counter, palm up; 1 a cream dress and a red SALE cap, one hand raising a
+## SALE card. Seen from the waist up over the counter, so the torso carries the detail.
+static func _clerk(n: Node3D, v: int) -> void:
+	var sale := v % 2 == 1
+	var ivory := _m("ivory")
+	var cloth: Material = _m("dress_cream") if sale else _m("shirt")
+	_put(_cyl(0.2, 0.24, 0.04, 24), _m("rubber"), Vector3(0, 0.02, 0), n)
+	_put(_cyl(0.018, 0.018, 0.5, 8), _m("brass"), Vector3(0, 0.3, 0), n)
+	var skirt := _put(_cyl(0.19, 0.31, 0.7, 24), cloth, Vector3(0, 0.88, 0), n)
+	skirt.scale = Vector3(1, 1, 0.82)
+	var bodice := _put(_cyl(0.2, 0.16, 0.56, 20), cloth, Vector3(0, 1.41, 0), n)
+	bodice.scale = Vector3(1, 1, 0.72)
+	_put(_cyl(0.165, 0.165, 0.05, 20), _m("rubber") if not sale else _m("plum"), Vector3(0, 1.16, 0), n).scale = Vector3(1, 1, 0.74)   # belt
+	var shoulder := _put(_capsule(0.07, 0.52), cloth, Vector3(0, 1.62, 0), n)
+	shoulder.rotation.z = PI / 2.0
+	shoulder.scale = Vector3(1, 1, 0.85)
+	if not sale:
+		for row in [-1.0, 1.0]:   # double-breasted brass buttons
+			for y in [1.3, 1.42, 1.54]:
+				_put(_sphere(0.016, 6), _m("brass"), Vector3(row * 0.055, y, 0.145), n)
+		var collar := _put(_cyl(0.075, 0.09, 0.06, 14), cloth, Vector3(0, 1.68, 0), n)
+		collar.scale = Vector3(1, 1, 0.9)
+		for sx in [-1.0, 1.0]:   # black bow tie
+			var wing := _put(_box(0.07, 0.05, 0.03), _m("rubber"), Vector3(sx * 0.04, 1.665, 0.085), n)
+			wing.rotation.z = sx * 0.25
+		_put(_sphere(0.018, 8), _m("rubber"), Vector3(0, 1.665, 0.1), n)
+	else:
+		_put(_cyl(0.07, 0.07, 0.012, 16), _m("rubber"), Vector3(0, 1.66, 0.02), n).rotation.x = 0.5   # choker
+	# Arms: [shoulder, elbow, hand] per side. Uniform: left at the side, right held out, palm up.
+	# Sale: right resting on the hip, left raised high with the card.
+	var arms: Array = [
+		[Vector3(-0.27, 1.6, 0), Vector3(-0.3, 1.3, 0.02), Vector3(-0.29, 1.02, 0.06)],
+		[Vector3(0.27, 1.6, 0), Vector3(0.48, 1.42, 0.14), Vector3(0.72, 1.4, 0.3)],
+	] if not sale else [
+		[Vector3(-0.27, 1.6, 0), Vector3(-0.44, 1.33, -0.04), Vector3(-0.22, 1.13, 0.04)],
+		[Vector3(0.27, 1.6, 0), Vector3(0.44, 1.62, 0.08), CLERK_CARD + Vector3(-0.02, -0.2, 0.0)],
+	]
+	for arm in arms:
+		_limb(n, arm[0], arm[1], 0.052, cloth)
+		_limb(n, arm[1], arm[2], 0.046, ivory)
+		_put(_sphere(0.05, 10), ivory, arm[2], n).scale = Vector3(0.75, 0.6 if arm[2].y > 1.3 and not sale else 1.0, 1.2)
+	_put(_cyl(0.05, 0.06, 0.12, 12), ivory, Vector3(0, 1.74, 0), n)
+	_put(_sphere(0.13, 18), ivory, Vector3(0, 1.92, 0.01), n).scale = Vector3(0.88, 1.18, 0.96)
+	if not sale:   # white peaked cap: crown, black band, black visor
+		_put(_cyl(0.16, 0.125, 0.11, 22), _m("shirt"), Vector3(0, 2.07, -0.01), n).scale = Vector3(1, 1, 1.05)
+		_put(_cyl(0.128, 0.128, 0.04, 22), _m("rubber"), Vector3(0, 2.02, -0.005), n)
+		var visor := _put(_cyl(0.13, 0.13, 0.014, 22), _m("rubber"), Vector3(0, 2.0, 0.07), n)
+		visor.scale = Vector3(1, 1, 0.6)
+		visor.rotation.x = 0.18
+	else:   # red baseball cap with its brim forward, and the SALE card held up
+		_put(_sphere(0.14, 18), _m("sale_red"), Vector3(0, 2.0, -0.005), n).scale = Vector3(1.0, 0.7, 1.05)
+		var brim := _put(_cyl(0.12, 0.12, 0.014, 20), _m("sale_red"), Vector3(0, 1.96, 0.13), n)
+		brim.scale = Vector3(1, 1, 0.75)
+		brim.rotation.x = 0.12
+		_put(_box(0.42, 0.56, 0.025), _m("sale_red"), CLERK_CARD + Vector3(0, 0, 0), n)
+		_put(_box(0.44, 0.58, 0.012), _m("brass"), CLERK_CARD + Vector3(0, 0, -0.012), n)
 
 
 ## A rounded limb from `a` to `b`.

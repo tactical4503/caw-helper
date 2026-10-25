@@ -22,6 +22,11 @@ const Atrium := preload("res://scripts/atrium.gd")
 
 const RACK_HOME := [Vector2(-4.9, 0.6), Vector2(4.9, 0.6)]
 const BELL_POS := Vector3(0, 0, -7.0)
+## The long perfume counters down the court's north end (the reference's foreground).
+const COUNTER_X := 3.75       # centre line; inner face at 3.2, so the lane between is 6.4 m
+const COUNTER_W := 1.1
+const COUNTER_Z0 := -9.3
+const COUNTER_Z1 := -2.4
 
 class SignData:
 	var node: Node3D
@@ -99,6 +104,19 @@ static func brass() -> StandardMaterial3D:
 	return _brass
 
 
+## A carpet border just inside `r` (x, z): a broad cream band, a dark teal band, a fine cream line.
+static func _band(root: Node3D, r: Rect2, cream: Material, dark: Material) -> void:
+	for ring in [[0.0, 0.26, cream, 0.033], [0.26, 0.16, dark, 0.03], [0.48, 0.05, cream, 0.033]]:
+		var inset: float = ring[0]
+		var w: float = ring[1]
+		var q := r.grow(-inset)
+		var y: float = ring[3]
+		put(box(q.size.x, 0.024, w), ring[2], Vector3(q.get_center().x, y, q.position.y + w * 0.5), root, false)
+		put(box(q.size.x, 0.024, w), ring[2], Vector3(q.get_center().x, y, q.end.y - w * 0.5), root, false)
+		put(box(w, 0.024, q.size.y - w * 2.0), ring[2], Vector3(q.position.x + w * 0.5, y, q.get_center().y), root, false)
+		put(box(w, 0.024, q.size.y - w * 2.0), ring[2], Vector3(q.end.x - w * 0.5, y, q.get_center().y), root, false)
+
+
 static func put(mesh: Mesh, material: Material, pos: Vector3, parent: Node3D, cast := true) -> MeshInstance3D:
 	var mi := MeshInstance3D.new()
 	mi.mesh = mesh
@@ -166,41 +184,44 @@ static func build_arena(parent: Node3D) -> Arena:
 	bell_light.look_at(Vector3(0, Atrium.LEVELS[0] + 1.6, Atrium.MEZZ_Z - 1.25), Vector3.FORWARD)
 
 	put(box(18, 0.1, 20), ST.textured("tile_cream", 0.6, ST.procedural(Color("b9a98a"), TILE, "marble")), Vector3(0, -0.05, 0), root, false)
-	put(box(16, 0.02, 18), ST.textured("carpet_forest", 0.5, ST.procedural(Color("1f3a2a"), CARPET_LIGHT, "carpet", 1.5)), Vector3(0, 0.01, 0), root, false)
-	# Three carpet inlays fan toward the bell: decoration that also reads as approach lanes. Each
-	# carpet section is framed by a broad cream stone border, as in the store's public aisles.
-	var lever_z := -6.1
+	var field := ST.textured("carpet_forest", 0.5, ST.procedural(Color("1f3a2a"), CARPET_LIGHT, "carpet", 1.5))
+	field.albedo_color = Color(0.86, 1.12, 1.16)   # toward the reference's blue-teal
+	put(box(16, 0.02, 18), field, Vector3(0, 0.01, 0), root, false)
+	# The carpet as in the reference: a deep teal field, and round every counter and the court a
+	# border of a broad cream band, a dark teal band and a fine cream line.
 	var border: Material = Atrium.Props._m("counter_top")
-	put(box(4, 0.02, 12), ST.textured("carpet_forest", 0.5, mat(CARPET, 0.9)), Vector3(0, 0.025, lever_z + 6.2), root, false)
+	var band_dark := ST.textured("carpet_forest", 0.5, mat(Color("1d3a36"), 0.9))
+	for side in [[Vector3(0, 0, -8.83), Vector3(16, 0, 0.34)], [Vector3(0, 0, 8.83), Vector3(16, 0, 0.34)],
+			[Vector3(-7.83, 0, 0), Vector3(0.34, 0, 18)], [Vector3(7.83, 0, 0), Vector3(0.34, 0, 18)]]:
+		put(box(side[1].x, 0.024, side[1].z), border, side[0] + Vector3(0, 0.031, 0), root, false)   # court perimeter
 	for s in [-1.0, 1.0]:
-		var strip := put(box(1.4, 0.02, 10), ST.textured("carpet_sage", 0.5, mat(CARPET_LIGHT, 0.9)), Vector3(s * 4.2, 0.022, lever_z + 5.4), root, false)
-		strip.rotation.y = s * 0.33
-		put(box(0.34, 0.024, 12.0), border, Vector3(s * 2.17, 0.03, lever_z + 6.2), root, false)       # runner borders
-	put(box(4.68, 0.024, 0.34), border, Vector3(0, 0.03, lever_z + 0.03), root, false)                   # runner head at the stand
-	for side in [[Vector3(0, 0.031, -8.83), Vector3(16, 0.024, 0.34)], [Vector3(0, 0.031, 8.83), Vector3(16, 0.024, 0.34)],
-			[Vector3(-7.83, 0.031, 0), Vector3(0.34, 0.024, 18)], [Vector3(7.83, 0.031, 0), Vector3(0.34, 0.024, 18)]]:
-		put(box(side[1].x, side[1].y, side[1].z), border, side[0], root, false)                           # court perimeter
-	# Bell partition (the rest of the north side opens onto the atrium), display platforms either side.
-	var wall := ST.textured("plaster_cream", 0.3, mat(CREAM, 0.7))
-	# The north edge is one waist-high balustrade: the lower hall, the escalators and the bell on
-	# the mezzanine read straight over it from the court.
-	put(box(3.8, 1.05, 0.25), Atrium._m("cream"), Vector3(0, 0.52, -9.15), root)
-	put(box(3.8, 0.08, 0.3), brass(), Vector3(0, 1.07, -9.15), root)
-	for s in [-1.0, 1.0]:
-		put(Atrium.Props.rounded_block(4.3, 0.06, 1.5, 0.08), mat(Color("2a1420"), 0.7), Vector3(s * 4.6, 0, -8.15), root)
-		put(Atrium.Props.rounded_block(4.4, 0.26, 1.6, 0.12, 0.03), ST.textured("laminate_plum", 1.2, mat(PLUM, 0.5)), Vector3(s * 4.6, 0.06, -8.15), root)
-		put(Atrium.Props.rounded_block(4.44, 0.03, 1.64, 0.13), brass(), Vector3(s * 4.6, 0.2, -8.15), root)
-	# Displays on the platforms (top at 0.32) mirror each other and step down toward the bell:
-	# a palm at the outer end, a perfume tower, then a mannequin turned in to present the bell,
-	# and only a low row of boxes at the inner end, so nothing crosses its silhouette.
-	var top := 0.32
+		_band(root, Rect2(Vector2(s * COUNTER_X - COUNTER_W * 0.5 - 0.55, COUNTER_Z0 - 0.55), Vector2(COUNTER_W + 1.1, COUNTER_Z1 - COUNTER_Z0 + 1.1)), border, band_dark)
+	_band(root, Rect2(Vector2(-1.55, -8.55), Vector2(3.1, 3.1)), border, band_dark)   # round the lily table
+	# The reference's foreground: a long perfume counter down each side of the court's north end,
+	# each kept by a clerk mannequin, stocked with gift boxes and testers. Ren walks the lane
+	# between them toward the lily table, the escalators and the bell on the mezzanine.
 	var P = Atrium.Props
 	for s in [-1.0, 1.0]:
-		P.place(root, "planter", Vector3(s * 6.35, top, -8.3), 0.0, 1)
-		P.place(root, "perfume_tower", Vector3(s * 5.0, top, -8.2), 0.0, 1 if s > 0 else 2)
-		P.place(root, "mannequin", Vector3(s * 3.75, top, -8.15), -s * 1.2, (3 if s > 0 else 1) + 4 * (0 if s > 0 else 2))
-		P.place(root, "perfume_boxes", Vector3(s * 2.95, top, -7.75), -s * 0.35, 1 if s > 0 else 2)
-		P.place(root, "price_card", Vector3(s * 2.6, top, -7.5), -s * 0.35, 0, "14.95" if s > 0 else "9.50")
+		var cx: float = s * COUNTER_X
+		var len := COUNTER_Z1 - COUNTER_Z0
+		var cz := (COUNTER_Z0 + COUNTER_Z1) * 0.5
+		var c: Node3D = P.counter(root, Vector3(cx, 0, cz), Vector3(COUNTER_W, P.WAIST, len), "cream", 0.1)
+		c.name = "RefCounter"
+		var top_y: float = P.WAIST
+		var n := int(len / 1.15)
+		for k in n:
+			var z := COUNTER_Z0 + (k + 0.5) * len / n
+			P.place(root, "perfume_boxes", Vector3(cx, top_y, z), -s * PI / 2.0, k + (0 if s < 0 else 2))
+		# A glass case of boxed scent behind each counter, and the clerk between case and counter.
+		if s < 0.0:   # a vitrine of boxed scent behind the west clerk; the east side stays open
+			for k in 2:
+				P.place(root, "shelf_unit", Vector3(s * (COUNTER_X + 1.45), 0, COUNTER_Z0 + 1.6 + k * 1.25), -s * PI / 2.0, 2)
+		var clerk: Node3D = P.place(root, "clerk", Vector3(s * (COUNTER_X + 0.72), 0, COUNTER_Z1 - (2.9 if s < 0 else 4.6)), -s * 1.2, 0 if s < 0 else 1)
+		clerk.scale = Vector3.ONE * 1.08
+		a.plinths.append(Rect2(Vector2(cx - COUNTER_W * 0.5, COUNTER_Z0), Vector2(COUNTER_W, len)))
+	P.place(root, "price_card", Vector3(-COUNTER_X + 0.35, P.WAIST, COUNTER_Z0 + 2.4), PI / 2.0, 0, "9.50")
+	P.place(root, "price_card", Vector3(COUNTER_X - 0.35, P.WAIST, COUNTER_Z0 + 2.4), -PI / 2.0, 0, "14.95")
+	var wall := ST.textured("plaster_cream", 0.3, mat(CREAM, 0.7))
 	# West wall with the service door; waist-high east barrier over the atrium; low south wall and gate.
 	# West wall runs up to the gallery floor, so the service doors sit in a full wall.
 	put(box(0.3, 4.55, 15.2), wall, Vector3(-8.15, 2.275, -1.4), root)
@@ -247,67 +268,36 @@ static func build_arena(parent: Node3D) -> Arena:
 	stage.name = "BellStage"
 	bell.add_child(stage)
 	var stone := ST.textured("stone_cream", 0.35, mat(Color("e6dcc8"), 0.6))
-	put(P.rounded_block(2.0, 0.1, 2.0, 0.16, 0.025), stone, Vector3.ZERO, stage)            # stepped stone base
-	put(P.rounded_block(2.03, 0.02, 2.03, 0.17), brass(), Vector3(0, 0.1, 0), stage)
-	P.counter(stage, Vector3(0, 0.1, 0), Vector3(1.3, 1.05, 1.3), "cream", 0.1)            # panelled pedestal, top at 1.15
-	var crown := 1.15
-	_emblem(stage, Vector3(0, 0.82, 0.668), 0.2)                                            # the B on the stand's face
-	put(box(0.26, 0.16, 0.012), brass(), Vector3(0, 0.42, 0.66), stage)                     # escutcheon round the lever slot
-	put(box(0.14, 0.1, 0.014), mat(DARK, 0.8), Vector3(0, 0.42, 0.662), stage)
-	var engraved := Label3D.new()   # quiet engraving on the top's front edge, not a sign
-	engraved.text = "S E R V I C E"
-	engraved.font_size = 48
-	engraved.pixel_size = 0.0016
-	engraved.outline_size = 0
-	engraved.modulate = Color("8a6a3a")
-	engraved.position = Vector3(0, crown - 0.04, 0.711)
-	engraved.double_sided = false
-	stage.add_child(engraved)
-	# Brass stanchions and plum velvet rope along the stand's flanks.
-	for sx in [-1.0, 1.0]:
-		var posts := [Vector3(sx * 1.25, 0, -0.9), Vector3(sx * 1.25, 0, 0.55)]
-		for p in posts:
-			put(cyl(0.13, 0.15, 0.04, 20), brass(), p + Vector3(0, 0.02, 0), stage)
-			put(cyl(0.022, 0.026, 0.92, 10), brass(), p + Vector3(0, 0.5, 0), stage)
-			put(sphere(0.045, 12), brass(), p + Vector3(0, 0.98, 0), stage)
-		var rope := ST.textured("velvet_red", 1.0, mat(PLUM, 0.9))
-		var prev: Vector3 = posts[0] + Vector3(0, 0.9, 0)
-		for k in range(1, 7):
-			var t := k / 6.0
-			var q: Vector3 = posts[0].lerp(posts[1], t) + Vector3(0, 0.9 - sin(t * PI) * 0.16, 0)
-			var seg := put(cyl(0.018, 0.018, prev.distance_to(q) + 0.01, 8), rope, (prev + q) * 0.5, stage)
-			seg.basis = P._aim_y(q - prev)
-			prev = q
-	for sx in [-1.0, 1.0]:   # ferns against the balustrade either side of the stand
-		P.place(stage, "planter", Vector3(sx * 1.7, 0, -1.6), 0.0, 0)
-	# The bell cable: plum-wrapped, brass ferrules, sagging from the cabinet up to the mezzanine.
-	var cable_from := Vector3(0.4, crown + 0.05, -0.45)
-	var cable_to := Vector3(0.5, Atrium.LEVELS[0] - 1.9, Atrium.MEZZ_Z - BELL_POS.z + 0.45)
-	var cable_mat := mat(Color("2a1420"), 0.6)
-	var last := cable_from
-	for k in range(1, 13):
-		var t := k / 12.0
-		var q := cable_from.lerp(cable_to, t) - Vector3(0, sin(t * PI) * 1.1, 0)
-		var seg := put(cyl(0.035, 0.035, last.distance_to(q) + 0.02, 8), cable_mat, (last + q) * 0.5, stage)
-		seg.basis = P._aim_y(q - last)
-		last = q
-	for e in [cable_from, cable_to]:
-		put(cyl(0.06, 0.06, 0.12, 12), brass(), e, stage)
+	# The striking stand is the reference's round lily table: a plum drum banded in brass under a
+	# cream top, a dark vase of white lilies, gift boxes round its rim. The lever comes out
+	# through a brass escutcheon on its south face, where the racks and the chair strike it.
+	put(cyl(0.8, 0.82, 0.08, 48), mat(Color("2a1420"), 0.7), Vector3(0, 0.04, 0), stage)
+	put(cyl(0.74, 0.76, 0.78, 48), Atrium.Props._m("counter_plum"), Vector3(0, 0.47, 0), stage)
+	for y in [0.12, 0.8]:
+		put(cyl(0.77, 0.77, 0.035, 48), Atrium.Props._m("counter_brass"), Vector3(0, y, 0), stage)
+	put(cyl(0.82, 0.79, 0.1, 48), Atrium.Props._m("cream"), Vector3(0, 0.88, 0), stage)
+	put(cyl(0.86, 0.86, 0.06, 48), Atrium.Props._m("counter_top"), Vector3(0, 0.96, 0), stage)
+	var crown := 0.99
+	P.place(stage, "flower_display", Vector3(0, crown - 0.73, 0), 0.0)   # its vase and lilies rise from the top
+	for k in 6:
+		var ang := TAU * k / 6.0 + 0.3
+		P.place(stage, "perfume_boxes", Vector3(sin(ang) * 0.56, crown, cos(ang) * 0.56), ang, k).scale = Vector3.ONE * 0.4
+	put(box(0.3, 0.2, 0.03), brass(), Vector3(0, 0.42, 0.76), stage)                       # escutcheon round the lever slot
+	put(box(0.16, 0.11, 0.034), mat(DARK, 0.8), Vector3(0, 0.42, 0.765), stage)
 	Atrium.merge(stage)
 	# The striking lever comes out through the stand's slot; racks hit its padded plate.
 	a.lever = Node3D.new()
-	a.lever.position = Vector3(0, 0.42, 0.25)
+	a.lever.position = Vector3(0, 0.42, 0.4)
 	bell.add_child(a.lever)
 	put(box(0.1, 0.08, 0.75), mat(Color("3b3430"), 0.5, 0.5), Vector3(0, 0, 0.35), a.lever)
 	put(box(0.5, 0.36, 0.12), mat(RED, 0.8), Vector3(0, 0, 0.75), a.lever)  # padded striking plate faces south
 	# The governor cabinet hangs from the mezzanine fascia under the great bell ("behind the
 	# service bell, upstairs"), the B on its door; its tabs count the rings. The stand stays
 	# low, so the flowers in the lower hall rise over it.
+	# Its door, with the B, is the front of the great bell's pedestal; tabs below count the rings.
 	var cabinet := Node3D.new()
-	cabinet.position = Vector3(0, Atrium.LEVELS[0] - 1.45, Atrium.MEZZ_Z + 0.45)
+	cabinet.position = Vector3(0, Atrium.LEVELS[0] + 0.78, Atrium.MEZZ_Z - 1.35 + 0.64)
 	root.add_child(cabinet)
-	for sx in [-0.45, 0.45]:   # its hanging brackets
-		put(box(0.06, 0.5, 0.3), brass(), Vector3(sx, 0.75, -0.12), cabinet)
 	put(box(1.2, 1.1, 0.5), mat(CREAM, 0.55), Vector3.ZERO, cabinet)
 	put(box(1.28, 0.06, 0.56), brass(), Vector3(0, 0.58, 0), cabinet)
 	a.cabinet_door = Node3D.new()
@@ -315,7 +305,7 @@ static func build_arena(parent: Node3D) -> Arena:
 	cabinet.add_child(a.cabinet_door)
 	put(box(1.12, 1.0, 0.04), mat(CREAM, 0.45), Vector3(0.56, 0, 0), a.cabinet_door)
 	put(box(0.05, 0.18, 0.05), brass(), Vector3(1.0, 0, 0.03), a.cabinet_door)
-	_emblem(a.cabinet_door, Vector3(0.56, 0.1, 0.038), 0.24)
+	_emblem(a.cabinet_door, Vector3(0.56, 0.1, 0.038), 0.3)
 	var governor := put(cyl(0.07, 0.07, 0.3), brass(), Vector3(0, 0, 0.02), cabinet)
 	governor.rotation.z = PI / 2.0
 	for x in [-0.34, 0.0, 0.34]:
@@ -329,7 +319,6 @@ static func build_arena(parent: Node3D) -> Arena:
 	grand.add_child(gstage)
 	put(P.rounded_block(2.2, 0.1, 2.2, 0.18, 0.025), stone, Vector3.ZERO, gstage)
 	P.counter(gstage, Vector3(0, 0.1, 0), Vector3(1.7, 1.45, 1.7), "cream", 0.12)   # tall enough that the dome clears the rail
-	_emblem(gstage, Vector3(0, 1.0, 0.868), 0.3)
 	var g_top := 1.55
 	put(cyl(1.12, 1.18, 0.12, 48), mat(Color("1d1418"), 0.35), Vector3(0, g_top + 0.06, 0), gstage)
 	put(cyl(1.19, 1.19, 0.03, 48), brass(), Vector3(0, g_top + 0.01, 0), gstage)
@@ -462,8 +451,7 @@ static func _build_hall(arena_root: Node3D) -> void:
 	arena_root.add_child(root)
 	# Columns along the court, each running up past both galleries to the roof.
 	var banner := ST.textured("plaster_plum", 0.8, mat(PLUM, 0.6))
-	for spot in [Vector2(-7.75, -6), Vector2(-7.75, -1), Vector2(-7.75, 4), Vector2(7.95, -6), Vector2(7.95, -1), Vector2(7.95, 4),
-			Vector2(-4, -8.85), Vector2(4, -8.85)]:
+	for spot in [Vector2(-7.75, -6), Vector2(-7.75, -1), Vector2(-7.75, 4), Vector2(7.95, -6), Vector2(7.95, -1), Vector2(7.95, 4)]:
 		var on_side: bool = absf(spot.x) > 7.0
 		var face := Vector3(-signf(spot.x), 0, 0) if on_side else Vector3(0, 0, 1)
 		# Stepped base, brass bands at rail height, capitals under each balcony; side columns
@@ -479,14 +467,23 @@ static func _build_hall(arena_root: Node3D) -> void:
 		put(box(bw + 0.08 if not on_side else 0.07, 0.09, 0.07 if not on_side else bw + 0.08), brass(), bb.position + Vector3(0, bh * 0.5, 0), root)
 		put(box(bw if not on_side else 0.065, 0.05, 0.065 if not on_side else bw), brass(), bb.position + Vector3(0, -bh * 0.5 + 0.18, 0) + face * 0.005, root)
 		Atrium.fleur(root, bb.position + Vector3(0, bh * 0.14, 0) + face * 0.05, face, 0.72)
-		Atrium._amber(ST.sconce(root, Vector3(spot.x, 2.3, spot.y) + face * 0.35, face, 0.9, 4.5))   # warm pool on each column
+		# As in the reference: a second plum banner on the court face of the ground storey, and a
+		# globe lantern on a brass bracket off the south face, on both storeys.
+		var lb := put(box(0.06, 2.6, 0.9), banner, Vector3(spot.x, 3.0, spot.y) + face * 0.38, root)
+		put(box(0.07, 0.08, 0.98), brass(), lb.position + Vector3(0, 1.3, 0), root)
+		put(box(0.065, 0.05, 0.9), brass(), lb.position + Vector3(0, -1.12, 0) + face * 0.005, root)
+		Atrium.fleur(root, lb.position + Vector3(0, 0.25, 0) + face * 0.05, face, 0.6)
+		for y in [2.75, Atrium.LEVELS[0] + 2.4]:
+			Atrium._amber(ST.lantern(root, Vector3(spot.x, y, spot.y + 0.36), Vector3(0, 0, 1), 1.1, 6.0))
 	# Chandeliers on long drops from the roof: pools of light down the court and over the bell.
-	for z in [5.0, 0.0, -5.0]:
+	for z in [5.0]:   # the north two are gone: the reference's view up the hall is clear to the roof
 		put(cyl(0.02, 0.02, Atrium.ROOF - 5.6, 6), brass(), Vector3(0, (Atrium.ROOF + 5.6) * 0.5, z), root, false)
 		put(cyl(0.5, 0.15, 0.25, 16), brass(), Vector3(0, 5.5, z), root, false)
 		for i in 6:
 			var ang := TAU * i / 6.0
 			ST.globe(root, Vector3(cos(ang) * 0.5, 5.25, z + sin(ang) * 0.5), 0.11)
+		Atrium._amber(ST.ceiling_light(root, Vector3(0, 5.0, z), 1.0, 6.5))
+	for z in [0.0, -5.0]:   # their light stays, from fittings in the coffers
 		Atrium._amber(ST.ceiling_light(root, Vector3(0, 5.0, z), 1.0, 6.5))
 	Atrium.merge(root)
 
