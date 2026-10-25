@@ -52,6 +52,23 @@ DAE files were not copied, nor were the stages' glTF files. The folders keep the
 
 Pre-import state: branch `pre-asset-import-baseline` (commit e02a750). That branch exists only in the local clone and was not pushed. Rolling back the integration alone means deleting the files above, or reverting the import commit. No existing file other than `.gitignore` was edited.
 
+## Placed in the playable atrium (user request, after staging)
+`Atrium.IMPORTED_PLACES` (scripts/atrium.gd) places 11 wrapped models as static dressing, all where neither Ren nor the Floor Manager walks:
+
+| Model | Placement |
+|---|---|
+| Plum clerk, teal clerk | behind the glazed MENSWEAR shopfront |
+| Two male dress forms | behind the glazed MENSWEAR shopfront |
+| Two female dress forms | on the mezzanine |
+| Suitcase | by the brass rack next to the lily table |
+| Both ivory pillars | against the window wall on the mezzanine |
+| Eric, Franklin | as costume figures on plum plinths on the side galleries |
+
+Each one is skipped when its files are absent, so a clean clone builds the same atrium without them.
+
+- **Export:** `export_presets.cfg` now includes `assets/imports/*`, so local builds carry the models.
+- **Stage sections:** not placed. They have no fitting location in the store, so they stay in the staging scene.
+
 ## Use
 - Run `rooms/asset_staging.tscn` (F6). A/D orbit, W/S zoom, Q/E switch row.
 - To render one group: `godot --path . -s res://tools/staging_shots.gd -- --group=props|characters|stage1|stage2 --views=front,back,top,close,close_back --out=<dir>`.
@@ -72,4 +89,4 @@ Pre-import state: branch `pre-asset-import-baseline` (commit e02a750). That bran
 - The pillar shaft is a half shell seen from behind (source geometry).
 - The character textures are visibly low-res and blocky; that is the art itself, not an import fault.
 - The stage scale is approximate; see `STAGE_UNIT`.
-- Not tested: real-time inspection in the editor window, and any placement in the playable level (none was made).
+- Not tested: real-time inspection in the editor window. The in-level placements were checked with a headless count (all 11 placed) and Forward+ renders.

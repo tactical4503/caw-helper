@@ -8,6 +8,8 @@ var out := "user://ref_shot.png"
 var ref := ""
 var pos := Vector2(0.0, -4.2)
 var show_boss := false
+var cam := Vector3.INF
+var look := Vector3.ZERO
 var room: Node
 var wait := -1
 
@@ -23,6 +25,12 @@ func _initialize() -> void:
 			pos = Vector2(float(p[0]), float(p[1]))
 		elif arg == "--boss":
 			show_boss = true
+		elif arg.begins_with("--cam="):   # free camera: --cam=x,y,z --look=x,y,z (no reference paste)
+			var c := arg.substr(6).split(",")
+			cam = Vector3(float(c[0]), float(c[1]), float(c[2]))
+		elif arg.begins_with("--look="):
+			var l := arg.substr(7).split(",")
+			look = Vector3(float(l[0]), float(l[1]), float(l[2]))
 	Engine.set_meta("afterbell_testing", true)
 	root.size = Vector2i(1280, 960)
 	room = load("res://main.tscn").instantiate()
@@ -48,6 +56,10 @@ func _process(_d: float) -> bool:
 			room._render(1.0 / 30.0)
 		room.boss.visible = show_boss
 		room.gauge.gamepad = true   # the reference shows controller glyphs
+		if cam != Vector3.INF:
+			room.set_process(false)
+			room.camera.position = cam
+			room.camera.look_at(look, Vector3.UP)
 		wait = 20
 		return false
 	wait -= 1

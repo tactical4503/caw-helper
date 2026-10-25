@@ -8,6 +8,7 @@ extends RefCounted
 
 const ST := preload("res://scripts/style.gd")
 const Props := preload("res://scripts/props.gd")
+const Imported := preload("res://scripts/imported_assets.gd")
 
 const CREAM := Color("eee6d4")
 const IVORY := Color("ece4d6")
@@ -56,6 +57,7 @@ static func build(root: Node3D) -> void:
 	_roof(a)
 	_lower_hall(a)
 	_dress_aisles(a)
+	_imported(a)
 	_lights(a)
 	merge(a)
 
@@ -475,6 +477,40 @@ static func _roof(a: Node3D) -> void:
 	for x in [-GALLERY_X, -3.0, 3.0, GALLERY_X]:
 		var rib := _put(_box(0.35, 0.45, depth), _m("walnut" if ST.DECO else "cream"), Vector3(x, ROOF - 0.22, mid_z), a, false)
 		rib.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+
+
+## The supplied package models (assets/imports/, local only; see docs/ASSET_IMPORT.md), placed as
+## static dressing where nobody walks: the clerks and dress forms behind the MENSWEAR glass, the
+## female forms on the mezzanine, the suitcase by the brass rack, the two pillar models against
+## the window wall, Eric and Franklin as costume displays on the side galleries. Each is skipped
+## if its files are missing, so a clean clone builds the same atrium without them.
+const IMPORTED_PLACES := [
+	["clerk_plum", Vector3(-1.1, 0, -23.2), 0.25],
+	["clerk_teal", Vector3(1.2, 0, -23.6), -0.3],
+	["mannequin_male", Vector3(-2.3, 0, -21.9), 0.3],
+	["mannequin_male", Vector3(2.3, 0, -21.9), -0.3],
+	["mannequin_female", Vector3(-4.9, LEVELS[0], MEZZ_Z - 2.6), 0.4],
+	["mannequin_female", Vector3(4.9, LEVELS[0], MEZZ_Z - 2.6), -0.4],
+	["suitcase", Vector3(1.35, 0, -8.0), 0.5],
+	["pillar_snowpoint", Vector3(-6.6, LEVELS[0], NORTH_Z + 1.0), 0.0],
+	["pillar_turnback", Vector3(6.6, LEVELS[0], NORTH_Z + 1.0), 0.0],
+	["eric", Vector3(-11.4, LEVELS[0] + 0.3, -3.0), PI / 2.0],
+	["franklin", Vector3(11.4, LEVELS[0] + 0.3, -3.0), -PI / 2.0],
+]
+
+
+static func _imported(a: Node3D) -> void:
+	for place in IMPORTED_PLACES:
+		var w: Node3D = Imported.make(place[0])
+		if w == null:
+			continue
+		w.position = place[1]
+		w.rotation.y = place[2]
+		a.add_child(w)
+		if place[0] in ["eric", "franklin"]:   # display plinths under the costume figures
+			var at: Vector3 = place[1]
+			_put(_cyl(0.42, 0.44, 0.3, 32), _m("plum"), Vector3(at.x, at.y - 0.15, at.z), a)
+			_put(_cyl(0.45, 0.45, 0.03, 32), _m("brass"), Vector3(at.x, at.y - 0.015, at.z), a)
 
 
 static func _lower_hall(a: Node3D) -> void:
