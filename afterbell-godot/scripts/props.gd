@@ -556,6 +556,12 @@ static func door_leaf(parent: Node3D, hinge: Vector3, width: float, height: floa
 	parent.add_child(pivot)
 	var t := 0.055
 	_put(_box(width, height, t), _m("walnut"), Vector3(width * 0.5, height * 0.5, 0), pivot)
+	# Three brass butt hinges on the hinge edge: knuckle barrel with a finial top and bottom.
+	for hy in [0.25, height * 0.5, height - 0.3]:
+		_put(_cyl(0.016, 0.016, 0.11, 10), _m("brass"), Vector3(-0.012, hy, 0), pivot)
+		for e in [-1.0, 1.0]:
+			_put(_sphere(0.012, 8), _m("brass"), Vector3(-0.012, hy + e * 0.062, 0), pivot)
+		_put(_box(0.05, 0.1, t + 0.004), _m("brass"), Vector3(0.025, hy, 0), pivot)
 	var panels := [[0.62, 0.95]] if window else [[0.62, 0.95], [1.65, 0.85]]
 	for face in [-1.0, 1.0]:
 		for pnl in panels:
@@ -844,6 +850,12 @@ static func _m(name: String) -> Material:
 		"vase": m = ST.plastic(Color("1e3029"), 0.4, 0.0)
 		"mirror": m = ST.plastic(Color("c9ccd0"), 0.08, 0.9)
 		"steel_dark": m = ST.plastic(Color("4a4a4e"), 0.35, 0.8)
+		"carton": m = ST.textured("cardboard", 1.0, ST.plastic(Color("a57a4c"), 0.9, 0.0))
+		"glass_clear":
+			m = StandardMaterial3D.new()
+			m.albedo_color = Color(0.85, 0.88, 0.9, 0.16)
+			m.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+			m.roughness = 0.05
 		"leaf": m = ST.plastic(Color("3a6a34"), 0.7, 0.0)
 		"lily": m = ST.plastic(Color("f6f0e4"), 0.7, 0.0)
 		"pollen": m = ST.plastic(Color("e2a43a"), 0.8, 0.0)

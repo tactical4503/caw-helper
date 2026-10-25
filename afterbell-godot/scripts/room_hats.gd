@@ -21,6 +21,7 @@ const Dialogue := preload("res://scripts/dialogue.gd")
 const Mover := preload("res://scripts/mover.gd")
 const Props := preload("res://scripts/props.gd")
 const Glimpse := preload("res://scripts/glimpse.gd")
+const Finish := preload("res://scripts/finish.gd")
 const ShoulderCam := preload("res://scripts/shoulder_cam.gd")
 var mover = Mover.new()
 const GaugeHud := preload("res://scripts/hud.gd")
@@ -184,25 +185,19 @@ func _build_room() -> void:
 	Glimpse.build(self, Vector3(HALF_W + 0.3, 0, 5.0), -PI / 2.0, "cosmetics", 3.6, 2.6, 3.0)
 	Props.portal(self, Vector3(HALF_W + 0.15, 0, 5.0), 1.8, 2.5, PI / 2.0, -1.0, "COSMETICS")
 	# Hat shelving across the room, with the aisle gap (x -1..1) and the alcove (x 1..3.4).
-	var shelf := ST.plastic(Color("6e4326"), 0.35, 0.0)   # lacquered walnut
+	var fin := Finish.begin(self)
 	for part in [[-3.0, 4.0], [4.2, 1.6]]:
 		var cx: float = part[0]
 		var w: float = part[1]
-		# A proper run of shelving: dark recessed plinth, rounded walnut case, brass band, cornice.
-		B.put(Props.rounded_block(w - 0.08, 0.12, 0.52, 0.04), B.mat(Color("2a1420"), 0.7), Vector3(cx, 0, PARTITION_Z), self)
-		B.put(Props.rounded_block(w, 1.54, 0.6, 0.07), shelf, Vector3(cx, 0.12, PARTITION_Z), self)
-		B.put(Props.rounded_block(w + 0.02, 0.035, 0.62, 0.08), B.brass(), Vector3(cx, 0.5, PARTITION_Z), self)
-		B.put(Props.rounded_block(w + 0.1, 0.07, 0.7, 0.1, 0.02), shelf, Vector3(cx, 1.66, PARTITION_Z), self)
-		for i in int(w / 0.6):
-			var hx: float = cx - w / 2.0 + 0.3 + i * 0.6
-			_hat(Vector3(hx, 1.75, PARTITION_Z), [B.CREAM, B.PLUM, B.RED][i % 3])
+		# Hat cabinets: plum panelled base, glazed case with hats on two shelves, cornice.
+		Finish.hat_cabinet(fin, Vector3(cx, 0, PARTITION_Z), w)
 		solids.append(Rect2(Vector2(cx - w / 2.0, PARTITION_Z - 0.3), Vector2(w, 0.6)))
 	# The alcove behind the shelving.
 	for wall_part in [[Vector3(2.2, 1.0, -4.65), Vector3(2.4, 2.0, 0.1)], [Vector3(1.0, 1.0, -3.85), Vector3(0.1, 2.0, 1.5)],
 			[Vector3(3.4, 1.0, -3.85), Vector3(0.1, 2.0, 1.5)]]:
 		var pos: Vector3 = wall_part[0]
 		var size: Vector3 = wall_part[1]
-		B.put(B.box(size.x, size.y, size.z), shelf, pos, self)
+		Finish.panel_screen(fin, pos, size)
 		solids.append(Rect2(Vector2(pos.x - size.x / 2.0, pos.z - size.z / 2.0), Vector2(size.x, size.z)))
 	# Souvenir pin SV-01: the rooftop lunchroom umbrella, on a little velvet stand.
 	pin_node = Node3D.new()
@@ -245,6 +240,17 @@ func _build_room() -> void:
 	for z in [6.0, 1.0, -2.6, -7.0]:
 		ST.ceiling_light(self, Vector3(0, 3.6, z), 0.95 if z == -2.6 else 0.7, 6.0)
 		ST.ceiling_fixture(self, Vector3(0, 3.65, z), 3.9)
+	# Upper walls, crown mouldings, hat shelves, ceiling beams between the fixtures.
+	var top := 3.9
+	Finish.upper_wall(fin, Vector3(-HALF_W, 0, -HALF_D), Vector3(-HALF_W, 0, HALF_D), Vector3(1, 0, 0), 2.75, 3.5, top)
+	Finish.upper_wall(fin, Vector3(HALF_W, 0, -HALF_D), Vector3(HALF_W, 0, HALF_D), Vector3(-1, 0, 0), 2.75, 3.5, top, [[12.6, 15.4]])
+	Finish.upper_wall(fin, Vector3(-HALF_W, 0, -HALF_D), Vector3(HALF_W, 0, -HALF_D), Vector3(0, 0, 1), 2.75, 3.5, top, [[3.45, 6.55]])
+	Finish.upper_wall(fin, Vector3(-HALF_W, 0, HALF_D), Vector3(HALF_W, 0, HALF_D), Vector3(0, 0, -1), 2.75, 3.5, top)
+	Finish.shelf(fin, Vector3(-HALF_W, 0, -2.6), Vector3(1, 0, 0), 1.6, 1.45, "hats")
+	Finish.shelf(fin, Vector3(HALF_W, 0, -2.6), Vector3(-1, 0, 0), 1.4, 1.45, "hats")
+	Finish.shelf(fin, Vector3(-3.2, 0, -HALF_D), Vector3(0, 0, 1), 1.4, 1.45, "hats")
+	Finish.ceiling_beams(fin, Rect2(-HALF_W, -HALF_D, HALF_W * 2.0, HALF_D * 2.0), top, true, [-8.3, -4.8, -0.8, 3.5, 7.7])
+	Finish.done(fin)
 
 
 func _hat(at: Vector3, color: Color) -> void:

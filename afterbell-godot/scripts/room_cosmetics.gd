@@ -74,6 +74,7 @@ const Dialogue := preload("res://scripts/dialogue.gd")
 const Mover := preload("res://scripts/mover.gd")
 const Props := preload("res://scripts/props.gd")
 const Glimpse := preload("res://scripts/glimpse.gd")
+const Finish := preload("res://scripts/finish.gd")
 var prop_solids: Array = []   # Rect2 footprints of floor props
 const ShoulderCam := preload("res://scripts/shoulder_cam.gd")
 var mover = Mover.new()
@@ -143,6 +144,21 @@ func _collide_player() -> void:
 			else:
 				p_pos.y = r.position.y if absf(p_pos.y - r.position.y) < absf(r.end.y - p_pos.y) else r.end.y
 	p_pos = Props.push_out(p_pos, prop_solids)
+
+
+## Upper walls, crown mouldings, ceiling beams and perfume shelving.
+func _finish_walls() -> void:
+	var fin := Finish.begin(self)
+	var top := 4.2
+	Finish.upper_wall(fin, Vector3(-HALF_W, 0, -HALF_D), Vector3(HALF_W, 0, -HALF_D), Vector3(0, 0, 1), 2.75, 3.8, top, [[5.3, 10.7]])
+	Finish.upper_wall(fin, Vector3(HALF_W, 0, -HALF_D), Vector3(HALF_W, 0, HALF_D), Vector3(-1, 0, 0), 2.75, 3.8, top, [[1.85, 3.75]])
+	Finish.upper_wall(fin, Vector3(-HALF_W, 0, -HALF_D), Vector3(-HALF_W, 0, HALF_D), Vector3(1, 0, 0), 2.75, 3.8, top, [[4.5, 8.0]])
+	Finish.upper_wall(fin, Vector3(-HALF_W, 0, HALF_D), Vector3(HALF_W, 0, HALF_D), Vector3(0, 0, -1), 2.75, 3.8, top, [[6.25, 9.75]])
+	for x in [-5.3, 5.3]:
+		Finish.shelf(fin, Vector3(x, 0, -HALF_D), Vector3(0, 0, 1), 1.5, 1.45, "perfume")
+	Finish.shelf(fin, Vector3(HALF_W, 0, -3.1), Vector3(-1, 0, 0), 1.1, 1.45, "perfume")
+	Finish.ceiling_beams(fin, Rect2(-HALF_W, -HALF_D, HALF_W * 2.0, HALF_D * 2.0), top, false, [-6.8, -2.3, 2.3, 6.8])
+	Finish.done(fin)
 
 
 ## Dressing that fills the corners without touching the demonstration: a perfume tower and
@@ -263,6 +279,7 @@ func _build_room() -> void:
 	for x in [-4.6, 0.0, 4.6]:
 		ST.ceiling_light(self, Vector3(x, 3.9, -0.6), 0.75, 6.0)
 		ST.ceiling_fixture(self, Vector3(x, 3.95, -0.6), 4.2)
+	_finish_walls()
 	# The attendant (placeholder figure until the Meshy staff mannequin arrives).
 	attendant = Node3D.new()
 	attendant.name = "Attendant"

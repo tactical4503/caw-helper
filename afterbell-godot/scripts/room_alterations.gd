@@ -18,6 +18,8 @@ const Dialogue := preload("res://scripts/dialogue.gd")
 const Mover := preload("res://scripts/mover.gd")
 const Props := preload("res://scripts/props.gd")
 const Glimpse := preload("res://scripts/glimpse.gd")
+const Finish := preload("res://scripts/finish.gd")
+var gate_needle: Node3D   # the winding station's dial needle
 const ShoulderCam := preload("res://scripts/shoulder_cam.gd")
 var mover = Mover.new()
 const GaugeHud := preload("res://scripts/hud.gd")
@@ -150,13 +152,14 @@ func _build_rooms() -> void:
 	Props.door_frame(self, Vector3(0, 0, 5.15), 1.8, 2.5)
 	Props.portal(self, Vector3(DOOR_X, 0, -5.15), 1.6, Props.DOOR_HEIGHT, 0.0, 1.0, "RECEIVING")
 	Props.portal(self, Vector3(0, 0, 5.15), 1.8, 2.5, 0.0, -1.0, "HATS  &  GLOVES")
-	Props.plaque(self, Vector3(5.0, 2.95, GATE_Z), 1.2, "ATRIUM", -PI / 2.0)
+	Props.portal(self, Vector3(5.15, 0, GATE_Z), 1.8, 2.4, PI / 2.0, -1.0, "ATRIUM")   # the gate, deeply framed
+	Props.portal(self, Vector3(DOOR_X, 0, -5.15), 1.6, Props.DOOR_HEIGHT, 0.0, -1.0, "ALTERATIONS")   # Receiving side
 	Glimpse.build(self, Vector3(5.3, 0, GATE_Z), -PI / 2.0, "atrium", 4.0, 5.0, 6.0)   # seen once the gate rolls up
 	Props.door_frame(self, Vector3(5.15, 0, GATE_Z), 1.8, 2.4, PI / 2.0)
 	B.wainscot(self, Vector3(-4.98, 0, 0), Vector3(0, 0, 10))
 	# Finished lower walls round the rest of Alterations and Receiving, clear of every opening,
 	# the crank socket, the freight lift and the loading gate.
-	for seg in [[Vector3(4.98, 0, -5.0), Vector3(4.98, 0, -1.3)], [Vector3(4.98, 0, 1.54), Vector3(4.98, 0, 5.0)],
+	for seg in [[Vector3(4.98, 0, -5.0), Vector3(4.98, 0, -1.3)], [Vector3(4.98, 0, 1.86), Vector3(4.98, 0, 5.0)],
 			[Vector3(-5.0, 0, 4.98), Vector3(-1.34, 0, 4.98)], [Vector3(1.34, 0, 4.98), Vector3(5.0, 0, 4.98)],
 			[Vector3(-5.0, 0, -4.98), Vector3(DOOR_X - 1.24, 0, -4.98)], [Vector3(DOOR_X + 1.24, 0, -4.98), Vector3(5.0, 0, -4.98)],
 			[Vector3(-4.98, 0, -13.0), Vector3(-4.98, 0, -10.14)], [Vector3(-4.98, 0, -7.86), Vector3(-4.98, 0, -5.3)],
@@ -176,13 +179,11 @@ func _build_rooms() -> void:
 	for i in 6:
 		B.put(B.box(0.12, 0.04, 1.8), B.brass(), Vector3(0, 0.25 + i * 0.4, 0), gate)
 	Props.pull_handle(gate, Vector3(-0.06, 0.38, 0), 0.7, -PI / 2.0)   # rises with the gate
-	B.put(B.box(0.04, 0.5, 0.5), B.brass(), Vector3(4.98, 1.15, SOCKET.y), self)          # socket plate
 	socket_disc = Node3D.new()
-	socket_disc.position = Vector3(4.95, 1.15, SOCKET.y)
+	socket_disc.position = Vector3(4.9, 1.15, SOCKET.y)
 	add_child(socket_disc)
 	B.put(B.cyl(0.18, 0.18, 0.04), B.mat(B.BLACK, 0.3), Vector3.ZERO, socket_disc).rotation.z = PI / 2.0
 	B.put(B.box(0.05, 0.05, 0.3), B.brass(), Vector3(-0.02, 0, 0), socket_disc)            # the broad slot
-	B.put(B.box(0.06, 0.12, 0.04), B.mat(B.RED, 0.4), Vector3(4.97, 1.55, SOCKET.y + 0.3), self)  # snapped crank stub
 	# Fitting platform with chalk dust; triple mirror.
 	var dais := StandardMaterial3D.new()   # waxed, not lacquered: no mirror highlights on the fitting platform
 	dais.albedo_color = Color("6e4326")
@@ -210,10 +211,8 @@ func _build_rooms() -> void:
 	add_child(fan_head)
 	B.put(B.cyl(0.16, 0.16, 0.06), B.brass(), Vector3(0.05, 0, 0), fan_head).rotation.z = PI / 2.0
 	# The curtained stall, the tailor inside, and the lost sleeve on the receiving doorknob.
-	B.put(B.box(1.8, 2.4, 0.06), wood, Vector3(STALL.x, 1.2, STALL.y - 0.9), self)
-	for side in [-1.0, 1.0]:
-		B.put(B.box(0.06, 2.4, 1.8), wood, Vector3(STALL.x + side * 0.9, 1.2, STALL.y), self)
-	B.put(B.box(1.86, 0.06, 1.86), B.brass(), Vector3(STALL.x, 2.4, STALL.y), self)
+	var fin := Finish.begin(self)
+	Finish.booth(fin, Vector3(STALL.x, 0, STALL.y))   # framed, panelled fitting booth
 	solids.append(Rect2(Vector2(STALL.x - 0.95, STALL.y - 0.95), Vector2(1.9, 1.85)))
 	curtain = Node3D.new()
 	curtain.position = Vector3(STALL.x, 0, STALL.y + 0.9)
@@ -287,9 +286,27 @@ func _build_rooms() -> void:
 		ST.ceiling_fixture(self, c + Vector3(0, 0.05, 0), 3.5)
 	# Receiving is a working room: green enamel pendants over the table and the cartons, neutral
 	# light, and one sconce by the loading door.
+	# The winding station round the crank socket, with a dial that follows the gate.
+	gate_needle = Finish.gate_panel(self, fin, Vector3(5.0, 1.15, SOCKET.y), Vector3(-1, 0, 0))
+	# Upper walls, crown mouldings, fabric bolts, ceiling beams; Receiving's steel beams, shelving, signs.
+	var top := 3.5
+	Finish.upper_wall(fin, Vector3(-5, 0, -5), Vector3(-5, 0, 5), Vector3(1, 0, 0), 2.55, 3.15, top)
+	Finish.upper_wall(fin, Vector3(5, 0, -5), Vector3(5, 0, 5), Vector3(-1, 0, 0), 2.55, 3.15, top, [[3.55, 6.9]])
+	Finish.upper_wall(fin, Vector3(-5, 0, -5), Vector3(5, 0, -5), Vector3(0, 0, 1), 2.55, 3.15, top, [[1.2, 3.8]])
+	Finish.upper_wall(fin, Vector3(-5, 0, 5), Vector3(5, 0, 5), Vector3(0, 0, -1), 2.55, 3.15, top, [[3.6, 6.4]])
+	Finish.shelf(fin, Vector3(-5, 0, -3.0), Vector3(1, 0, 0), 1.2, 1.5, "bolts")
+	Finish.ceiling_beams(fin, Rect2(-5, -5, 10, 10), top, true, [-3.2, 0.2, 3.2])
+	for c in [[Vector3(-5, 0, -13), Vector3(7, 0, -13), Vector3(0, 0, 1)], [Vector3(-5, 0, -13), Vector3(-5, 0, -5.3), Vector3(1, 0, 0)],
+			[Vector3(7, 0, -13), Vector3(7, 0, -5.3), Vector3(-1, 0, 0)]]:
+		Finish.crown(fin, c[0], c[1], c[2], top)
+	Finish.ceiling_beams(fin, Rect2(-5, -13, 12, 7.7), top, true, [-12.0, -10.0, -8.0, -6.2], true)
+	Finish.shelf(fin, Vector3(7, 0, -6.5), Vector3(-1, 0, 0), 1.4, 0.9, "cartons")
+	Props.plaque(self, Vector3(3.6, 2.45, -13.0), 1.3, "STAFF  ONLY")
+	Props.plaque(self, Vector3(-5.0, 2.45, -6.6), 1.4, "DELIVERIES", PI / 2.0)
 	ST.pendant(self, Vector3(0.5, 2.75, -10.6), 3.5, 0.7, 5.5)
 	ST.pendant(self, Vector3(4.6, 2.75, -11.2), 3.5, 0.45, 4.5)
 	ST.pendant(self, Vector3(-3.4, 2.75, -7.0), 3.5, 0.4, 4.5)
+	Finish.done(fin)
 	ST.sconce(self, Vector3(-5.0, 2.2, -11.4), Vector3(1, 0, 0), 0.6)
 	interactables = [
 		[Vector2(STALL.x, STALL.y + 1.5), "tailor"], [Vector2(DOOR_X + 0.65, -4.3), "sleeve"],
@@ -517,6 +534,8 @@ func _update_world(dt: float) -> void:
 		ren_anim.play(clip, 0.15)
 		ren_clip = clip
 	gate.position.y = lerpf(gate.position.y, gate_progress * 2.3, 1.0 - exp(-8.0 * dt))
+	if gate_needle:   # the winding station's dial: SHUT .. OPEN as the gate rises
+		gate_needle.rotation.z = lerpf(1.2, -1.2, clampf(gate.position.y / 2.3, 0.0, 1.0))
 	fan_head.rotation.y = sin(time * 0.8) * 0.8
 	var open_curtain := tailor_asked and not sleeve_returned
 	curtain.position.x = lerpf(curtain.position.x, STALL.x + (1.4 if open_curtain else 0.0), 1.0 - exp(-4.0 * dt))

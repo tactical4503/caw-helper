@@ -9,6 +9,7 @@ const SHOTS := [
 	["hats", "res://rooms/hats.tscn", Vector2(-1.0, 2.2), ""],
 	["alterations", "res://rooms/alterations.tscn", Vector2(0.5, 2.8), "tailor"],
 	["receiving", "res://rooms/alterations.tscn", Vector2(0.8, -6.2), "hesta"],
+	["alterations_gate", "res://rooms/alterations.tscn", Vector2(2.8, 0.6), "gate"],
 	["court", "res://main.tscn", Vector2(0.3, 4.4), ""],
 	["court_doors", "res://main.tscn", Vector2(-3.5, 6.2), "look_west"],
 	["atrium_aisle", "res://main.tscn", Vector2(-3.5, 6.2), "look_north"],
@@ -82,6 +83,9 @@ func _process(_delta: float) -> bool:
 			for i in 90:
 				room.step(1.0 / 60.0)
 			room._place_camera(10.0)
+			if shot[3] == "gate":   # the atrium gate and its winding station, close
+				room.camera.position = Vector3(2.2, 1.65, 1.2)
+				room.camera.look_at(Vector3(5.0, 1.35, -0.3), Vector3.UP)
 		wait = 25
 		return false
 	wait -= 1
