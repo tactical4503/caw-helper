@@ -303,7 +303,7 @@ func reset_attempt(keep: bool) -> void:
 	chair_yaw = PI
 	steer_to = PI
 	m_state = "enter"
-	m_t = 1.2
+	m_t = 3.2   # holds off the aisle while the arrival shot shows the bell, then rolls to his mark
 	m_close = 0.0
 	m_next = "sign"
 	flinch = 0.0

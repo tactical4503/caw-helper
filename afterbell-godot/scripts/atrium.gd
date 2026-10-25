@@ -23,8 +23,8 @@ const SOUTH_Z := 9.6
 const MEZZ_Z := -18.6         # mezzanine front edge (escalator tops)
 const ESC_X := 5.4            # escalators sit either side of the centre line
 const ESC_FOOT_Z := -10.0
-const LEVELS := [5.0, 10.2]   # upper floor heights
-const ROOF := 16.0
+const LEVELS := [5.0]         # one gallery floor: the reference's single balcony storey, not a canyon
+const ROOF := 12.0
 const SLAB := 0.45
 const UPPER_ESC_X := 11.9      # gallery-to-gallery escalators, against the outer walls
 const UPPER_ESC_FOOT := 2.0
@@ -43,11 +43,6 @@ static func build(root: Node3D) -> void:
 	_mezzanine(a)
 	for side in [-1.0, 1.0]:
 		escalator(a, Vector3(side * ESC_X, 0, ESC_FOOT_Z), LEVELS[0], MEZZ_Z)
-		# The top gallery is reached by a second escalator on each side gallery.
-		var up := Node3D.new()
-		up.position.y = LEVELS[0]
-		a.add_child(up)
-		escalator(up, Vector3(side * UPPER_ESC_X, 0, UPPER_ESC_FOOT), LEVELS[1] - LEVELS[0], UPPER_ESC_TOP, 1.15, true)
 	_colonnade(a)
 	_aisle(a)
 	_shops(a)
@@ -86,7 +81,7 @@ static func _galleries(a: Node3D) -> void:
 	var mid_z := (SOUTH_Z + NORTH_Z) * 0.5
 	var width := OUTER_X - GALLERY_X
 	for level in LEVELS:
-		var top: bool = level == LEVELS[1]
+		var top := false   # a second gallery storey (with its escalator hole) is out of this chapter
 		for s in [-1.0, 1.0]:
 			var cx: float = s * (GALLERY_X + width * 0.5)
 			if top:
@@ -300,10 +295,10 @@ static func escalator(a: Node3D, foot: Vector3, rise: float, top_z: float, width
 # ---------------------------------------------------------------- the window
 
 static func _window(a: Node3D) -> void:
-	var w := 9.0
+	var w := 7.6
 	var r := w * 0.5
-	var sill := 5.8
-	var spring := 10.8                 # where the arch starts
+	var sill := 5.7
+	var spring := 7.7                  # where the arch starts; the crown sits just under the roof
 	var z := NORTH_Z + 0.02
 	var sky := QuadMesh.new()
 	sky.size = Vector2(w, spring + r - sill)
@@ -679,7 +674,7 @@ static func _lights(a: Node3D) -> void:
 	sun_in.spot_attenuation = 0.15        # flat falloff: near surfaces don't clip, the far end still gets light
 	sun_in.spot_angle = 46.0             # wide enough to wash the colonnade's inner faces
 	sun_in.spot_angle_attenuation = 1.2
-	sun_in.position = Vector3(0, 11.0, NORTH_Z + 0.9)
+	sun_in.position = Vector3(0, 8.8, NORTH_Z + 0.9)
 	a.add_child(sun_in)
 	sun_in.look_at(Vector3(0, 0, -1.0), Vector3.UP)   # clears the bell partition onto the court's north end
 	# A soft peach bounce off the window reveal into the upper hall: no shadows, no gobo.
@@ -689,7 +684,7 @@ static func _lights(a: Node3D) -> void:
 	glow.light_specular = 0.0
 	glow.omni_range = 14.0
 	glow.omni_attenuation = 1.6
-	glow.position = Vector3(0, 10.5, NORTH_Z + 3.0)
+	glow.position = Vector3(0, 8.6, NORTH_Z + 3.0)
 	a.add_child(glow)
 	# Gallery and mezzanine ceiling lights: warm, local pools rather than a flat fill.
 	for level in LEVELS:
@@ -800,7 +795,7 @@ static func _window_shafts(a: Node3D) -> void:
 	m.cull_mode = BaseMaterial3D.CULL_DISABLED
 	m.albedo_texture = tex
 	m.disable_receive_shadows = true
-	var top := Vector3(0, 12.0, NORTH_Z + 0.3)
+	var top := Vector3(0, 10.4, NORTH_Z + 0.3)
 	var foot := Vector3(0, 0.5, -11.0)
 	var length := top.distance_to(foot)
 	for x in [-2.2, -0.7, 0.8, 2.3]:

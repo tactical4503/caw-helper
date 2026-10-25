@@ -281,8 +281,8 @@ static func build_arena(parent: Node3D) -> Arena:
 	for sx in [-1.0, 1.0]:   # ferns against the balustrade either side of the stand
 		P.place(stage, "planter", Vector3(sx * 1.7, 0, -1.6), 0.0, 0)
 	# The bell cable: plum-wrapped, brass ferrules, sagging from the cabinet up to the mezzanine.
-	var cable_from := Vector3(0.55, crown + 1.05, -0.15)
-	var cable_to := Vector3(0.7, Atrium.LEVELS[0] - 0.75, Atrium.MEZZ_Z - BELL_POS.z + 0.05)
+	var cable_from := Vector3(0.4, crown + 0.05, -0.45)
+	var cable_to := Vector3(0.5, Atrium.LEVELS[0] - 1.9, Atrium.MEZZ_Z - BELL_POS.z + 0.45)
 	var cable_mat := mat(Color("2a1420"), 0.6)
 	var last := cable_from
 	for k in range(1, 13):
@@ -300,10 +300,14 @@ static func build_arena(parent: Node3D) -> Arena:
 	bell.add_child(a.lever)
 	put(box(0.1, 0.08, 0.75), mat(Color("3b3430"), 0.5, 0.5), Vector3(0, 0, 0.35), a.lever)
 	put(box(0.5, 0.36, 0.12), mat(RED, 0.8), Vector3(0, 0, 0.75), a.lever)  # padded striking plate faces south
-	# The governor cabinet stands on the stand, the B on its door; its tabs count the rings.
+	# The governor cabinet hangs from the mezzanine fascia under the great bell ("behind the
+	# service bell, upstairs"), the B on its door; its tabs count the rings. The stand stays
+	# low, so the flowers in the lower hall rise over it.
 	var cabinet := Node3D.new()
-	cabinet.position = Vector3(0, crown + 0.55, -0.1)
-	bell.add_child(cabinet)
+	cabinet.position = Vector3(0, Atrium.LEVELS[0] - 1.45, Atrium.MEZZ_Z + 0.45)
+	root.add_child(cabinet)
+	for sx in [-0.45, 0.45]:   # its hanging brackets
+		put(box(0.06, 0.5, 0.3), brass(), Vector3(sx, 0.75, -0.12), cabinet)
 	put(box(1.2, 1.1, 0.5), mat(CREAM, 0.55), Vector3.ZERO, cabinet)
 	put(box(1.28, 0.06, 0.56), brass(), Vector3(0, 0.58, 0), cabinet)
 	a.cabinet_door = Node3D.new()
@@ -467,10 +471,14 @@ static func _build_hall(arena_root: Node3D) -> void:
 		var reach := (Atrium.GALLERY_X - absf(spot.x) - 0.35) if on_side else 0.0
 		Atrium.pillar(root, spot.x, spot.y, Atrium.ROOF, signf(spot.x) if on_side else 0.0, reach)
 		# Banners hang between the bands and capitals on each upper storey.
-		for b in [[7.8, 2.6], [13.2, 2.8]]:
-			var bb := put(box(0.75 if not on_side else 0.06, b[1], 0.06 if not on_side else 0.75), banner, Vector3(spot.x, b[0], spot.y) + face * 0.4, root)
-			put(box(0.79 if not on_side else 0.07, 0.08, 0.07 if not on_side else 0.79), brass(), bb.position + Vector3(0, b[1] * 0.5, 0), root)
-			Atrium.fleur(root, bb.position + Vector3(0, b[1] * 0.12, 0) + face * 0.05, face, 0.36)
+		# One long botanical banner per column on the balcony storey: plum, a brass rod and hem,
+		# and a large brass fleur-de-lis that reads from across the court.
+		var bw := 1.1
+		var bh := 4.2
+		var bb := put(box(bw if not on_side else 0.06, bh, 0.06 if not on_side else bw), banner, Vector3(spot.x, 8.7, spot.y) + face * 0.42, root)
+		put(box(bw + 0.08 if not on_side else 0.07, 0.09, 0.07 if not on_side else bw + 0.08), brass(), bb.position + Vector3(0, bh * 0.5, 0), root)
+		put(box(bw if not on_side else 0.065, 0.05, 0.065 if not on_side else bw), brass(), bb.position + Vector3(0, -bh * 0.5 + 0.18, 0) + face * 0.005, root)
+		Atrium.fleur(root, bb.position + Vector3(0, bh * 0.14, 0) + face * 0.05, face, 0.72)
 		Atrium._amber(ST.sconce(root, Vector3(spot.x, 2.3, spot.y) + face * 0.35, face, 0.9, 4.5))   # warm pool on each column
 	# Chandeliers on long drops from the roof: pools of light down the court and over the bell.
 	for z in [5.0, 0.0, -5.0]:
