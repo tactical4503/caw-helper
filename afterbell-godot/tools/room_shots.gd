@@ -18,6 +18,7 @@ const SHOTS := [
 ]
 
 var out_dir := "user://rooms"
+var only := []   # --only=court,atrium_aisle renders just those shots
 var room: Node
 var index := -1
 var wait := 0
@@ -27,6 +28,8 @@ func _initialize() -> void:
 	for arg in OS.get_cmdline_user_args():
 		if arg.begins_with("--out="):
 			out_dir = arg.substr(6)
+		if arg.begins_with("--only="):
+			only = Array(arg.substr(7).split(","))
 	DirAccess.make_dir_recursive_absolute(out_dir)
 	Engine.set_meta("afterbell_testing", true)
 	root.size = Vector2i(1280, 720)
@@ -37,6 +40,8 @@ func _next() -> void:
 	if room:
 		room.queue_free()
 	index += 1
+	while index < SHOTS.size() and not only.is_empty() and not SHOTS[index][0] in only:
+		index += 1
 	if index >= SHOTS.size():
 		quit()
 		return

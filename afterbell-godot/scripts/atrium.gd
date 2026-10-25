@@ -113,6 +113,12 @@ static func _galleries(a: Node3D) -> void:
 				rack(a, Vector3(s * (OUTER_X - 0.7), level, rz), PI / 2.0)
 			for mz in [-17.0, -9.0, -1.0, 6.5]:
 				mannequin(a, Vector3(s * (GALLERY_X + 1.0), level, mz), -s * PI / 2.0, int(mz + level) % 3)
+			# Ferns at the balcony corners and between the mannequins, where they read from below.
+			for pz in [NORTH_Z + 0.8, -13.0, -5.0, 2.75, SOUTH_Z - 0.8]:
+				Props.place(a, "planter", Vector3(s * (GALLERY_X + 0.55), level, pz))
+			# Two stocked shelf bays between the back-wall racks.
+			for k in 2:
+				Props.place(a, "shelf_unit", Vector3(s * (OUTER_X - 0.25), level, -17.65 + k * 1.3), -s * PI / 2.0, (k + int(level)) % 4)
 			for lz in [-24.0, -15.0, -7.0, 1.0, 8.0]:
 				ST.sconce(a, Vector3(s * OUTER_X, level + 2.3, lz), Vector3(-s, 0, 0), 0.0)
 
@@ -157,6 +163,11 @@ static func _mezzanine(a: Node3D) -> void:
 	for x in [-5.3, 5.3]:
 		palm(a, Vector3(x, level, -25.1))
 	Props.counter(a, Vector3(0, level, -21.5), Vector3(2.4, Props.WAIST, 0.8), "cream", 0.08, Vector3(0, 0, -1))
+	Props.place(a, "perfume_boxes", Vector3(0, level + Props.WAIST, -21.55), 0.0, 3)
+	price(a, Vector3(0.75, level + Props.WAIST, -21.12), 0.0, "18.00")
+	# Ferns at the rail's ends and where it breaks for the escalators.
+	for x in [-GALLERY_X + 0.6, -ESC_X - 1.25, ESC_X + 1.25, GALLERY_X - 0.6]:
+		Props.place(a, "planter", Vector3(x, level, MEZZ_Z - 0.55))
 
 
 ## A balcony edge with real depth: a cornice lip, two brass bands, a cream frieze with brass
@@ -453,14 +464,18 @@ static func _roof(a: Node3D) -> void:
 
 
 static func _lower_hall(a: Node3D) -> void:
-	# Lilies at the head of the aisle, perfume counters and palms along its edges.
-	Props.place(a, "flower_display", Vector3(0, 0, -14.2))
+	# The grand arrangement at the head of the aisle; along each edge, in a row with walkable
+	# gaps of 1.3 m or more: perfume counter, folded-knitwear table, rack. Palms at the corners.
+	Props.place(a, "centrepiece", Vector3(0, 0, -14.2))
 	for side in [-1.0, 1.0]:
 		Props.place(a, "perfume_counter", Vector3(side * 3.45, 0, -11.6), 0.0, 1 if side > 0 else 2)
+		price(a, Vector3(side * 3.45 + 0.6, Props.WAIST, -11.32), 0.0, "12.50" if side > 0 else "8.75")
+		Props.place(a, "folded_table", Vector3(side * 3.45, 0, -14.1), 0.0, 2 if side > 0 else 0)
 		palm(a, Vector3(side * 3.9, 0, -9.9))
 		rack(a, Vector3(side * 3.35, 0, -16.6), 0.0)
 		mannequin(a, Vector3(side * 6.9, 0, -12.5), 0.0, 1)
 		mannequin(a, Vector3(side * 6.9, 0, -16.0), 0.0, 2)
+	Props.place(a, "easel", Vector3(-6.9, 0, -14.25), 0.25, 1, "SALE")
 
 
 ## A pillar: stepped stone base with a brass torus, brass bands at rail height on every floor,
@@ -569,7 +584,7 @@ static func shop_front(a: Node3D, at: Vector3, yaw: float, name: String) -> void
 		var glass := _put(_box(win_w, 2.1, 0.03), _m("glass_clear"), Vector3(wx, 1.6, depth - 0.05), f, false)
 		glass.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 		_put(_box(win_w, 0.05, 0.08), _m("brass"), Vector3(wx, 2.67, depth - 0.05), f)
-		var m := Props.place(f, "mannequin", Vector3(wx, 0.53, depth * 0.45), 0.0, int(absf(wx) * 3.0 + name.length()) % 4)
+		var m := Props.place(f, "mannequin", Vector3(wx, 0.53, depth * 0.45), 0.0, int(absf(wx) * 3.0 + name.length() + sx) % 16)
 		m.scale = Vector3.ONE * 0.92
 	# Fascia with the shop's name, a cornice above it.
 	_put(_box(total, 0.7, depth + 0.15), _m("cream"), Vector3(0, h + 0.35, depth * 0.5), f)
@@ -587,8 +602,14 @@ static func shop_front(a: Node3D, at: Vector3, yaw: float, name: String) -> void
 ## The aisle beyond the court's east rail: perfume counters facing the fight, mannequins between
 ## them, and the same lilies on each gallery landing.
 static func _dress_aisles(a: Node3D) -> void:
-	for z in [-6.5, -1.5, 3.5]:
+	var prices := ["24.00", "6.25", "32.50"]
+	for i in 3:
+		var z: float = [-6.5, -1.5, 3.5][i]
 		Props.place(a, "perfume_counter", Vector3(10.6, 0, z), -PI / 2.0, int(z) & 3)
+		price(a, Vector3(10.32, Props.WAIST, z - 0.6), -PI / 2.0, prices[i])
+	# The wall between the first two shop fronts: three bays of the same stock lines.
+	for k in 3:
+		Props.place(a, "shelf_unit", Vector3(OUTER_X - 0.25, 0, -7.6 + k * 1.3), -PI / 2.0, [0, 3, 1][k])
 	for z in [-4.0, 1.0]:
 		Props.place(a, "mannequin_group", Vector3(10.0, 0, z), -PI / 2.0, int(absf(z)) % 4)
 	Props.place(a, "mannequin", Vector3(9.3, 0, 6.5), -PI / 2.0, 2)
@@ -599,6 +620,12 @@ static func _dress_aisles(a: Node3D) -> void:
 			Props.place(a, "flower_display", Vector3(s * 11.4, level, -11.0))
 			Props.place(a, "perfume_counter", Vector3(s * 12.0, level, 6.0), -s * PI / 2.0, 3)
 			Props.place(a, "folded_table", Vector3(s * 11.2, level, -1.5), -s * PI / 2.0, int(level) % 4)
+	Props.place(a, "easel", Vector3(9.5, LEVELS[0], 0.6), -PI / 2.0 - 0.3, 1, "SALE")
+
+
+## A price card standing on a counter or table.
+static func price(a: Node3D, at: Vector3, yaw: float, text: String) -> void:
+	Props.place(a, "price_card", at, yaw, 0, text)
 
 
 static func _lights(a: Node3D) -> void:
@@ -729,31 +756,18 @@ static func fleur(a: Node3D, at: Vector3, face: Vector3, size: float) -> void:
 
 ## Mannequins and racks come from the shared prop library, so the atrium repeats the same
 ## models as the departments.
+## A mannequin in `look`; its pose comes from where it stands, so neighbours differ.
 static func mannequin(a: Node3D, at: Vector3, yaw: float, look: int) -> void:
-	Props.place(a, "mannequin", at, yaw, look)
+	Props.place(a, "mannequin", at, yaw, look + 4 * (int(absf(at.x * 3.0 + at.z * 2.0)) % 4))
 
 
 static func rack(a: Node3D, at: Vector3, yaw: float) -> void:
 	Props.place(a, "rack", at, yaw, int(absf(at.z)) % 2)
 
 
-## A potted palm: brass-banded cream urn, a fan of drooping fronds.
+## A kentia palm in a pedestal urn.
 static func palm(a: Node3D, at: Vector3) -> void:
-	var p := Node3D.new()
-	p.position = at
-	a.add_child(p)
-	_put(_cyl(0.32, 0.24, 0.6, 20), _m("cream"), Vector3(0, 0.3, 0), p)
-	_put(_cyl(0.33, 0.33, 0.06, 20), _m("brass"), Vector3(0, 0.55, 0), p)
-	_put(_cyl(0.05, 0.06, 0.9, 8), _m("wood"), Vector3(0, 1.0, 0), p)
-	for i in 9:
-		var ang := TAU * i / 9.0
-		var frond := Node3D.new()
-		frond.position = Vector3(0, 1.4, 0)
-		frond.rotation = Vector3(0, ang, 0)
-		p.add_child(frond)
-		var leaf := _put(_box(0.22, 0.02, 0.9), _m("leaf"), Vector3(0, 0, 0.42), frond)
-		leaf.rotation.x = 0.45 + (i % 3) * 0.12   # droop
-		leaf.position.y = -0.18 - (i % 3) * 0.05
+	Props.place(a, "planter", at, 0.0, 1)
 
 
 # ---------------------------------------------------------------- helpers

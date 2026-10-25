@@ -182,6 +182,18 @@ static func build_arena(parent: Node3D) -> Arena:
 		put(Atrium.Props.rounded_block(4.3, 0.06, 1.5, 0.08), mat(Color("2a1420"), 0.7), Vector3(s * 4.6, 0, -8.15), root)
 		put(Atrium.Props.rounded_block(4.4, 0.26, 1.6, 0.12, 0.03), ST.textured("laminate_plum", 1.2, mat(PLUM, 0.5)), Vector3(s * 4.6, 0.06, -8.15), root)
 		put(Atrium.Props.rounded_block(4.44, 0.03, 1.64, 0.13), brass(), Vector3(s * 4.6, 0.2, -8.15), root)
+	# Window displays on the platforms (top at 0.32), facing the court: perfume to the west,
+	# fashion to the east, each with its mannequins in different poses and price cards.
+	var top := 0.32
+	var P = Atrium.Props
+	P.place(root, "mannequin", Vector3(-6.3, top, -8.25), 0.35, 1 + 4)
+	P.place(root, "perfume_tower", Vector3(-4.75, top, -8.2), 0.0, 2)
+	P.place(root, "perfume_boxes", Vector3(-3.15, top, -7.95), 0.0, 1)
+	P.place(root, "mannequin", Vector3(3.0, top, -8.25), -0.35, 0 + 8)
+	P.place(root, "folded_table", Vector3(4.65, top, -8.15), 0.0, 3)
+	P.place(root, "mannequin", Vector3(6.3, top, -8.25), -0.3, 3 + 12)
+	for c in [[Vector3(-4.1, top, -7.55), "14.95"], [Vector3(-2.7, top, -7.5), "9.50"], [Vector3(3.6, top, -7.55), "27.00"], [Vector3(5.6, top, -7.55), "16.50"]]:
+		P.place(root, "price_card", c[0], 0.0, 0, c[1])
 	# West wall with the service door; waist-high east barrier over the atrium; low south wall and gate.
 	# West wall runs up to the gallery floor, so the service doors sit in a full wall.
 	put(box(0.3, 4.55, 15.2), wall, Vector3(-8.15, 2.275, -1.4), root)
@@ -208,7 +220,8 @@ static func build_arena(parent: Node3D) -> Arena:
 		put(Atrium.Props.rounded_block(1.1, 0.38, 1.1, 0.1), ST.textured("laminate_plum", 1.2, mat(PLUM, 0.6)), Vector3(p.x, 0.08, p.y), root)   # plum base
 		put(Atrium.Props.rounded_block(1.13, 0.035, 1.13, 0.11), brass(), Vector3(p.x, 0.46, p.y), root)                     # brass band
 		put(Atrium.Props.rounded_block(1.2, 0.07, 1.2, 0.13, 0.02), mat(CREAM, 0.5), Vector3(p.x, 0.49, p.y), root)          # cream top
-		put(box(0.34, 0.14, 0.14), mat(RED, 0.5), Vector3(p.x, 0.62, p.y), root)
+		Atrium.Props.shoe_pair(root, Vector3(p.x - 0.12, 0.56, p.y - 0.12), 0.0 if p.y < 7.0 else PI, Atrium.Props._m(["shoe", "suit_brown", "plum"][int(absf(p.x + p.y)) % 3]))
+		put(box(0.3, 0.12, 0.18), mat(RED, 0.5), Vector3(p.x + 0.3, 0.62, p.y - 0.28), root)   # its box behind
 		a.plinths.append(Rect2(p - Vector2(0.6, 0.6), Vector2(1.2, 1.2)))
 		Atrium.Props.place(root, "sale_card", Vector3(p.x, 0.555, p.y + 0.2), 0.0 if p.y < 7.0 else PI)
 

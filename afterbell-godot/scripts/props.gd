@@ -3,9 +3,13 @@ extends RefCounted
 ##
 ##   Props.place(parent, "rack", Vector3(x, 0, z), yaw, variant)
 ##
-## Kinds: rack (0 suits, 1 dresses), mannequin (0 navy suit + fedora, 1 cream dress + cloche,
-## 2 brown suit, 3 plum dress), perfume_counter, perfume_tower, perfume_boxes (a cluster to stand
-## on any counter), flower_display, easel (needs text), sale_card, hanging_sign (needs text).
+## Kinds: rack (0 suits, 1 dresses), mannequin (look = variant % 4: 0 navy suit + fedora,
+## 1 cream dress + cloche, 2 brown suit, 3 plum dress; pose = variant / 4: 0 presenting,
+## 1 hand on hip, 2 hands clasped, 3 hand to the hat brim), perfume_counter, perfume_tower,
+## perfume_boxes (a cluster to stand on any counter), flower_display, centrepiece (the grand
+## tiered arrangement), shelf_unit (0 knitwear, 1 hat boxes, 2 perfume, 3 shoes), planter
+## (0 fern in an urn, 1 kentia palm), easel (needs text), sale_card, price_card (needs text),
+## hanging_sign (needs text).
 ##
 ## Each kind/variant is built once and baked into a single multi-material mesh; every placement
 ## shares that mesh, so a room full of racks costs a handful of draws. Text is a Label3D per
@@ -27,6 +31,7 @@ const HALF := {
 	"rack": Vector2(0.95, 0.32), "mannequin": Vector2(0.3, 0.3), "perfume_counter": Vector2(0.88, 0.34),
 	"perfume_tower": Vector2(0.6, 0.6), "flower_display": Vector2(0.66, 0.66), "easel": Vector2(0.36, 0.32),
 	"folded_table": Vector2(0.68, 0.38), "mannequin_group": Vector2(0.88, 0.88),
+	"centrepiece": Vector2(1.25, 1.25), "shelf_unit": Vector2(0.64, 0.24), "planter": Vector2(0.34, 0.34),
 }
 
 static var _cache := {}
@@ -48,6 +53,8 @@ static func place(parent: Node3D, kind: String, at: Vector3, yaw := 0.0, variant
 			_label(node, text, Vector3(0, 1.12, 0.056), 0.0042 if text.length() <= 5 else 0.0026, Color("eee6d4"), 56, 0.0 if text.length() <= 5 else 0.52)
 		"sale_card":
 			_label(node, text if text != "" else "SALE", Vector3(0, 0.3, 0.012), 0.0022, Color("eee6d4"), 48)
+		"price_card":
+			_label(node, text, Vector3(0, 0.105, 0.006), 0.0006, Color("4a2238"), 64)
 		"hanging_sign":
 			# Scale the lettering so the whole name fits inside the 2 m panel.
 			_label(node, text, Vector3(0, 0, 0.035), minf(0.0045, 1.8 / (maxf(text.length(), 1) * 0.55 * 64.0)), Color("4a2238"), 64)
@@ -116,8 +123,19 @@ static func coat(parent: Node3D, at: Vector3, cloth: Material, dress := false, y
 	c.position = at
 	c.rotation.y = yaw
 	parent.add_child(c)
-	_put(_cyl(0.008, 0.008, 0.08, 6), _m("brass"), Vector3(0, 0.0, 0), c)
-	_put(_box(0.025, 0.03, 0.42), _m("wood"), Vector3(0, -0.055, 0), c)
+	# The hanger: a brass hook curling over the rail (whose centre sits 2 cm above `at`), and a
+	# shaped wooden hanger whose arms slope down into the shoulders.
+	var r := 0.03
+	var hook := [Vector3(0, -0.026, 0)]
+	for i in 7:
+		var t := PI - i * (PI + 0.4) / 6.0
+		hook.append(Vector3(0, 0.02 + sin(t) * r, cos(t) * r))
+	for i in hook.size() - 1:
+		_tube(c, hook[i], hook[i + 1], 0.0032, _m("brass"), 5)
+	_put(_box(0.026, 0.028, 0.05), _m("wood"), Vector3(0, -0.032, 0), c)
+	for s in [-1.0, 1.0]:
+		var arm := _put(_box(0.022, 0.024, 0.21), _m("wood"), Vector3(0, -0.044, s * 0.105), c)
+		arm.rotation.x = s * 0.2
 	var shoulders := _put(_capsule(0.05, 0.44), cloth, Vector3(0, -0.1, 0), c)
 	shoulders.rotation.x = PI / 2.0
 	if dress:
@@ -157,6 +175,10 @@ static func _build(kind: String, v: int) -> Node3D:
 		"flower_display": _flower_display(n)
 		"easel": _easel(n, v)
 		"sale_card": _sale_card(n)
+		"price_card": _price_card(n)
+		"centrepiece": _centrepiece(n)
+		"shelf_unit": _shelf_unit(n, v)
+		"planter": _planter(n, v)
 		"hanging_sign": _hanging_sign(n)
 	return n
 
@@ -173,7 +195,7 @@ static func _rack(n: Node3D, v: int) -> void:
 
 
 static func _mannequin(n: Node3D, v: int) -> void:
-	var dress := v == 1 or v == 3
+	var dress := v % 4 == 1 or v % 4 == 3
 	var outfit: Material = _m(["suit_navy", "dress_cream", "suit_brown", "plum"][v % 4])
 	var ivory := _m("ivory")
 	_put(_cyl(0.2, 0.24, 0.04, 24), _m("rubber"), Vector3(0, 0.02, 0), n)
@@ -201,19 +223,24 @@ static func _mannequin(n: Node3D, v: int) -> void:
 			lapel.rotation.z = s * 0.38
 		for y in [1.2, 1.3]:
 			_put(_sphere(0.014, 6), _m("brass"), Vector3(0, y, 0.15), n)
-	# Shoulders and arms: one arm down, one bent forward to present.
+	# Shoulders, then the arms in one of four poses: [elbow, hand] for the left and right arm.
 	var shoulder := _put(_capsule(0.065, 0.5), outfit, Vector3(0, 1.56, 0), n)
 	shoulder.rotation.z = PI / 2.0
 	shoulder.scale = Vector3(1, 1, 0.85)
-	var down := _put(_capsule(0.048, 0.62), outfit if not dress else ivory, Vector3(-0.25, 1.24, 0), n)
-	down.rotation.z = -0.07
-	_put(_sphere(0.045, 10), ivory, Vector3(-0.27, 0.92, 0.0), n)
-	var upper := _put(_capsule(0.048, 0.34), outfit if not dress else ivory, Vector3(0.26, 1.4, 0.02), n)
-	upper.rotation.z = 0.12
-	var fore := _put(_capsule(0.044, 0.32), outfit if not dress else ivory, Vector3(0.28, 1.2, 0.14), n)
-	fore.rotation.x = PI / 2.0 - 0.3
-	var palm := _put(_sphere(0.05, 10), ivory, Vector3(0.29, 1.15, 0.3), n)
-	palm.scale = Vector3(0.6, 1.0, 1.3)
+	var sleeve: Material = ivory if dress else outfit
+	var arms: Array = [
+		[[Vector3(-0.27, 1.27, 0.0), Vector3(-0.27, 0.95, 0.0)], [Vector3(0.28, 1.29, 0.04), Vector3(0.29, 1.15, 0.32)]],    # presenting
+		[[Vector3(-0.28, 1.27, 0.0), Vector3(-0.27, 0.96, 0.03)], [Vector3(0.42, 1.31, -0.05), Vector3(0.2, 1.08, 0.02)]],   # hand on hip
+		[[Vector3(-0.27, 1.28, 0.04), Vector3(-0.06, 1.07, 0.17)], [Vector3(0.27, 1.28, 0.04), Vector3(0.05, 1.09, 0.18)]],  # hands clasped
+		[[Vector3(-0.42, 1.31, -0.05), Vector3(-0.2, 1.08, 0.02)], [Vector3(0.4, 1.58, 0.18), Vector3(0.17, 1.84, 0.12)]],   # hip, hand to the brim
+	][(v / 4) % 4]
+	for k in 2:
+		var from := Vector3(-0.25 if k == 0 else 0.25, 1.55, 0)
+		var elbow: Vector3 = arms[k][0]
+		var hand: Vector3 = arms[k][1]
+		_limb(n, from, elbow, 0.048, sleeve)
+		_limb(n, elbow, hand, 0.044, sleeve)
+		_put(_sphere(0.046, 10), ivory, hand, n).scale = Vector3(0.7, 1.0, 1.15)
 	# Neck, egg head, hat.
 	_put(_cyl(0.05, 0.06, 0.12, 12), ivory, Vector3(0, 1.66, 0), n)
 	_put(_sphere(0.125, 18), ivory, Vector3(0, 1.84, 0.01), n).scale = Vector3(0.88, 1.18, 0.96)
@@ -231,6 +258,12 @@ static func _mannequin(n: Node3D, v: int) -> void:
 			_put(_cyl(0.22, 0.22, 0.012, 24), _m("dress_cream"), Vector3(0, 1.93, 0), n)
 			_put(_cyl(0.11, 0.12, 0.09, 18), _m("dress_cream"), Vector3(0, 1.98, 0), n)
 			_put(_cyl(0.122, 0.122, 0.025, 18), _m("plum"), Vector3(0, 1.95, 0), n)
+
+
+## A rounded limb from `a` to `b`.
+static func _limb(n: Node3D, a: Vector3, b: Vector3, r: float, mat: Material) -> void:
+	var l := _put(_capsule(r, a.distance_to(b) + r), mat, (a + b) * 0.5, n)
+	l.basis = _aim_y(b - a)
 
 
 static func _perfume_counter(n: Node3D, v: int) -> void:
@@ -368,7 +401,7 @@ static func _mannequin_group(n: Node3D, v: int) -> void:
 		fig.rotation.y = -s * 0.4
 		fig.scale = Vector3.ONE * FIGURE_SCALE
 		n.add_child(fig)
-		_mannequin(fig, looks[k])
+		_mannequin(fig, looks[k] + 4 * ((v + k * 2 + 1) % 4))   # the pair never strike the same pose
 
 
 static func _flower_display(n: Node3D) -> void:
@@ -393,20 +426,186 @@ static func _flower_display(n: Node3D) -> void:
 		var tip := base + dir * length
 		var stem := _put(_cyl(0.008, 0.01, length, 6), _m("leaf"), (base + tip) * 0.5, n)
 		stem.basis = _aim_y(dir)
-		var bloom := Node3D.new()
-		bloom.position = tip
-		bloom.basis = _aim_y(dir)
-		n.add_child(bloom)
-		for k in 5:
-			var pa := TAU * k / 5.0
-			var petal := _put(_sphere(0.06, 10), _m("lily"), Vector3(cos(pa) * 0.05, 0.03, sin(pa) * 0.05), bloom)
-			petal.scale = Vector3(0.5, 0.25, 1.4)
-			petal.rotation.y = -pa + PI / 2.0
-			petal.rotation.x = -0.5
-		_put(_sphere(0.022, 8), _m("pollen"), Vector3(0, 0.04, 0), bloom)
+		_lily(n, tip, dir)
 		if i % 2 == 0:
 			var leaf := _put(_sphere(0.07, 8), _m("leaf"), base + dir * length * 0.45 + Vector3(0, 0, 0.02), n)
 			leaf.basis = _aim_y(dir.rotated(Vector3.UP, 0.6)) * Basis.from_scale(Vector3(0.35, 1.8, 0.12))
+
+
+## A lily at `at`, opening along `dir`: five petals round a yellow heart.
+static func _lily(n: Node3D, at: Vector3, dir: Vector3) -> void:
+	var bloom := Node3D.new()
+	bloom.position = at
+	bloom.basis = _aim_y(dir)
+	n.add_child(bloom)
+	for k in 5:
+		var pa := TAU * k / 5.0
+		var petal := _put(_sphere(0.06, 8), _m("lily"), Vector3(cos(pa) * 0.05, 0.03, sin(pa) * 0.05), bloom)
+		petal.scale = Vector3(0.5, 0.25, 1.4)
+		petal.rotation.y = -pa + PI / 2.0
+		petal.rotation.x = -0.5
+	_put(_sphere(0.022, 6), _m("pollen"), Vector3(0, 0.04, 0), bloom)
+
+
+## A garden rose: a tight cupped head of petals.
+static func _rose(n: Node3D, at: Vector3, mat: Material) -> void:
+	_put(_sphere(0.04, 8), mat, at, n).scale = Vector3(1, 0.8, 1)
+	for k in 3:
+		var a := TAU * k / 3.0 + at.x * 7.0
+		var petal := _put(_sphere(0.034, 6), mat, at + Vector3(cos(a) * 0.03, -0.012, sin(a) * 0.03), n)
+		petal.scale = Vector3(1, 0.7, 1)
+
+
+## One frond: a stem arching out from `base` on bearing `az`, starting `lift` radians above
+## level and bending down by `droop` per segment, with paired leaflets that shorten toward the tip.
+static func _frond(n: Node3D, base: Vector3, az: float, lift: float, seg: float, count: int, leaf: float, droop: float, mat: Material) -> void:
+	var p := base
+	var el := lift
+	for i in count:
+		var dir := Vector3(cos(el) * cos(az), sin(el), cos(el) * sin(az))
+		var q := p + dir * seg
+		_tube(n, p, q, 0.006 * (1.0 - 0.6 * i / count), mat, 4)
+		var side := dir.cross(Vector3.UP).normalized()
+		var length := leaf * (1.0 - 0.65 * float(i) / count)
+		for sgn in [-1.0, 1.0]:
+			var out: Vector3 = (side * sgn * 0.85 + dir * 0.35 + Vector3.DOWN * 0.25).normalized()
+			var l := _put(_box(length * 0.28, length, 0.006), mat, (p + q) * 0.5 + out * length * 0.5, n)
+			l.basis = _aim_y(out)
+		p = q
+		el -= droop
+
+
+## The grand arrangement at the head of the aisle: a two-tier round plinth (plum, brass, cream),
+## a tall dark-green urn, and lilies, roses and arching ferns rising about 3 m.
+static func _centrepiece(n: Node3D) -> void:
+	_put(_cyl(1.22, 1.24, 0.08, 48), _m("plinth"), Vector3(0, 0.04, 0), n)
+	_put(_cyl(1.18, 1.2, 0.42, 48), _m("plum"), Vector3(0, 0.29, 0), n)
+	_put(_cyl(1.21, 1.21, 0.035, 48), _m("brass"), Vector3(0, 0.5, 0), n)
+	_put(_cyl(1.25, 1.25, 0.06, 48), _m("cream"), Vector3(0, 0.55, 0), n)
+	_put(_cyl(0.68, 0.7, 0.3, 40), _m("plum"), Vector3(0, 0.73, 0), n)
+	_put(_cyl(0.71, 0.71, 0.03, 40), _m("brass"), Vector3(0, 0.88, 0), n)
+	_put(_cyl(0.74, 0.74, 0.05, 40), _m("cream"), Vector3(0, 0.92, 0), n)
+	var y := 0.945
+	_put(_cyl(0.18, 0.24, 0.1, 24), _m("vase"), Vector3(0, y + 0.05, 0), n)
+	_put(_cyl(0.1, 0.16, 0.16, 20), _m("vase"), Vector3(0, y + 0.18, 0), n)
+	_put(_sphere(0.3, 20), _m("vase"), Vector3(0, y + 0.52, 0), n).scale = Vector3(1, 0.95, 1)
+	_put(_cyl(0.2, 0.26, 0.24, 24), _m("vase"), Vector3(0, y + 0.88, 0), n)
+	_put(_cyl(0.27, 0.27, 0.04, 24), _m("brass"), Vector3(0, y + 1.0, 0), n)
+	_put(_cyl(0.25, 0.25, 0.04, 24), _m("brass"), Vector3(0, y + 0.42, 0), n)
+	var lip := Vector3(0, y + 1.0, 0)
+	var rng := RandomNumberGenerator.new()
+	rng.seed = 21
+	for i in 8:   # ferns spilling over the lip
+		_frond(n, lip, TAU * i / 8.0 + rng.randf_range(-0.15, 0.15), 0.5, 0.12, 6, 0.12, 0.35, _m("fern"))
+	for i in 8:   # upright greenery behind the blooms, arching outward: the arrangement's mass
+		_frond(n, lip + Vector3(0, 0.02, 0), TAU * i / 8.0 + 0.4, rng.randf_range(1.05, 1.3), 0.13, 6, 0.17, 0.22, _m("leaf"))
+	for i in 12:   # lilies: a wide crown, three tall ones at the centre
+		var a := TAU * i / 12.0 + rng.randf_range(-0.2, 0.2)
+		var tilt := rng.randf_range(0.45, 1.0) if i % 4 else 0.1
+		var length := rng.randf_range(0.65, 1.0) if i % 4 else 1.3
+		var dir := Vector3(sin(tilt) * cos(a), cos(tilt), sin(tilt) * sin(a))
+		var tip := lip + dir * length
+		_tube(n, lip, tip, 0.01, _m("leaf"), 5)
+		_lily(n, tip, dir)
+		if i % 3 == 0:
+			var leaf := _put(_sphere(0.09, 6), _m("leaf"), lip + dir * length * 0.4, n)
+			leaf.basis = _aim_y(dir.rotated(Vector3.UP, 0.7)) * Basis.from_scale(Vector3(0.3, 1.8, 0.1))
+	for i in 22:   # two rings of roses through the foliage
+		var a := TAU * i / 11.0 + (0.3 if i >= 11 else 0.0)
+		var r := 0.46 if i < 11 else 0.32
+		var h := 0.18 if i < 11 else 0.42
+		_rose(n, lip + Vector3(cos(a) * r, h + 0.05 * (i % 2), sin(a) * r), _m("sale_red" if i % 3 == 0 else "dress_rose"))
+
+
+## A freestanding walnut shelf bay, 1.2 m wide and 2.1 m tall: side cheeks, a dark back, a
+## plinth, a corniced top and three shelves with brass lips, stocked to the edge with one
+## repeated line of merchandise: 0 folded knitwear, 1 striped hat boxes, 2 boxed perfume,
+## 3 shoes.
+static func _shelf_unit(n: Node3D, v: int) -> void:
+	var w := 1.2
+	var d := 0.42
+	var h := 2.1
+	for s in [-1.0, 1.0]:
+		_put(_box(0.04, h, d), _m("walnut"), Vector3(s * (w * 0.5 - 0.02), h * 0.5, 0), n)
+	_put(_box(w - 0.08, h - 0.1, 0.02), _m("walnut_dark"), Vector3(0, h * 0.5 + 0.05, -d * 0.5 + 0.01), n)
+	_put(_box(w - 0.06, 0.1, d - 0.03), _m("plinth"), Vector3(0, 0.05, -0.01), n)
+	_put(_box(w + 0.08, 0.07, d + 0.06), _m("walnut"), Vector3(0, h + 0.035, 0.0), n)
+	_put(_box(w + 0.02, 0.025, 0.012), _m("brass"), Vector3(0, h - 0.02, d * 0.5 + 0.004), n)
+	var levels := [0.1, 0.58, 1.06, 1.54]
+	for y in levels:
+		_put(_box(w - 0.08, 0.025, d - 0.03), _m("walnut"), Vector3(0, y + 0.0125, -0.005), n)
+		_put(_box(w - 0.08, 0.03, 0.01), _m("brass"), Vector3(0, y + 0.015, d * 0.5 - 0.02), n)
+	var colours := ["suit_navy", "dress_cream", "plum", "suit_charcoal", "dress_rose", "dress_sage"]
+	for li in levels.size():
+		var y: float = levels[li] + 0.025
+		match v % 4:
+			0:   # three stacks of six folded jumpers, one colour per stack
+				for k in 3:
+					var c: Material = _m(colours[(li * 3 + k) % colours.size()])
+					for j in 6:
+						_put(_box(0.32, 0.055, 0.3), c, Vector3((k - 1) * 0.36, y + 0.028 + j * 0.057, 0.02), n)
+						_put(_box(0.3, 0.014, 0.012), c, Vector3((k - 1) * 0.36, y + 0.04 + j * 0.057, 0.172), n)   # rolled front fold
+			1:   # round hat boxes, striped lids, two high
+				for k in 3:
+					for j in 2:
+						var at := Vector3((k - 1) * 0.36, y + j * 0.21, 0.0)
+						_put(_cyl(0.15, 0.15, 0.17, 20), _m("box_pink" if (k + li) % 2 else "dress_cream"), at + Vector3(0, 0.085, 0), n)
+						_put(_cyl(0.155, 0.155, 0.04, 20), _m("plum" if (k + j) % 2 else "suit_navy"), at + Vector3(0, 0.19, 0), n)
+			2:   # boxed perfume, eight to a shelf, a tester bottle in front
+				var fam: Array = FAMILIES[li % FAMILIES.size()]
+				for k in 8:
+					_put(_box(0.11, 0.17 + 0.03 * (k % 2), 0.09), _m(fam[k % 2]), Vector3(-0.47 + k * 0.134, y + 0.085 + 0.015 * (k % 2), -0.06), n)
+				_bottle_at(n, Vector3(0, y, 0.1), fam[2], 0.14, 0.04, li % 2 == 0)
+			3:   # two pairs of shoes, toes out, heels back
+				for k in 2:
+					shoe_pair(n, Vector3((k - 0.5) * 0.52, y, 0.0), 0.0, _m(["shoe", "suit_brown", "plum", "dress_cream"][(li + k) % 4]))
+
+
+## A pair of shoes side by side, toes toward local +z: sole, rounded upper, low heel.
+static func shoe_pair(n: Node3D, at: Vector3, yaw: float, leather: Material) -> void:
+	for s in [-1.0, 1.0]:
+		var shoe := Node3D.new()
+		shoe.position = at + Vector3(s * 0.065, 0, 0).rotated(Vector3.UP, yaw)
+		shoe.rotation.y = yaw + s * 0.06
+		n.add_child(shoe)
+		_put(_box(0.085, 0.018, 0.26), _m("shoe"), Vector3(0, 0.009, 0), shoe)
+		_put(_sphere(0.05, 10), leather, Vector3(0, 0.035, 0.06), shoe).scale = Vector3(0.85, 0.6, 1.5)
+		_put(_box(0.08, 0.06, 0.12), leather, Vector3(0, 0.048, -0.06), shoe)
+		_put(_box(0.07, 0.03, 0.05), _m("shoe"), Vector3(0, 0.015, -0.1), shoe)    # heel
+		_put(_box(0.05, 0.006, 0.07), _m("dress_cream"), Vector3(0, 0.079, -0.06), shoe)   # insole showing at the opening
+
+
+## A cream pedestal urn with a brass band, planted: 0 a Boston fern of arching fronds, 1 a
+## kentia palm of three canes with drooping, leafleted fronds.
+static func _planter(n: Node3D, v: int) -> void:
+	_put(_cyl(0.18, 0.22, 0.08, 20), _m("cream"), Vector3(0, 0.04, 0), n)
+	_put(_cyl(0.13, 0.16, 0.12, 20), _m("cream"), Vector3(0, 0.14, 0), n)
+	_put(_cyl(0.31, 0.15, 0.4, 24), _m("cream"), Vector3(0, 0.4, 0), n)
+	_put(_cyl(0.315, 0.315, 0.04, 24), _m("brass"), Vector3(0, 0.55, 0), n)
+	_put(_cyl(0.33, 0.31, 0.06, 24), _m("cream"), Vector3(0, 0.63, 0), n)
+	_put(_cyl(0.29, 0.29, 0.02, 20), _m("walnut_dark"), Vector3(0, 0.655, 0), n)
+	var rng := RandomNumberGenerator.new()
+	rng.seed = 5 + v
+	if v % 2 == 0:
+		for i in 16:
+			var a := TAU * i / 16.0 + rng.randf_range(-0.12, 0.12)
+			_frond(n, Vector3(0, 0.66, 0), a, rng.randf_range(0.7, 1.2), 0.1, 7, 0.11, 0.3, _m("fern"))
+	else:
+		for c in 3:
+			var ca := TAU * c / 3.0
+			var top := Vector3(cos(ca) * 0.08, 1.35 + c * 0.25, sin(ca) * 0.08)
+			_tube(n, Vector3(cos(ca) * 0.04, 0.66, sin(ca) * 0.04), top, 0.018, _m("wood"), 6)
+			for i in 4:
+				_frond(n, top, ca + TAU * i / 4.0 + rng.randf_range(-0.3, 0.3), rng.randf_range(0.6, 0.9), 0.13, 8, 0.24, 0.2, _m("leaf"))
+
+
+## A small price card in a brass clip on a weighted foot; the price is a Label3D per placement.
+static func _price_card(n: Node3D) -> void:
+	_put(_cyl(0.025, 0.028, 0.008, 12), _m("brass"), Vector3(0, 0.004, 0), n)
+	_put(_cyl(0.003, 0.003, 0.06, 6), _m("brass"), Vector3(0, 0.035, 0), n)
+	_put(_box(0.135, 0.075, 0.004), _m("shirt"), Vector3(0, 0.105, 0), n)
+	_put(_box(0.145, 0.085, 0.002), _m("brass"), Vector3(0, 0.105, -0.003), n)
+	_put(_box(0.02, 0.012, 0.008), _m("brass"), Vector3(0, 0.067, 0), n)   # clip
 
 
 static func _easel(n: Node3D, v: int) -> void:
@@ -442,10 +641,6 @@ static func _hanging_sign(n: Node3D) -> void:
 
 # ---------------------------------------------------------------- counters and doors
 
-## A counter that reads as solid furniture: a recessed dark plinth, a plum base with a brass
-## band, a cream cabinet, a brass trim line and an overhanging countertop with a softened edge.
-## Every layer has rounded corners. `at` is the floor centre; size is (width, height, depth).
-## `top` picks the countertop: "cream" (stone), "walnut" or "plum".
 ## A shop counter about Ren's belt height: recessed toe plinth, plum base, brass bands, a
 ## panelled cream cabinet and an 8 cm top with a softened edge, lifted off the cabinet on a dark
 ## reveal so it reads as a separate slab. Every face but `service` carries framed, recessed
@@ -1187,6 +1382,7 @@ static func _m(name: String) -> Material:
 		"lily": m = ST.plastic(Color("f6f0e4"), 0.7, 0.0)
 		"pollen": m = ST.plastic(Color("e2a43a"), 0.8, 0.0)
 		"sale_red": m = ST.plastic(Color("9e1b22"), 0.7, 0.0)
+		"fern": m = ST.plastic(Color("4d7a38"), 0.75, 0.0)
 		"straw": m = ST.plastic(Color("d6bd86"), 0.85, 0.0)
 		"steel": m = ST.plastic(Color("a9abae"), 0.3, 0.85)
 		"tape": m = ST.plastic(Color("e9dcae"), 0.75, 0.0)
