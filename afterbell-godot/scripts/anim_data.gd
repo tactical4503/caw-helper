@@ -289,11 +289,26 @@ static func ren_clips() -> Dictionary:
 	var c := {}
 	var rest := {"_rest": true}
 
+	# Idle: a relaxed, asymmetric stance (contrapposto), not attention. Weight on the right leg
+	# (straighter), the left knee soft and turned out, hips and shoulders counter-tilted, chest
+	# turned a touch toward the sword side. Knock hangs low in the right hand, elbow bent, blade
+	# angled forward and down past the knee (arm + forearm + sword pitch = -0.9 rad, about 50
+	# degrees forward of hanging), turned slightly out; the left hand a loose fist off the hip.
+	# Breath: a slow 2.4 s rise and fall in chest and shoulders, weight easing between the feet.
+	var stand := {PELVIS_P: Vector3(0.015, HIP_Y - 0.025, 0), PELVIS_R: Vector3(0, 0.08, 0.04),
+		LEG_R: Vector3(0.04, 0, -0.07), KNEE_R: Vector3(0.1, 0, 0),
+		LEG_L: Vector3(-0.12, 0.25, 0.12), KNEE_L: Vector3(0.24, 0, 0),
+		TORSO: Vector3(0.05, 0.1, -0.05), RHEAD: Vector3(-0.03, -0.12, 0.04),
+		ARM_R_: Vector3(-0.28, 0, -0.2), FORE_R: Vector3(-0.55, 0, 0), SWORD: Vector3(-0.07, 0, -0.25),
+		ARM_L_: Vector3(0.06, 0, 0.18), FORE_L: Vector3(-0.42, 0, 0)}
+	var breath_in := {PELVIS_P: Vector3(0.0, HIP_Y - 0.02, 0), PELVIS_R: Vector3(0, 0.06, 0.03),
+		TORSO: Vector3(0.0, 0.11, -0.04), RHEAD: Vector3(-0.06, -0.1, 0.03),
+		ARM_R_: Vector3(-0.3, 0, -0.22), FORE_R: Vector3(-0.58, 0, 0), SWORD: Vector3(-0.05, 0, -0.25),
+		ARM_L_: Vector3(0.04, 0, 0.2), FORE_L: Vector3(-0.46, 0, 0), KNEE_L: Vector3(0.2, 0, 0)}
 	c["idle"] = [2.4, true, [
-		[0.0, rest, SMOOTH],
-		[1.2, {PELVIS_P: Vector3(0, HIP_Y - 0.012, 0), TORSO: Vector3(0.06, 0, 0), RHEAD: Vector3(0.03, 0.04, 0),
-			ARM_L_: Vector3(0.12, 0, 0.13), SWORD: Vector3(0.0, 0, 0)}, SMOOTH],
-		[2.4, rest, SMOOTH]]]
+		[0.0, o([rest, stand]), SMOOTH],
+		[1.2, breath_in, SMOOTH],
+		[2.4, o([rest, stand]), SMOOTH]]]
 
 	# Run: contact / passing / contact / passing at 0.6 s per two steps; pelvis drops on contact,
 	# torso counter-twists, left arm swings opposite the left leg, the sword arm swings less.

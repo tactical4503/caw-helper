@@ -46,9 +46,20 @@ func ok() -> bool:
 ## `twist` optionally turns a role about the figure's z axis (arms out to the side). A role's
 ## value may instead be a Vector3 (pitch about x, yaw about y, roll about z), for heads and spines.
 func apply(angles: Dictionary, twist := {}) -> void:
+	var q := compute(angles, twist)
+	for i in q:
+		skel.set_bone_pose_rotation(i, q[i])
+
+
+## The same pose as local bone rotations {bone index: Quaternion}, without applying it (for
+## blending over motion capture).
+func compute(angles: Dictionary, twist := {}, only: Array = []) -> Dictionary:
+	var out := {}
 	if not ok():
-		return
+		return out
 	for role in idx:
+		if not only.is_empty() and not role in only:
+			continue
 		var i: int = idx[role]
 		var v = angles.get(role, 0.0)
 		var r: Basis
@@ -59,7 +70,8 @@ func apply(angles: Dictionary, twist := {}) -> void:
 		var p: Basis = parent_rest[i]
 		var rest: Transform3D = rest_local[i]
 		var b: Basis = p.inverse() * r * p * rest.basis
-		skel.set_bone_pose_rotation(i, b.orthonormalized().get_rotation_quaternion())
+		out[i] = b.orthonormalized().get_rotation_quaternion()
+	return out
 
 
 ## The hand's position in the figure's space (for props held in it).

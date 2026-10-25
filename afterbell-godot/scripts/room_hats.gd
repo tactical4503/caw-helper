@@ -28,6 +28,16 @@ const GaugeHud := preload("res://scripts/hud.gd")
 const Fade := preload("res://scripts/fade.gd")
 const Imported := preload("res://scripts/imported_assets.gd")
 const SkinPose := preload("res://scripts/skin_pose.gd")
+const Retarget := preload("res://scripts/mocap_retarget.gd")
+## Motion capture for the guards (Mixamo great-sword pack, retargeted onto the staff figures):
+## [clip file, loops]. The slash is timed to the guard's tell and strike (see GUARD_SLASH).
+const GUARD_CLIPS := {"idle": ["great_sword_idle_2", true], "walk": ["great_sword_walk", true],
+	"strafe": ["great_sword_strafe", true], "slash": ["great_sword_slash", false],
+	"hit": ["great_sword_impact", false], "topple": ["great_sword_impact_2", false]}
+## Slash clip timing (seconds into the clip): the baton is at the top of the wind-up at 0.52 and
+## lands at 0.66; the clip is played so the tell ends at the top and the strike lands on time.
+const GUARD_SLASH := Vector2(0.52, 0.66)
+const WALK_CLIP_SPEED := 1.15   # m/s the walk cycle covers at 1x
 ## The two etiquette guards are the supplied staff figures: the plum-suited clerk (npc10) at the
 ## post and the teal-dressed clerk (npc12) who joins after the rack moves. Without their files
 ## the guards fall back to the built-in ivory figures.
@@ -71,6 +81,9 @@ class Guard:
 	var spoke := false
 	var orbit := 1.0
 	var pose: RefCounted = null   # SkinPose when the guard is one of the supplied figures
+	var mocap: RefCounted = null  # Retarget: its motion capture
+	var clip := ""
+	var idle_w := 0.0
 	var baton: Node3D
 	var stool: Node3D
 	var stride := 0.0
@@ -290,6 +303,9 @@ func _make_guard(at: Vector2, state: String, which := 0) -> Guard:
 	if figure:
 		body.add_child(figure)
 		g.pose = SkinPose.new(figure, GUARD_MODELS[which][1])
+		g.mocap = Retarget.new(figure, GUARD_MODELS[which][1], GUARD_CLIPS, g.node)
+		if not g.mocap.ok():
+			g.mocap = null
 		g.seed = which * 2.3
 		g.vis_yaw = g.yaw
 		# The padded measuring baton, carried in the right hand (placed each frame).
@@ -819,10 +835,87 @@ func _render_actors(dt: float) -> void:
 		gg.arm_baton.rotation.x = lerpf(gg.arm_baton.rotation.x, baton_x, 1.0 - exp(-(30.0 if gg.state == "strike" else 10.0) * dt))
 		gg.arm_palm.rotation.x = lerpf(gg.arm_palm.rotation.x, palm_x, 1.0 - exp(-10.0 * dt))
 		body.position.y = lerpf(body.position.y, (-0.42 if gg.pose else -0.55) * sit, 1.0 - exp(-8.0 * dt))
-		body.rotation.x = lerpf(body.rotation.x, -0.25 * sit + (0.15 if gg.state == "flinch" else 0.0), 1.0 - exp(-8.0 * dt))
-		if gg.pose:
+		body.rotation.x = lerpf(body.rotation.x, (0.0 if gg.mocap else -0.25 * sit) + (0.15 if gg.state == "flinch" and not gg.mocap else 0.0), 1.0 - exp(-8.0 * dt))
+		if gg.mocap:
+			_mocap_figure(gg, dt, sit)
+		elif gg.pose:
 			_pose_figure(gg, dt, sit)
 			gg.stool.visible = sit > 0.5
+
+
+## Drives a staff figure with motion capture: each guard state picks a clip (idle, walk scaled to
+## the guard's real speed, strafe while circling, the slash timed to the tell and strike, a hit
+## reaction, a heavier one when toppled), crossfading between them. Sitting has no clip: the
+## spring-posed sit (_pose_figure's targets) is blended over the capture as the guard sits.
+func _mocap_figure(g: Guard, dt: float, sit: float) -> void:
+	if dt <= 0.0:
+		g.mocap.update(0.0)
+		return
+	var moved := g.pos.distance_to(g.last)
+	g.last = g.pos
+	g.speed = lerpf(g.speed, moved / dt, 1.0 - exp(-10.0 * dt))
+	if g.state != g.shown:
+		g.shown = g.state
+		g.held = 0.0
+	g.held += dt
+	var want := "idle"
+	var speed := 1.0
+	var blend := 0.3
+	match g.state:
+		"approach", "standing", "post", "dormant":
+			if g.speed > 0.2:
+				want = "walk"
+				speed = clampf(g.speed / WALK_CLIP_SPEED, 0.6, 1.6)
+		"circle":
+			want = "strafe" if g.speed > 0.2 else "idle"
+		"tell":
+			want = "slash"
+			speed = GUARD_SLASH.x / GUARD_TELL     # reach the top of the wind-up as the tell ends
+			blend = 0.12
+		"strike":
+			want = "slash"
+			speed = (GUARD_SLASH.y - GUARD_SLASH.x) / 0.18
+		"recover":
+			want = "slash" if g.clip == "slash" and g.mocap.player.is_playing() else "idle"
+			speed = (g.mocap.length("slash") - GUARD_SLASH.y) / GUARD_RECOVER
+		"flinch":
+			want = "hit"
+			blend = 0.08
+		"seated":
+			want = "topple" if g.clip == "topple" or g.held < 0.1 else "idle"
+	# Start the clip on a change, and restart the slash or the hit each time that state begins.
+	var fresh := g.held <= dt * 1.01 and g.state in ["tell", "flinch"]
+	if want != g.clip or fresh:
+		g.mocap.play(want, blend, speed)
+		if fresh:
+			g.mocap.player.seek(0.0, true)
+		g.clip = want
+	g.mocap.player.speed_scale = speed if want in ["slash", "walk"] else 1.0
+	# The sit blends in as the body lowers (and out again as it rises). Standing idle, the
+	# capture's fighting crouch is straightened toward an upright shop-floor stance.
+	var overlay := {}
+	var ow := smoothstep(0.0, 1.0, sit)
+	if want == "idle" and sit <= 0.01:
+		overlay = g.pose.compute({"spine": Vector3(0.02, 0.0, 0.0), "r_thigh": Vector3(-0.04, 0.0, 0.03),
+			"l_thigh": Vector3(0.02, 0.0, -0.03), "r_shin": Vector3(0.06, 0.0, 0.0), "l_shin": Vector3(0.04, 0.0, 0.0)},
+			{}, ["spine", "r_thigh", "l_thigh", "r_shin", "l_shin"])
+		ow = 0.6
+	if sit > 0.01:
+		var s2 := sit
+		overlay = g.pose.compute({
+			"spine": Vector3(0.18 * s2, 0.0, 0.0), "head": Vector3(0.25 * s2, 0.0, 0.0),
+			"r_thigh": Vector3(-1.5 * s2, 0.0, 0.05), "l_thigh": Vector3(-1.5 * s2, 0.0, -0.05),
+			"r_shin": Vector3(1.5 * s2, 0.0, 0.0), "l_shin": Vector3(1.5 * s2, 0.0, 0.0),
+			"r_arm": Vector3(-0.55 * s2 - 0.1, 0.0, -0.1), "l_arm": Vector3(-0.55 * s2 - 0.05, 0.0, 0.1),
+			"r_fore": Vector3(-0.85 * s2 - 0.25, 0.0, 0.0), "l_fore": Vector3(-0.85 * s2 - 0.2, 0.0, 0.0)})
+	g.idle_w = lerpf(g.idle_w, ow, 1.0 - exp(-4.0 * dt))   # ease the stance change in and out
+	g.mocap.update(dt, overlay, g.idle_w if sit <= 0.01 else ow)
+	# The baton follows the right hand, held as the capture holds its sword: along the grip.
+	var rt: RefCounted = g.mocap
+	var src_hand: int = rt.src_skel.find_bone("mixamorig_RightHand")
+	var delta: Basis = rt.src_skel.get_bone_global_pose(src_hand).basis.orthonormalized() * rt.src_skel.get_bone_global_rest(src_hand).basis.orthonormalized().inverse()
+	var hand: Vector3 = rt.skel.global_transform * rt.skel.get_bone_global_pose(rt.hand).origin
+	g.baton.global_transform = Transform3D(rt.skel.global_basis.orthonormalized() * delta, hand)
 
 
 ## Joint springs: stiffness (how fast a joint chases its pose) and damping ratio (below 1 it
