@@ -622,6 +622,108 @@ static func _price_card(n: Node3D) -> void:
 
 
 
+# ---------------------------------------------------------------- people
+
+static var _tints := {}
+
+
+## A plain matte material for a colour (skin, cloth, hair), cached.
+static func tint(c: Color, rough := 0.8) -> Material:
+	var key := "%s/%.2f" % [c.to_html(false), rough]
+	if not _tints.has(key):
+		_tints[key] = ST.plastic(c, rough, 0.0)
+	return _tints[key]
+
+
+## A store employee (a person, not a mannequin), about 1.7 m, facing +z. `look` keys:
+## skin, hair, top, top2 (shirt/blouse), legs, shoes (Colors); skirt, cap, glasses, bun (bools);
+## pose: "fold" (arms crossed), "hip" (one hand on hip) or "rest".
+static func person(parent: Node3D, at: Vector3, yaw: float, look: Dictionary) -> Node3D:
+	var n := Node3D.new()
+	n.position = at
+	n.rotation.y = yaw
+	parent.add_child(n)
+	var skin := tint(look.get("skin", Color("d9a77f")), 0.6)
+	var top := tint(look.get("top", Color("4e1f3a")), 0.85)
+	var top2 := tint(look.get("top2", Color("f2ece0")), 0.75)
+	var legs := tint(look.get("legs", Color("3a3438")), 0.85)
+	var shoe := tint(look.get("shoes", Color("1c1715")), 0.45)
+	var hair := tint(look.get("hair", Color("3b2a26")), 0.7)
+	var dark := tint(Color("2a1a1a"), 0.5)
+	# Feet and legs: a skirt over stockinged legs, or trousers.
+	for s in [-1.0, 1.0]:
+		_put(rounded_block(0.1, 0.07, 0.25, 0.04, 0.02), shoe, Vector3(s * 0.09, 0.0, 0.035), n)
+		if look.get("skirt", false):
+			_put(_cyl(0.045, 0.055, 0.5, 10), tint(Color(look.get("skin", Color("d9a77f"))).darkened(0.25), 0.5), Vector3(s * 0.085, 0.3, 0), n)
+		else:
+			_put(_cyl(0.075, 0.065, 0.82, 12), legs, Vector3(s * 0.095, 0.47, 0), n)
+	if look.get("skirt", false):
+		_put(_cyl(0.17, 0.25, 0.42, 20), legs, Vector3(0, 0.73, 0), n).scale = Vector3(1, 1, 0.8)
+	else:
+		_put(_sphere(0.17, 14), legs, Vector3(0, 0.9, 0), n).scale = Vector3(1.1, 0.6, 0.8)
+	# Torso: shirt front, the jacket or cardigan over it, a collar and buttons.
+	_put(_cyl(0.2, 0.17, 0.58, 20), top, Vector3(0, 1.2, 0), n).scale = Vector3(1, 1, 0.68)
+	_put(_box(0.1, 0.18, 0.02), top2, Vector3(0, 1.41, 0.125), n)                           # shirt between the fronts
+	for s in [-1.0, 1.0]:
+		var lapel := _put(_box(0.07, 0.26, 0.018), top, Vector3(s * 0.07, 1.36, 0.13), n)
+		lapel.rotation.z = s * 0.3
+		var collar := _put(_box(0.08, 0.035, 0.05), top2, Vector3(s * 0.05, 1.52, 0.1), n)
+		collar.rotation.z = s * -0.5
+	for y in [1.0, 1.1, 1.2]:
+		_put(_sphere(0.012, 6), tint(look.get("buttons", Color("c9a86a")), 0.4), Vector3(0, y, 0.135), n)
+	# Shoulders, neck and arms.
+	var shoulders := _put(_capsule(0.07, 0.48), top, Vector3(0, 1.48, 0), n)
+	shoulders.rotation.z = PI / 2.0
+	shoulders.scale = Vector3(1, 1, 0.8)
+	_put(_cyl(0.05, 0.055, 0.09, 12), skin, Vector3(0, 1.56, 0), n)
+	var pose: String = look.get("pose", "rest")
+	var arms: Array = {
+		"rest": [[Vector3(-0.26, 1.2, 0.0), Vector3(-0.27, 0.92, 0.04)], [Vector3(0.26, 1.2, 0.0), Vector3(0.27, 0.92, 0.04)]],
+		"fold": [[Vector3(-0.27, 1.22, 0.06), Vector3(0.12, 1.28, 0.2)], [Vector3(0.27, 1.22, 0.06), Vector3(-0.12, 1.24, 0.2)]],
+		"hip": [[Vector3(-0.26, 1.2, 0.0), Vector3(-0.27, 0.92, 0.04)], [Vector3(0.4, 1.22, -0.04), Vector3(0.19, 1.0, 0.03)]],
+	}[pose]
+	for k in 2:
+		var from := Vector3(-0.23 if k == 0 else 0.23, 1.47, 0)
+		var elbow: Vector3 = arms[k][0]
+		var hand: Vector3 = arms[k][1]
+		_limb(n, from, elbow, 0.05, top)
+		_limb(n, elbow, hand, 0.045, top)
+		_put(_cyl(0.047, 0.047, 0.03, 10), top2, hand.lerp(elbow, 0.12), n).basis = _aim_y(hand - elbow)   # cuff
+		_put(_sphere(0.042, 10), skin, hand + (hand - elbow).normalized() * 0.03, n).scale = Vector3(0.8, 1.0, 1.1)
+	# Head: an oval face with features drawn as small shapes, ears, hair.
+	var head := Node3D.new()
+	head.position = Vector3(0, 1.685, 0.01)
+	n.add_child(head)
+	_put(_sphere(0.105, 18), skin, Vector3.ZERO, head).scale = Vector3(0.9, 1.12, 0.98)
+	_put(_sphere(0.075, 14), skin, Vector3(0, -0.06, 0.02), head).scale = Vector3(1.0, 0.8, 1.0)      # jaw
+	_put(_sphere(0.018, 8), skin, Vector3(0, -0.005, 0.1), head).scale = Vector3(0.8, 1.2, 1.0)       # nose
+	for s in [-1.0, 1.0]:
+		_put(_sphere(0.022, 8), skin, Vector3(s * 0.092, 0.0, 0.0), head).scale = Vector3(0.5, 1.0, 0.8)   # ears
+		_put(_sphere(0.011, 8), dark, Vector3(s * 0.035, 0.025, 0.088), head).scale = Vector3(1.2, 0.8, 0.6)   # eyes
+		var brow := _put(_box(0.04, 0.007, 0.01), hair, Vector3(s * 0.036, 0.05, 0.09), head)
+		brow.rotation.z = s * -0.12
+	_put(_box(0.035, 0.006, 0.008), tint(Color("8a4a44"), 0.6), Vector3(0, -0.055, 0.092), head)     # mouth
+	_put(_sphere(0.112, 16), hair, Vector3(0, 0.035, -0.018), head).scale = Vector3(0.95, 0.85, 0.98)  # hair cap
+	if look.get("bun", false):
+		_put(_sphere(0.05, 12), hair, Vector3(0, 0.07, -0.1), head)
+	if look.get("glasses", false):
+		for s in [-1.0, 1.0]:
+			var rim := TorusMesh.new()
+			rim.inner_radius = 0.016
+			rim.outer_radius = 0.021
+			rim.rings = 12
+			rim.ring_segments = 4
+			var r := _put(rim, tint(Color("6b5a3a"), 0.4), Vector3(s * 0.036, 0.025, 0.1), head)
+			r.rotation.x = PI / 2.0
+		_put(_box(0.022, 0.004, 0.004), tint(Color("6b5a3a"), 0.4), Vector3(0, 0.03, 0.105), head)
+	if look.get("cap", false):
+		var cap := tint(look.get("cap_color", Color("4e1f3a")), 0.6)
+		_put(_cyl(0.105, 0.11, 0.075, 16), cap, Vector3(0, 0.1, -0.005), head)
+		_put(_box(0.16, 0.012, 0.07), cap, Vector3(0, 0.07, 0.1), head)                             # visor
+		_put(_box(0.04, 0.03, 0.006), _m("brass"), Vector3(0, 0.11, 0.105), head)                    # badge
+	return n
+
+
 # ---------------------------------------------------------------- department stock
 
 const LEATHERS := ["suit_brown", "plum", "dress_cream", "shoe", "leather_tan"]

@@ -22,11 +22,14 @@ const VIEWS := [
 	["plants", Vector3(-27.0, 2.1, 3.6), Vector3(-27.0, 1.3, -0.6)],
 	["stock_a", Vector3(19.4, 1.5, 2.6), Vector3(19.4, 0.6, -0.6)],
 	["stock_b", Vector3(24.4, 1.5, 2.6), Vector3(24.4, 0.6, -0.6)],
+	["people", Vector3(31.5, 1.55, 2.6), Vector3(31.5, 1.15, 0)],
 ]
+const ONLY_ARG := "--only="
 
 var out_dir := "user://furniture"
 var cam: Camera3D
 var index := 0
+var only := []
 var frames := 0
 
 
@@ -34,6 +37,8 @@ func _initialize() -> void:
 	for arg in OS.get_cmdline_user_args():
 		if arg.begins_with("--out="):
 			out_dir = arg.substr(6)
+		if arg.begins_with(ONLY_ARG):
+			only = Array(arg.substr(ONLY_ARG.length()).split(","))
 	DirAccess.make_dir_recursive_absolute(out_dir)
 	root.size = Vector2i(1280, 960)
 	var w := Node3D.new()
@@ -85,6 +90,10 @@ func _initialize() -> void:
 		w.add_child(plinth)
 		Props.place(w, "window_stock", Vector3(x, 0.5, -0.4), 0.0, k)
 	Props.place(w, "leather_table", Vector3(23.6, 0, 1.0), 0.0, 0)
+	Props.person(w, Vector3(30.9, 0, 0), 0.25, {"skin": Color("d9a77f"), "hair": Color("9a948c"), "top": Color("4e1f3a"),
+			"top2": Color("efe6d4"), "legs": Color("4a4648"), "skirt": true, "bun": true, "glasses": true, "pose": "fold"})
+	Props.person(w, Vector3(32.1, 0, 0), -0.25, {"skin": Color("8a5a3c"), "hair": Color("1e1612"), "top": Color("e8dcc2"),
+			"top2": Color("f6f1e6"), "legs": Color("2e2a30"), "cap": true, "pose": "hip"})
 	for x in [1.5, 6.1, -4.8, 8.2, -17.2, -28.2]:   # Ren's height
 		var post := MeshInstance3D.new()
 		var c := CylinderMesh.new()
@@ -95,7 +104,7 @@ func _initialize() -> void:
 		post.position = Vector3(x, Props.REN_HEIGHT * 0.5, 0.6)
 		post.material_override = ST.plastic(Color("b0302a"), 0.6, 0.0)
 		w.add_child(post)
-	for lx in [-27.0, -21.0, -15.0, -4.0, 0.0, 5.0, 10.0, 19.0, 25.0]:
+	for lx in [-27.0, -21.0, -15.0, -4.0, 0.0, 5.0, 10.0, 19.0, 25.0, 31.5]:
 		ST.ceiling_light(w, Vector3(lx, 3.6, 1.2), 1.2, 9.0)
 	cam = Camera3D.new()
 	cam.fov = 45
@@ -104,6 +113,8 @@ func _initialize() -> void:
 
 
 func _aim() -> void:
+	while not only.is_empty() and index < VIEWS.size() - 1 and not VIEWS[index][0] in only:
+		index += 1
 	var v: Array = VIEWS[index]
 	cam.position = v[1]
 	cam.look_at(v[2], Vector3.UP)
@@ -117,6 +128,8 @@ func _process(_d: float) -> bool:
 		root.get_texture().get_image().save_png(path)
 		print("saved ", path)
 		index += 1
+		while not only.is_empty() and index < VIEWS.size() and not VIEWS[index][0] in only:
+			index += 1
 		if index >= VIEWS.size():
 			quit()
 			return true
