@@ -21,10 +21,15 @@ const GALLERY_X := 8.6        # gallery fronts, just behind the court's columns
 const NORTH_Z := -26.0        # back wall with the window
 const SOUTH_Z := 9.6
 const MEZZ_Z := -18.6         # mezzanine front edge (escalator tops)
-const ESC_X := 5.4            # escalators sit either side of the centre line
-const ESC_FOOT_Z := -10.0
+const ESC_X := 4.6            # where the escalators arrive at the mezzanine (its rail opens here)...
+const ESC_FOOT_X := 2.9       # ...from feet close in by the lily table: a V, as in the reference
+const ESC_FOOT_Z := -10.1
 const LEVELS := [5.0]         # one gallery floor: the reference's single balcony storey, not a canyon
 const ROOF := 12.0
+const WINDOW_W := 6.4
+const WINDOW_SILL := 7.0
+const TERRACE_H := 1.85       # the raised terrace in front of the window, above the mezzanine floor
+const TERRACE_D := 2.4
 const SLAB := 0.45
 const UPPER_ESC_X := 11.9      # gallery-to-gallery escalators, against the outer walls
 const UPPER_ESC_FOOT := 2.0
@@ -42,7 +47,8 @@ static func build(root: Node3D) -> void:
 	_galleries(a)
 	_mezzanine(a)
 	for side in [-1.0, 1.0]:
-		escalator(a, Vector3(side * ESC_X, 0, ESC_FOOT_Z), LEVELS[0], MEZZ_Z)
+		escalator(a, Vector3(side * ESC_FOOT_X, 0, ESC_FOOT_Z), LEVELS[0], MEZZ_Z, 1.15, false,
+				-side * atan2(ESC_X - ESC_FOOT_X, ESC_FOOT_Z - MEZZ_Z))
 	_colonnade(a)
 	_aisle(a)
 	_shops(a)
@@ -67,13 +73,6 @@ static func _shell(a: Node3D) -> void:
 		_put(_box(0.4, ROOF - LEVELS[0], depth), _m("stone"), Vector3(s * (OUTER_X + 0.2), (ROOF + LEVELS[0]) * 0.5, mid_z), a)
 	_put(_box(OUTER_X * 2.0, ROOF, 0.4), _m("stone"), Vector3(0, ROOF * 0.5, SOUTH_Z + 0.2), a)
 	_put(_box(OUTER_X * 2.0, ROOF, 0.4), _m("stone"), Vector3(0, ROOF * 0.5, NORTH_Z - 0.2), a)
-	# North of the bell partition: low balustrades either side, so the lower hall and the
-	# escalators read through.
-	for s in [-1.0, 1.0]:
-		var x0: float = s * 1.9
-		var x1: float = s * 8.15
-		_put(_box(absf(x1 - x0), 1.05, 0.25), _m("cream"), Vector3((x0 + x1) * 0.5, 0.52, -9.15), a)
-		_put(_box(absf(x1 - x0), 0.08, 0.3), _m("brass"), Vector3((x0 + x1) * 0.5, 1.07, -9.15), a)
 
 
 static func _galleries(a: Node3D) -> void:
@@ -152,16 +151,16 @@ static func _mezzanine(a: Node3D) -> void:
 		var gem := _put(_box(0.16, 0.16, 0.04), _m("brass"), Vector3(s * 1.75, level - 0.5, MEZZ_Z + 0.19), a)
 		gem.rotation.z = PI / 4.0
 	# Mannequins along the rail, racks and palms behind, a counter in the middle.
-	for x in [-7.4, -3.0, 3.0, 7.4]:
-		mannequin(a, Vector3(x, level, MEZZ_Z - 1.0), 0.0, int(absf(x)) % 3)
-	for x in [-7.2, 7.2]:   # kept to the sides so the window reads from below
+	# Suits and fedoras flank the great bell at the rail; navy suit racks behind them; palms at
+	# the ends (as in the reference).
+	for x in [-1.7, 1.7, -6.9, 6.9]:
+		Props.place(a, "mannequin", Vector3(x, level, MEZZ_Z - 0.9), 0.0, (0 if absf(x) < 3.0 else 2) + 4 * 2)
+	for x in [-3.3, 3.3]:
+		Props.place(a, "rack", Vector3(x, level, MEZZ_Z - 1.9), 0.0, 0)
+	for x in [-7.2, 7.2]:
 		rack(a, Vector3(x, level, -23.4), 0.0)
-	for x in [-5.3, 5.3]:
-		palm(a, Vector3(x, level, -25.1))
-	# The centre of the mezzanine front is kept for the great service bell (builders.gd), framed
-	# by a palm each side.
-	for x in [-2.05, 2.05]:
-		palm(a, Vector3(x, level, MEZZ_Z - 1.4))
+	for x in [-5.6, 5.6]:
+		palm(a, Vector3(x, level, MEZZ_Z - 1.2))
 	# Ferns at the rail's ends and where it breaks for the escalators.
 	for x in [-GALLERY_X + 0.6, -ESC_X - 1.25, ESC_X + 1.25, GALLERY_X - 0.6]:
 		Props.place(a, "planter", Vector3(x, level, MEZZ_Z - 0.55))
@@ -232,13 +231,15 @@ static func balustrade(a: Node3D, from: Vector3, to: Vector3, height := 1.0) -> 
 ## Stepped treads with gold nosings, steel skirts and decks, a cream-clad truss with a brass
 ## seam, smoked glass panels under a black handrail on a steel guide, curled newel ends on
 ## solid housings, and brass-edged landing plates.
-static func escalator(a: Node3D, foot: Vector3, rise: float, top_z: float, width := 1.15, flush := false) -> void:
-	var run := foot.z - top_z
+static func escalator(a: Node3D, foot: Vector3, rise: float, top_z: float, width := 1.15, flush := false, yaw := 0.0) -> void:
+	var run := (foot.z - top_z) / cos(yaw)   # turned by `yaw` about its foot, it still lands at top_z
 	var length := sqrt(run * run + rise * rise)
 	var pitch := atan2(rise, run)
+	top_z = foot.z - run
 	var e := Node3D.new()
 	e.name = "Escalator"
 	a.add_child(e)
+	e.transform = Transform3D(Basis(Vector3.UP, yaw), foot) * Transform3D(Basis(), -foot)
 	var mid := Vector3(foot.x, rise * 0.5, (foot.z + top_z) * 0.5)
 	var up := Vector3(0, cos(pitch), sin(pitch))   # local "up" of the incline (rotation.x = pitch)
 	var incline := func(size: Vector3, m: Material, at: Vector3, cast := true) -> void:
@@ -296,10 +297,10 @@ static func escalator(a: Node3D, foot: Vector3, rise: float, top_z: float, width
 # ---------------------------------------------------------------- the window
 
 static func _window(a: Node3D) -> void:
-	var w := 7.6
+	var w := WINDOW_W
 	var r := w * 0.5
-	var sill := 5.7
-	var spring := 7.7                  # where the arch starts; the crown sits just under the roof
+	var sill := WINDOW_SILL            # above the raised terrace at the back of the mezzanine
+	var spring := 8.4                  # where the arch starts; the crown sits just under the roof
 	var z := NORTH_Z + 0.02
 	var sky := QuadMesh.new()
 	sky.size = Vector2(w, spring + r - sill)
@@ -356,10 +357,19 @@ static func _window(a: Node3D) -> void:
 		var p1: Vector2 = Vector2(cos(t1), sin(t1)) * (r - 0.06)
 		var seg := _put(_box(p0.distance_to(p1) + 0.03, 0.12, 0.1), dark, Vector3((p0.x + p1.x) * 0.5, spring + (p0.y + p1.y) * 0.5, fz), a)
 		seg.rotation.z = (t0 + t1) * 0.5 + PI / 2.0
-	# The window terrace: a low balustrade at the glass with a palm either side of the parasol view.
-	balustrade(a, Vector3(-r - 0.3, LEVELS[0], NORTH_Z + 0.9), Vector3(r + 0.3, LEVELS[0], NORTH_Z + 0.9), 0.85)
-	for x in [-2.6, 2.6]:
-		palm(a, Vector3(x, LEVELS[0], NORTH_Z + 1.5))
+	# The window terrace: a raised tier at the back of the mezzanine, cream-faced with brass bands,
+	# its balustrade along the front and palms either side of the parasol view (the reference's
+	# second tier above the bell).
+	var tw := r + 1.6
+	var ty: float = LEVELS[0] + TERRACE_H
+	var tz := NORTH_Z + TERRACE_D
+	_put(_box(tw * 2.0, TERRACE_H, TERRACE_D), _m("cream"), Vector3(0, LEVELS[0] + TERRACE_H * 0.5, NORTH_Z + TERRACE_D * 0.5), a)
+	_put(_box(tw * 2.0, 0.02, TERRACE_D - 0.1), _m("carpet"), Vector3(0, ty + 0.01, NORTH_Z + TERRACE_D * 0.5), a, false)
+	for y in [ty - 0.12, LEVELS[0] + 0.5]:
+		_put(_box(tw * 2.0 + 0.04, 0.05, 0.04), _m("brass"), Vector3(0, y, tz + 0.01), a)
+	balustrade(a, Vector3(-tw, ty, tz - 0.12), Vector3(tw, ty, tz - 0.12), 0.85)
+	for x in [-2.3, 2.3]:
+		palm(a, Vector3(x, ty, NORTH_Z + 1.1))
 	# Fluted ivory pilasters with plum inset panels flank the window (no hanging cloth).
 	for s in [-1.0, 1.0]:
 		_pilaster(a, Vector3(s * (r + 1.5), LEVELS[0], z + 0.2), ROOF - 0.6 - LEVELS[0])
@@ -400,8 +410,8 @@ static func _sunset_view(a: Node3D, z: float, w: float, sill: float, top: float)
 					var lit := _put(_box(0.08, 0.1, 0.01), _m("window_lit"), Vector3(x + rng.randf_range(0.1, bw - 0.1), sill + rng.randf_range(0.3, bh - 0.2), z + 0.056), a, false)
 					lit.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 			x += bw
-	_put(_cyl(0.0, 0.8, 0.3, 16), _m("skyline"), Vector3(-0.8, sill + 2.7, z + 0.06), a, false)
-	_put(_box(0.04, 0.9, 0.01), _m("skyline"), Vector3(-0.8, sill + 2.2, z + 0.06), a, false)
+	_put(_cyl(0.0, 0.8, 0.3, 16), _m("skyline"), Vector3(-0.2, sill + 2.7, z + 0.06), a, false)
+	_put(_box(0.04, 0.9, 0.01), _m("skyline"), Vector3(-0.2, sill + 2.2, z + 0.06), a, false)
 
 
 ## A fluted ivory pilaster rising `h` from `base` against the back wall: stepped base, three
@@ -470,14 +480,14 @@ static func _roof(a: Node3D) -> void:
 static func _lower_hall(a: Node3D) -> void:
 	# Past the court's lily table, as in the reference: gentlemen's suits in fedoras either side
 	# of the aisle, a brass rack of jackets, and racks along the escalator feet.
-	for p in [[Vector3(-1.9, 0, -10.9), 0.35, 0], [Vector3(-2.7, 0, -11.9), 0.2, 2], [Vector3(-1.4, 0, -12.8), 0.0, 0],
-			[Vector3(1.8, 0, -11.2), -0.3, 2], [Vector3(2.6, 0, -12.4), -0.15, 0], [Vector3(1.3, 0, -13.4), 0.0, 2]]:
+	for p in [[Vector3(-1.4, 0, -11.4), 0.3, 0], [Vector3(1.5, 0, -11.8), -0.3, 2], [Vector3(-0.8, 0, -13.3), 0.1, 2],
+			[Vector3(0.9, 0, -13.7), -0.1, 0], [Vector3(-4.7, 0, -11.6), 0.4, 2], [Vector3(4.8, 0, -12.0), -0.4, 0]]:
 		Props.place(a, "mannequin", p[0], p[1], p[2] + 4 * ([1, 2, 1, 3, 2, 1][int(absf(p[0].x * 10.0)) % 6]))
-	Props.place(a, "rack", Vector3(2.75, 0, -9.9), PI / 2.0 - 0.2, 0)
-	rack(a, Vector3(-3.0, 0, -14.0), 0.15)
-	rack(a, Vector3(3.2, 0, -14.6), -0.15)
+	Props.place(a, "rack", Vector3(2.05, 0, -8.4), PI / 2.0 - 0.15, 0)   # the brass jacket rack by the lily table
+	rack(a, Vector3(-5.3, 0, -15.0), 0.15)
+	rack(a, Vector3(5.4, 0, -15.4), -0.15)
 	for side in [-1.0, 1.0]:
-		Props.place(a, "folded_table", Vector3(side * 3.3, 0, -16.4), 0.0, 2 if side > 0 else 0)
+		Props.place(a, "folded_table", Vector3(side * 1.4, 0, -16.4), 0.0, 2 if side > 0 else 0)
 		mannequin(a, Vector3(side * 6.9, 0, -12.5), 0.0, 0)
 		mannequin(a, Vector3(side * 6.9, 0, -16.0), 0.0, 2)
 
@@ -531,8 +541,9 @@ static func _colonnade(a: Node3D) -> void:
 	shop_glow.omni_range = 10.0
 	shop_glow.position = Vector3(0, 3.0, NORTH_Z + 3.0)
 	a.add_child(shop_glow)
-	for x in [-6.2, -4.9, -3.6, 3.6, 4.9, 6.2]:
-		Props.place(a, "shelf_unit", Vector3(x, 0, NORTH_Z + 0.25), 0.0, [1, 0, 1, 0, 1, 0][int(absf(x) * 2.0) % 6])
+	for k in 11:
+		var x := -6.5 + k * 1.3
+		Props.place(a, "shelf_unit", Vector3(x, 0, NORTH_Z + 0.25), 0.0, [1, 0, 3, 0, 1][k % 5])
 	# The floor itself: display tables of shirts and hats, suits on forms, a rack, more light.
 	for p in [[Vector3(-3.4, 0, -22.4), 0], [Vector3(3.4, 0, -22.4), 3], [Vector3(-1.6, 0, -24.0), 1], [Vector3(1.6, 0, -24.0), 2]]:
 		Props.place(a, "folded_table", p[0], 0.0, p[1])
@@ -564,7 +575,7 @@ static func _shops(a: Node3D) -> void:
 		var zs := [-12.0, 0.5, 6.6]
 		for i in 3:
 			shop_front(a, Vector3(s * OUTER_X, 0, zs[i]), -s * PI / 2.0, names[side][i])
-	shop_front(a, Vector3(0, 0, NORTH_Z), 0.0, "GENTLEMEN'S OUTFITTERS")
+	# Under the mezzanine the MENSWEAR floor runs straight back to stocked walls (see _colonnade).
 
 
 ## One shop front built out from a wall: pilasters, a fascia with its name plaque, two display

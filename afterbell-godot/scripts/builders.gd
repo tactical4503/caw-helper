@@ -24,7 +24,7 @@ const RACK_HOME := [Vector2(-4.9, 0.6), Vector2(4.9, 0.6)]
 const BELL_POS := Vector3(0, 0, -7.0)
 ## The long perfume counters down the court's north end (the reference's foreground).
 const GRAND_SCALE := 0.62     # the great bell and its pedestal, at the reference's size...
-const GRAND_DAIS := 0.55      # ...raised so the B on the pedestal shows over the mezzanine rail
+const GRAND_DAIS := 0.95      # ...raised so the B on the pedestal shows over the mezzanine rail
 const COUNTER_X := 3.75       # centre line; inner face at 3.2, so the lane between is 6.4 m
 const COUNTER_W := 1.1
 const COUNTER_Z0 := -9.3
@@ -474,18 +474,25 @@ static func _build_hall(arena_root: Node3D) -> void:
 		# and a large brass fleur-de-lis that reads from across the court.
 		var bw := 1.1
 		var bh := 4.2
-		var bb := put(box(bw if not on_side else 0.06, bh, 0.06 if not on_side else bw), banner, Vector3(spot.x, 8.7, spot.y) + face * 0.42, root)
-		put(box(bw + 0.08 if not on_side else 0.07, 0.09, 0.07 if not on_side else bw + 0.08), brass(), bb.position + Vector3(0, bh * 0.5, 0), root)
-		put(box(bw if not on_side else 0.065, 0.05, 0.065 if not on_side else bw), brass(), bb.position + Vector3(0, -bh * 0.5 + 0.18, 0) + face * 0.005, root)
-		Atrium.fleur(root, bb.position + Vector3(0, bh * 0.14, 0) + face * 0.05, face, 0.72)
+		var uf: Vector3 = Vector3(0, 0, 1) if spot.y < -6.5 else face   # the north pair show theirs to the camera
+		var side_on := absf(uf.x) > 0.5
+		var bb := put(box(bw if not side_on else 0.06, bh, 0.06 if not side_on else bw), banner, Vector3(spot.x, 8.7, spot.y) + uf * 0.42, root)
+		put(box(bw + 0.08 if not side_on else 0.07, 0.09, 0.07 if not side_on else bw + 0.08), brass(), bb.position + Vector3(0, bh * 0.5, 0), root)
+		put(box(bw if not side_on else 0.065, 0.05, 0.065 if not side_on else bw), brass(), bb.position + Vector3(0, -bh * 0.5 + 0.18, 0) + uf * 0.005, root)
+		Atrium.fleur(root, bb.position + Vector3(0, bh * 0.14, 0) + uf * 0.05, uf, 0.72)
 		# As in the reference: a second plum banner on the court face of the ground storey, and a
 		# globe lantern on a brass bracket off the south face, on both storeys.
-		var lb := put(box(0.06, 2.6, 0.9), banner, Vector3(spot.x, 3.0, spot.y) + face * 0.38, root)
-		put(box(0.07, 0.08, 0.98), brass(), lb.position + Vector3(0, 1.3, 0), root)
-		put(box(0.065, 0.05, 0.9), brass(), lb.position + Vector3(0, -1.12, 0) + face * 0.005, root)
-		Atrium.fleur(root, lb.position + Vector3(0, 0.25, 0) + face * 0.05, face, 0.6)
+		var bf: Vector3 = Vector3(0, 0, 1) if spot.y < -6.5 else face   # banner face
+		var across := absf(bf.z) > 0.5
+		var lb := put(box(0.9 if across else 0.06, 2.6, 0.06 if across else 0.9), banner, Vector3(spot.x, 3.0, spot.y) + bf * 0.38, root)
+		put(box(0.98 if across else 0.07, 0.08, 0.07 if across else 0.98), brass(), lb.position + Vector3(0, 1.3, 0), root)
+		put(box(0.9 if across else 0.065, 0.05, 0.065 if across else 0.9), brass(), lb.position + Vector3(0, -1.12, 0) + bf * 0.005, root)
+		Atrium.fleur(root, lb.position + Vector3(0, 0.25, 0) + bf * 0.05, bf, 0.6)
+		# The north pair face the camera: banners on their south faces, lanterns toward the aisle.
+		var north: bool = spot.y < -6.5
+		var lamp_face := Vector3(-signf(spot.x), 0, 0) if north else Vector3(0, 0, 1)
 		for y in [2.75, Atrium.LEVELS[0] + 2.4]:
-			Atrium._amber(ST.lantern(root, Vector3(spot.x, y, spot.y + 0.36), Vector3(0, 0, 1), 1.1, 6.0))
+			Atrium._amber(ST.lantern(root, Vector3(spot.x, y, spot.y) + lamp_face * 0.36, lamp_face, 1.1, 6.0))
 	# Chandeliers on long drops from the roof: pools of light down the court and over the bell.
 	for z in [5.0]:   # the north two are gone: the reference's view up the hall is clear to the roof
 		put(cyl(0.02, 0.02, Atrium.ROOF - 5.6, 6), brass(), Vector3(0, (Atrium.ROOF + 5.6) * 0.5, z), root, false)

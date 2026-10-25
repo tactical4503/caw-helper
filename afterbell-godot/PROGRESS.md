@@ -117,6 +117,16 @@ loose static meshes merged (`Atrium.merge_direct`).
 - Carpet: tinted further toward blue-teal.
 - `ref_shot`: Ren is turned three-quarters up the aisle, as in the reference.
 
+**Layout pass:**
+- Escalators: they form a V, feet at (±2.9, −10.1) by the lily table and tops at ±4.6 on the mezzanine.
+- Mezzanine and window:
+  - a raised terrace (1.85 m) with a balustrade and palms behind the bell;
+  - a smaller, higher window (6.4 m wide, sill 7.0);
+  - suits, fedoras and navy racks flank the bell, which sits on a 0.95 m dais so the B door clears the rail.
+- North court columns: their banners face the camera and their lanterns face the aisle.
+- Removed: the bell-partition balustrades; the shop front under the mezzanine is replaced by stocked shelving all along the back wall.
+- Haze: thicker (density 0.016).
+
 **Not identical:** the reference is a painting. The atrium is deeper than it shows, the court's side columns sit outside the frame, the shop under the mezzanine is less lit, and Ren is the game's model.
 
 **Checks:** all six test suites pass, and the fight and door views were re-rendered.

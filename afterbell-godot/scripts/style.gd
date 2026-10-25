@@ -244,8 +244,8 @@ static func deco_environment(e: Environment) -> void:
 	e.fog_enabled = true
 	e.fog_light_color = Color("aaa39b")
 	e.fog_light_energy = 0.75
-	e.fog_density = 0.011
-	e.fog_aerial_perspective = 0.35
+	e.fog_density = 0.016
+	e.fog_aerial_perspective = 0.4
 	e.fog_sky_affect = 0.3
 	e.adjustment_enabled = true
 	e.adjustment_saturation = 1.1
