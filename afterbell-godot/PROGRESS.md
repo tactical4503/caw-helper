@@ -127,6 +127,13 @@ loose static meshes merged (`Atrium.merge_direct`).
 - Removed: the bell-partition balustrades; the shop front under the mezzanine is replaced by stocked shelving all along the back wall.
 - Haze: thicker (density 0.016).
 
+**Shopfront pass:**
+- Lily table: moved 2.3 m north, between the escalator feet. The striking lever stays where the fight needs it, on a slim brass post with a plum pad.
+- Escalators: 1.45 m wide, with lighter blue-grey treads.
+- MENSWEAR floor: a walnut-framed glazed shopfront with an open centre doorway under the mezzanine.
+
+**Checks:** all six test suites pass; the court costs 3272 draws.
+
 **Not identical:** the reference is a painting. The atrium is deeper than it shows, the court's side columns sit outside the frame, the shop under the mezzanine is less lit, and Ren is the game's model.
 
 **Checks:** all six test suites pass, and the fight and door views were re-rendered.

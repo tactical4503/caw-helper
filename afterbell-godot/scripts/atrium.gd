@@ -47,7 +47,7 @@ static func build(root: Node3D) -> void:
 	_galleries(a)
 	_mezzanine(a)
 	for side in [-1.0, 1.0]:
-		escalator(a, Vector3(side * ESC_FOOT_X, 0, ESC_FOOT_Z), LEVELS[0], MEZZ_Z, 1.15, false,
+		escalator(a, Vector3(side * ESC_FOOT_X, 0, ESC_FOOT_Z), LEVELS[0], MEZZ_Z, 1.45, false,
 				-side * atan2(ESC_X - ESC_FOOT_X, ESC_FOOT_Z - MEZZ_Z))
 	_colonnade(a)
 	_aisle(a)
@@ -533,6 +533,20 @@ static func _colonnade(a: Node3D) -> void:
 	for x in [-7.2, -2.2, 2.2, 7.2]:
 		pillar(a, x, MEZZ_Z + 0.25, LEVELS[0] - SLAB + 0.02)
 		_amber(ST.lantern(a, Vector3(x, 2.9, MEZZ_Z + 0.61), Vector3(0, 0, 1), 0.7, 5.0))   # globes framing MENSWEAR below
+	# Under the mezzanine, between the inner columns: a walnut-framed glazed shopfront with an open
+	# centre doorway, so the lit MENSWEAR floor shows through, as in the reference.
+	var fz := MEZZ_Z - 2.6
+	var fy: float = LEVELS[0] - SLAB
+	_put(_box(5.6, 0.5, 0.25), _m("walnut"), Vector3(0, fy - 0.25, fz), a)                # fascia over the front
+	_put(_box(5.64, 0.05, 0.27), _m("brass"), Vector3(0, fy - 0.52, fz), a)
+	for x in [-2.75, -1.95, -0.75, 0.75, 1.95, 2.75]:
+		_put(_box(0.14, fy - 0.5, 0.18), _m("walnut"), Vector3(x, (fy - 0.5) * 0.5, fz), a)
+	for x in [-2.35, -1.35, 1.35, 2.35]:
+		var pane := _put(_box(0.8 if absf(x) > 2.0 else 1.06, fy - 1.1, 0.03), _m("shop_glass"), Vector3(x, 0.6 + (fy - 1.1) * 0.5, fz), a, false)
+		pane.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	for x in [-1.75, 1.75]:
+		_put(_box(2.0, 0.6, 0.2), _m("walnut"), Vector3(x, 0.3, fz), a)                     # stall risers under the glass
+		_put(_box(2.04, 0.04, 0.24), _m("brass"), Vector3(x, 0.61, fz), a)
 	# Under the mezzanine, the MENSWEAR floor glows: a pendant, warm light and stocked shelving.
 	_amber(ST.pendant(a, Vector3(0, 3.7, MEZZ_Z - 1.6), LEVELS[0] - SLAB, 1.4, 8.0))
 	var shop_glow := OmniLight3D.new()
@@ -994,7 +1008,7 @@ static func _m(name: String) -> StandardMaterial3D:
 		"vase": m = ST.plastic(Color("1d2b2a"), 0.2, 0.3)
 		"steps":   # blue-grey treads, as in the reference
 			m = ST.textured("metal_charcoal", 1.0, ST.plastic(Color("3a3c40"), 0.45, 0.6), 0.6)
-			m.albedo_color = Color(1.7, 1.85, 2.15)
+			m.albedo_color = Color(2.3, 2.5, 2.9)
 		"steel": m = ST.plastic(Color("8e9399"), 0.62, 0.45)   # brushed, not mirrored: a glossy strip clipped to a white line at grazing angles
 		"rubber": m = ST.plastic(Color("141316"), 0.45, 0.0)
 		"skyline":
@@ -1019,6 +1033,12 @@ static func _m(name: String) -> StandardMaterial3D:
 			m.albedo_color = Color(0.85, 0.88, 0.9, 0.18)
 			m.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
 			m.roughness = 0.05
+		"shop_glass":
+			m = StandardMaterial3D.new()
+			m.albedo_color = Color(0.85, 0.8, 0.7, 0.16)
+			m.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+			m.roughness = 0.08
+			m.metallic_specular = 0.8
 		"glass":
 			m = StandardMaterial3D.new()
 			m.albedo_color = Color(0.12, 0.13, 0.16, 0.55)

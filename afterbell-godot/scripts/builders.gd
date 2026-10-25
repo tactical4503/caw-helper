@@ -23,6 +23,7 @@ const Atrium := preload("res://scripts/atrium.gd")
 const RACK_HOME := [Vector2(-4.9, 0.6), Vector2(4.9, 0.6)]
 const BELL_POS := Vector3(0, 0, -7.0)
 ## The long perfume counters down the court's north end (the reference's foreground).
+const LILY_BACK := -2.3       # the lily table stands this far north of the striking post
 const GRAND_SCALE := 0.62     # the great bell and its pedestal, at the reference's size...
 const GRAND_DAIS := 0.95      # ...raised so the B on the pedestal shows over the mezzanine rail
 const COUNTER_X := 3.75       # centre line; inner face at 3.2, so the lane between is 6.4 m
@@ -198,7 +199,7 @@ static func build_arena(parent: Node3D) -> Arena:
 		put(box(side[1].x, 0.024, side[1].z), border, side[0] + Vector3(0, 0.031, 0), root, false)   # court perimeter
 	for s in [-1.0, 1.0]:
 		_band(root, Rect2(Vector2(s * COUNTER_X - COUNTER_W * 0.5 - 0.55, COUNTER_Z0 - 0.55), Vector2(COUNTER_W + 1.1, COUNTER_Z1 - COUNTER_Z0 + 1.1)), border, band_dark)
-	_band(root, Rect2(Vector2(-1.55, -8.55), Vector2(3.1, 3.1)), border, band_dark)   # round the lily table
+	_band(root, Rect2(Vector2(-1.55, BELL_POS.z + LILY_BACK - 1.55), Vector2(3.1, 3.1)), border, band_dark)   # round the lily table
 	# The reference's foreground: a long perfume counter down each side of the court's north end,
 	# each kept by a clerk mannequin, stocked with gift boxes and testers. Ren walks the lane
 	# between them toward the lily table, the escalators and the bell on the mezzanine.
@@ -271,23 +272,30 @@ static func build_arena(parent: Node3D) -> Arena:
 	var stage := Node3D.new()   # everything that never moves, baked together
 	stage.name = "BellStage"
 	bell.add_child(stage)
+	# The lily table stands back between the escalator feet (where the reference has it); the
+	# striking lever stays on the court's north edge on a slim brass post with a plum pad.
+	var table := Node3D.new()
+	table.position = Vector3(0, 0, LILY_BACK)
+	stage.add_child(table)
+	put(cyl(0.16, 0.2, 0.05, 20), brass(), Vector3(0, 0.025, 0.25), stage)
+	put(cyl(0.045, 0.05, 0.5, 14), brass(), Vector3(0, 0.27, 0.25), stage)
+	put(sphere(0.07, 12), brass(), Vector3(0, 0.52, 0.25), stage)
 	var stone := ST.textured("stone_cream", 0.35, mat(Color("e6dcc8"), 0.6))
 	# The striking stand is the reference's round lily table: a plum drum banded in brass under a
 	# cream top, a dark vase of white lilies, gift boxes round its rim. The lever comes out
 	# through a brass escutcheon on its south face, where the racks and the chair strike it.
-	put(cyl(0.8, 0.82, 0.08, 48), mat(Color("2a1420"), 0.7), Vector3(0, 0.04, 0), stage)
-	put(cyl(0.74, 0.76, 0.78, 48), Atrium.Props._m("counter_plum"), Vector3(0, 0.47, 0), stage)
+	put(cyl(0.8, 0.82, 0.08, 48), mat(Color("2a1420"), 0.7), Vector3(0, 0.04, 0), table)
+	put(cyl(0.74, 0.76, 0.78, 48), Atrium.Props._m("counter_plum"), Vector3(0, 0.47, 0), table)
 	for y in [0.12, 0.8]:
-		put(cyl(0.77, 0.77, 0.035, 48), Atrium.Props._m("counter_brass"), Vector3(0, y, 0), stage)
-	put(cyl(0.82, 0.79, 0.1, 48), Atrium.Props._m("cream"), Vector3(0, 0.88, 0), stage)
-	put(cyl(0.86, 0.86, 0.06, 48), Atrium.Props._m("counter_top"), Vector3(0, 0.96, 0), stage)
+		put(cyl(0.77, 0.77, 0.035, 48), Atrium.Props._m("counter_brass"), Vector3(0, y, 0), table)
+	put(cyl(0.82, 0.79, 0.1, 48), Atrium.Props._m("cream"), Vector3(0, 0.88, 0), table)
+	put(cyl(0.86, 0.86, 0.06, 48), Atrium.Props._m("counter_top"), Vector3(0, 0.96, 0), table)
 	var crown := 0.99
-	P.place(stage, "bouquet", Vector3(0, crown, 0), 0.0)   # a dark vase heaped with white lilies
+	P.place(table, "bouquet", Vector3(0, crown, 0), 0.0)   # a dark vase heaped with white lilies
 	for k in 6:
 		var ang := TAU * k / 6.0 + 0.3
-		P.place(stage, "perfume_boxes", Vector3(sin(ang) * 0.56, crown, cos(ang) * 0.56), ang, k).scale = Vector3.ONE * 0.4
-	put(box(0.3, 0.2, 0.03), brass(), Vector3(0, 0.42, 0.76), stage)                       # escutcheon round the lever slot
-	put(box(0.16, 0.11, 0.034), mat(DARK, 0.8), Vector3(0, 0.42, 0.765), stage)
+		P.place(table, "perfume_boxes", Vector3(sin(ang) * 0.56, crown, cos(ang) * 0.56), ang, k).scale = Vector3.ONE * 0.4
+
 	Atrium.merge(stage)
 	# The striking lever comes out through the stand's slot; racks hit its padded plate.
 	a.lever = Node3D.new()
