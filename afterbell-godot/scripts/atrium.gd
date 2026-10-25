@@ -120,7 +120,7 @@ static func _galleries(a: Node3D) -> void:
 			for k in 2:
 				Props.place(a, "shelf_unit", Vector3(s * (OUTER_X - 0.25), level, -17.65 + k * 1.3), -s * PI / 2.0, (k + int(level)) % 4)
 			for lz in [-24.0, -15.0, -7.0, 1.0, 8.0]:
-				ST.sconce(a, Vector3(s * OUTER_X, level + 2.3, lz), Vector3(-s, 0, 0), 0.0)
+				_amber(ST.sconce(a, Vector3(s * OUTER_X, level + 2.3, lz), Vector3(-s, 0, 0), 0.75, 3.6))   # warm pools on the gallery walls
 
 
 ## One rectangle of gallery floor (|x| from x0 to x1 on side s, z from z0 to z1): slab and carpet.
@@ -628,29 +628,103 @@ static func price(a: Node3D, at: Vector3, yaw: float, text: String) -> void:
 	Props.place(a, "price_card", at, yaw, 0, text)
 
 
+## Lamp colour for the atrium: a soft amber, warmer than the overhead key.
+const AMBER := Color("ffd4aa")
+
+
+## The atrium's mood, applied to the main scene's environment and overhead key light. Ambient is
+## kept low and slightly cool so shade reads (pillars get a lit and a shaded side, balcony
+## undersides fall dark); the window and the lamps do the warm work. The key comes in high from
+## the window side, and its shadows reach the far end of the hall.
+static func light_environment(e: Environment, key: DirectionalLight3D) -> void:
+	e.ambient_light_color = Color("cfd6e2")   # cool shade, so cream reads cream and not mustard
+	e.ambient_light_energy = 0.21
+	e.tonemap_exposure = 1.0
+	e.ssao_radius = 1.3        # broader contact shade: pillar bases, rack feet, balcony junctions
+	e.ssao_intensity = 2.8
+	key.light_color = Color("f2ede8")
+	key.light_energy = 0.32
+	key.light_specular = 0.04   # no glare lines off the escalator glass at this angle
+	key.rotation = Vector3(deg_to_rad(-58), deg_to_rad(205), 0)   # from high above the window, slanting south-east
+	key.directional_shadow_max_distance = 48.0
+	key.shadow_blur = 3.0
+
+
 static func _lights(a: Node3D) -> void:
-	# Sunset through the window: a long warm wash down the atrium onto the bell area.
+	# Sunset through the arched window: a broad peach spot just inside the glass, shaped by a
+	# window gobo (arch, mullions and transoms) and shadowed, so the mezzanine, rails and pillars
+	# cut into the light laid down the aisle toward the bell.
 	var sun_in := SpotLight3D.new()
-	sun_in.light_color = Color("ffb48c")   # peach
-	sun_in.light_energy = 4.2
-	sun_in.light_specular = 0.2
-	sun_in.spot_range = 34.0
-	sun_in.spot_angle = 42.0
-	sun_in.spot_attenuation = 0.6
-	sun_in.spot_angle_attenuation = 2.5   # feathered edge
-	sun_in.position = Vector3(0, 12.5, NORTH_Z + 1.0)
+	sun_in.light_color = Color("ffb183")   # peach
+	sun_in.light_energy = 8.5
+	sun_in.light_specular = 0.04   # no glints off the escalator rails
+	sun_in.light_projector = _window_gobo()
+	sun_in.light_size = 1.2               # a wide source: soft shadow edges
+	sun_in.shadow_enabled = true
+	sun_in.shadow_blur = 1.5
+	sun_in.spot_range = 46.0
+	sun_in.spot_attenuation = 0.15        # flat falloff: near surfaces don't clip, the far end still gets light
+	sun_in.spot_angle = 46.0             # wide enough to wash the colonnade's inner faces
+	sun_in.spot_angle_attenuation = 1.2
+	sun_in.position = Vector3(0, 11.0, NORTH_Z + 0.9)
 	a.add_child(sun_in)
-	sun_in.look_at(Vector3(0, 0, -4.0), Vector3.UP)
-	# Fill for each gallery floor and the mezzanine, and for under the mezzanine.
+	sun_in.look_at(Vector3(0, 0, -1.0), Vector3.UP)   # clears the bell partition onto the court's north end
+	# A soft peach bounce off the window reveal into the upper hall: no shadows, no gobo.
+	var glow := OmniLight3D.new()
+	glow.light_color = Color("ffbf98")
+	glow.light_energy = 1.4
+	glow.light_specular = 0.0
+	glow.omni_range = 14.0
+	glow.omni_attenuation = 1.6
+	glow.position = Vector3(0, 10.5, NORTH_Z + 3.0)
+	a.add_child(glow)
+	# Gallery and mezzanine ceiling lights: warm, local pools rather than a flat fill.
 	for level in LEVELS:
 		for s in [-1.0, 1.0]:
 			for z in [-12.0, 2.0]:
-				ST.ceiling_light(a, Vector3(s * 10.8, level + 3.2, z), 0.7, 7.5)
+				_amber(ST.ceiling_light(a, Vector3(s * 10.8, level + 3.2, z), 0.55, 6.0))
 	for s in [-1.0, 1.0]:
-		ST.ceiling_light(a, Vector3(s * 3.5, LEVELS[0] + 3.5, -22.0), 0.8, 8.0)
-		ST.ceiling_light(a, Vector3(s * 3.5, LEVELS[0] - 0.6, -14.0), 0.7, 7.0)
+		_amber(ST.ceiling_light(a, Vector3(s * 3.5, LEVELS[0] + 3.5, -22.0), 0.65, 6.5))
+		_amber(ST.ceiling_light(a, Vector3(s * 3.5, LEVELS[0] - 0.6, -14.0), 0.6, 6.0))
 	_under_balconies(a)
 	_window_shafts(a)
+
+
+## Warms a fixture's light to the atrium's amber.
+static func _amber(l: Light3D) -> void:
+	l.light_color = AMBER
+
+
+## The window as a light gobo: white panes, dark frame, arch head, five mullions and three
+## transoms, matching _window(). Top of the image is the arch.
+static func _window_gobo() -> ImageTexture:
+	var n := 192
+	var img := Image.create(n, n, false, Image.FORMAT_L8)
+	for py in n:
+		for px in n:
+			var u := px / float(n - 1) * 2.0 - 1.0
+			var v := 1.0 - py / float(n - 1) * 2.0
+			var spring := 0.05
+			var r := 0.78
+			var inside := (absf(u) < r and v > -0.95 and v < spring) or (u * u + (v - spring) * (v - spring) < r * r and v >= spring)
+			var bar := false
+			for mx in [-0.52, -0.26, 0.0, 0.26, 0.52]:
+				if absf(u - mx) < 0.018 and v < spring:
+					bar = true
+			for ty in [-0.62, -0.29, spring]:
+				if absf(v - ty) < 0.018:
+					bar = true
+			if v >= spring:
+				var d := Vector2(u, v - spring)
+				if absf(d.length() - r * 0.42) < 0.018:
+					bar = true
+				for i in 7:
+					var ang := PI * (i + 1) / 8.0
+					var dir := Vector2(cos(ang), sin(ang))
+					if absf(d.cross(dir)) < 0.014 and d.dot(dir) > 0.0:
+						bar = true
+			img.set_pixel(px, py, Color(0.92, 0.92, 0.92) if inside and not bar else Color(0, 0, 0))
+	return ImageTexture.create_from_image(img)
 
 
 ## Gentle light under every balcony: recessed glass discs in the slab soffits, with a few soft
@@ -660,7 +734,7 @@ static func _under_balconies(a: Node3D) -> void:
 	disc.albedo_color = Color("f3ebde")
 	disc.emission_enabled = true
 	disc.emission = Color("ffdcb4")
-	disc.emission_energy_multiplier = 0.6
+	disc.emission_energy_multiplier = 0.5
 	for level in LEVELS:
 		var soffit: float = level - SLAB - 0.01
 		for s in [-1.0, 1.0]:
@@ -673,9 +747,9 @@ static func _under_balconies(a: Node3D) -> void:
 				for lz in [-20.0, -11.0, -2.0, 6.0]:
 					var l := OmniLight3D.new()
 					l.light_color = Color("ffdcb4")
-					l.light_energy = 0.5
+					l.light_energy = 0.26   # just enough to read the shop fronts; the recess stays darker
 					l.light_specular = 0.05
-					l.omni_range = 5.0
+					l.omni_range = 4.5
 					l.omni_attenuation = 1.2
 					l.position = Vector3(s * 10.8, soffit - 0.5, lz)
 					a.add_child(l)
@@ -687,8 +761,8 @@ static func _under_balconies(a: Node3D) -> void:
 	for x in [-4.0, 4.0]:
 		var l := OmniLight3D.new()
 		l.light_color = Color("ffdcb4")
-		l.light_energy = 0.6
-		l.omni_range = 6.0
+		l.light_energy = 0.32
+		l.omni_range = 5.0
 		l.omni_attenuation = 1.2
 		l.position = Vector3(x, mz - 0.6, -21.5)
 		a.add_child(l)

@@ -154,6 +154,7 @@ static func build_arena(parent: Node3D) -> Arena:
 	# Lighting: warm store interior; the bell is the brightest brass object (Section 3).
 	var key := ST.sun()
 	root.add_child(key)
+	Atrium.light_environment(env.environment, key)   # the atrium's own mood (side rooms keep theirs)
 	var bell_light := SpotLight3D.new()
 	bell_light.light_color = Color("ffd59a")
 	bell_light.light_energy = 6.0
@@ -370,7 +371,7 @@ static func _build_hall(arena_root: Node3D) -> void:
 			var bb := put(box(0.75 if not on_side else 0.06, b[1], 0.06 if not on_side else 0.75), banner, Vector3(spot.x, b[0], spot.y) + face * 0.4, root)
 			put(box(0.79 if not on_side else 0.07, 0.08, 0.07 if not on_side else 0.79), brass(), bb.position + Vector3(0, b[1] * 0.5, 0), root)
 			Atrium.fleur(root, bb.position + Vector3(0, b[1] * 0.12, 0) + face * 0.05, face, 0.36)
-		ST.sconce(root, Vector3(spot.x, 2.3, spot.y) + face * 0.35, face, 0.8, 5.5)
+		Atrium._amber(ST.sconce(root, Vector3(spot.x, 2.3, spot.y) + face * 0.35, face, 0.9, 4.5))   # warm pool on each column
 	# Chandeliers on long drops from the roof: pools of light down the court and over the bell.
 	for z in [5.0, 0.0, -5.0]:
 		put(cyl(0.02, 0.02, Atrium.ROOF - 5.6, 6), brass(), Vector3(0, (Atrium.ROOF + 5.6) * 0.5, z), root, false)
@@ -378,7 +379,7 @@ static func _build_hall(arena_root: Node3D) -> void:
 		for i in 6:
 			var ang := TAU * i / 6.0
 			ST.globe(root, Vector3(cos(ang) * 0.5, 5.25, z + sin(ang) * 0.5), 0.11)
-		ST.ceiling_light(root, Vector3(0, 5.0, z), 0.9, 8.0)
+		Atrium._amber(ST.ceiling_light(root, Vector3(0, 5.0, z), 1.0, 6.5))
 	Atrium.merge(root)
 
 
