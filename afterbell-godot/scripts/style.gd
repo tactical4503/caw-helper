@@ -147,7 +147,7 @@ static func environment() -> Environment:
 	e.background_mode = Environment.BG_COLOR
 	e.background_color = Color("1c1416")
 	e.ambient_light_source = Environment.AMBIENT_SOURCE_COLOR
-	e.ambient_light_color = Color("f0d8c2")   # warm fill so shade reads amber, not grey
+	e.ambient_light_color = Color("ebe4dc")   # a warm-neutral fill: shade stays clean, not brown
 	e.ambient_light_energy = 0.36
 	e.reflected_light_source = Environment.REFLECTION_SOURCE_BG
 	e.tonemap_mode = Environment.TONE_MAPPER_FILMIC
@@ -164,7 +164,7 @@ static func environment() -> Environment:
 	e.glow_bloom = 0.0
 	e.glow_hdr_threshold = 1.2
 	e.fog_enabled = true            # faint depth falloff, not a milky haze
-	e.fog_light_color = Color("3a2a26")
+	e.fog_light_color = Color("2a2a30")
 	e.fog_density = 0.0025
 	e.adjustment_enabled = true
 	e.adjustment_saturation = 1.05
@@ -176,7 +176,7 @@ static func environment() -> Environment:
 ## fall under things rather than across the room. Kept low; the lamps do the warm work.
 static func sun() -> DirectionalLight3D:
 	var key := DirectionalLight3D.new()
-	key.light_color = Color("ffcfae")   # peach: late sun through the skylights
+	key.light_color = Color("ffe4d2")   # soft peach: late sun through the skylights
 	key.light_energy = 0.4
 	key.light_specular = 0.6
 	key.shadow_enabled = true
@@ -198,7 +198,7 @@ static var _lamp_glass: StandardMaterial3D
 static func lamp(parent: Node3D, at: Vector3, energy := 0.9, reach := 5.5, light_offset := Vector3.ZERO) -> OmniLight3D:
 	globe(parent, at)
 	var light := OmniLight3D.new()
-	light.light_color = Color("ffbb80")
+	light.light_color = Color("ffd2a4")
 	light.light_energy = energy * 0.6   # soft pools, no hot spot on the column beside it
 	light.light_specular = 0.1
 	light.omni_range = reach
@@ -222,7 +222,7 @@ static func globe(parent: Node3D, at: Vector3, radius := 0.14) -> MeshInstance3D
 		_lamp_glass.emission = Color("ff9448")
 		_lamp_glass.emission_energy_multiplier = 0.45
 		_lamp_cap = StandardMaterial3D.new()
-		_lamp_cap.albedo_color = Color("b58d3f")
+		_lamp_cap.albedo_color = Color("b39a5c")
 		_lamp_cap.metallic = 0.85
 		_lamp_cap.roughness = 0.35
 	var g := MeshInstance3D.new()
@@ -254,7 +254,7 @@ static func globe(parent: Node3D, at: Vector3, radius := 0.14) -> MeshInstance3D
 ## Overhead fill from the ceiling fixtures: neutral-warm pools on the floor, falling off at walls.
 static func ceiling_light(parent: Node3D, at: Vector3, energy := 0.8, reach := 7.0) -> OmniLight3D:
 	var light := OmniLight3D.new()
-	light.light_color = Color("ffdcb4")
+	light.light_color = Color("ffeedd")
 	light.light_energy = energy
 	light.light_specular = 0.0
 	light.omni_range = reach

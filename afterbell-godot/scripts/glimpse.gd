@@ -110,8 +110,8 @@ static func _staff_corridor(g: Node3D, w: float, d: float, h: float) -> void:
 ## toward a side gallery; a column with its banner, lilies and a mannequin pair stand in the
 ## peach light.
 static func _atrium(g: Node3D, w: float, d: float, h: float) -> void:
-	var stone := ST.textured("stone_cream", 0.35, ST.plastic(Color("ddd0b4"), 0.75, 0.0))
-	_shell(g, w, d, h, stone, ST.textured("carpet_forest", 0.5, ST.plastic(Color("1f3c2c"), 0.9, 0.0)), ST.plastic(Color("cbbd9f"), 0.8, 0.0))
+	var stone := ST.textured("stone_cream", 0.35, ST.plastic(Color("ddd5c3"), 0.75, 0.0))
+	_shell(g, w, d, h, stone, ST.textured("carpet_forest", 0.5, ST.plastic(Color("22433e"), 0.9, 0.0)), ST.plastic(Color("cbbd9f"), 0.8, 0.0))
 	# Sunset window: sill at 0.9 m so it shows through a doorway, rising well above it.
 	var ww := w * 0.5
 	var sill := 0.9
@@ -160,8 +160,8 @@ static func _atrium(g: Node3D, w: float, d: float, h: float) -> void:
 ## A corner of Cosmetics: cream panelled walls, a perfume counter under a lamp, a mannequin
 ## and lilies, in warm pink-amber light.
 static func _cosmetics(g: Node3D, w: float, d: float, h: float) -> void:
-	_shell(g, w, d, h, ST.textured("plaster_cream", 0.3, ST.plastic(Color("efe3c8"), 0.7, 0.0)),
-			ST.textured("carpet_forest", 0.5, ST.plastic(Color("1f3c2c"), 0.9, 0.0)), ST.plastic(Color("cbbd9f"), 0.8, 0.0))
+	_shell(g, w, d, h, ST.textured("plaster_cream", 0.3, ST.plastic(Color("eee6d4"), 0.7, 0.0)),
+			ST.textured("carpet_forest", 0.5, ST.plastic(Color("22433e"), 0.9, 0.0)), ST.plastic(Color("cbbd9f"), 0.8, 0.0))
 	var B := load("res://scripts/builders.gd")
 	B.wainscot(g, Vector3(0, 0, -d + 0.02), Vector3(w, 0, 0))
 	Props.place(g, "perfume_counter", Vector3(-w * 0.12, 0, -d + 0.65), 0.0, 0)

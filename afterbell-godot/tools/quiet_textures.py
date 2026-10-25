@@ -201,21 +201,21 @@ def linen(name, base, seed):
 
 
 SETS = {
-    "carpet_forest": lambda: carpet("carpet_forest", hexc("#1f3c2c"), hexc("#2f5a40"), 11),
-    "carpet_green": lambda: carpet("carpet_green", hexc("#24452f"), hexc("#355f44"), 12),
-    "carpet_sage": lambda: carpet("carpet_sage", hexc("#3b5c48"), hexc("#4c6f58"), 13, lattice=False),
-    "carpet_plum": lambda: carpet("carpet_plum", hexc("#4e1a36"), hexc("#6b2a4c"), 14),
-    "plaster_cream": lambda: plaster("plaster_cream", hexc("#e2d3b4"), 21),
-    "plaster_plum": lambda: plaster("plaster_plum", hexc("#4a1d36"), 22),
+    "carpet_forest": lambda: carpet("carpet_forest", hexc("#203b38"), hexc("#2d4e49"), 11),
+    "carpet_green": lambda: carpet("carpet_green", hexc("#264a44"), hexc("#37635b"), 12),
+    "carpet_sage": lambda: carpet("carpet_sage", hexc("#3a5650"), hexc("#48655e"), 13, lattice=False),
+    "carpet_plum": lambda: carpet("carpet_plum", hexc("#4e1f3a"), hexc("#64304d"), 14),
+    "plaster_cream": lambda: plaster("plaster_cream", hexc("#e6ddca"), 21),
+    "plaster_plum": lambda: plaster("plaster_plum", hexc("#4e1f3a"), 22),
     "plaster_sage": lambda: plaster("plaster_sage", hexc("#90a68d"), 23),
-    "stone_cream": lambda: stone("stone_cream", hexc("#d9cbad"), 31),
-    "tile_cream": lambda: tile("tile_cream", hexc("#dccfb3"), 41),
-    "laminate_plum": lambda: laminate("laminate_plum", hexc("#5a1c34"), 51),
-    "velvet_red": lambda: velvet("velvet_red", hexc("#5a1424"), 61),
-    "linen_cream": lambda: linen("linen_cream", hexc("#e6dac2"), 71),
+    "stone_cream": lambda: stone("stone_cream", hexc("#dcd3c0"), 31),
+    "tile_cream": lambda: tile("tile_cream", hexc("#ddd5c3"), 41),
+    "laminate_plum": lambda: laminate("laminate_plum", hexc("#4e1f3a"), 51),
+    "velvet_red": lambda: velvet("velvet_red", hexc("#4e1f3a"), 61),
+    "linen_cream": lambda: linen("linen_cream", hexc("#ebe4d4"), 71),
 }
 
-if __name__ == "__main__" and "--calm" not in sys.argv:
+if __name__ == "__main__" and "--calm" not in sys.argv and "--brass" not in sys.argv:
     for name in (sys.argv[1:] or SETS):
         SETS[name]()
 
@@ -244,7 +244,20 @@ def calm(name, keep=0.5, blur=2.0):
     print(f"{name}: calmed (contrast x{keep}, blur {blur}px)")
 
 
+def retint(name, color):
+    """Recolour a texture set's albedo toward `color`, keeping its light and dark detail."""
+    p = os.path.join(ROOT, name, "albedo.png")
+    a = np.asarray(Image.open(p).convert("RGB")).astype(float) / 255.0
+    lum = a.mean(-1, keepdims=True)
+    out = hexc(color)[None, None, :] * (lum / max(lum.mean(), 1e-3))
+    Image.fromarray((np.clip(out, 0, 1) * 255 + 0.5).astype(np.uint8), "RGB").save(p)
+    print(f"{name}: retinted toward {color}")
+
+
 CALM = {"brass": 0.6, "metal_charcoal": 0.5, "marble_cream": 0.6, "cardboard": 0.6, "canopy_green": 0.5}
+
+if __name__ == "__main__" and "--brass" in sys.argv:
+    retint("brass", "#b8a066")   # muted gold
 
 if __name__ == "__main__" and "--calm" in sys.argv:
     for name, keep in CALM.items():

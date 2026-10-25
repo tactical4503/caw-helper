@@ -262,7 +262,7 @@ func _build_rooms() -> void:
 		B.put(B.cyl(0.07, 0.07, 0.1), B.mat(B.RED, 0.3), Vector3(0.2 + i * 0.18, Props.WAIST + 0.05, -11.9), self)
 		B.put(B.cyl(0.072, 0.072, 0.04), B.mat(B.CREAM, 0.4), Vector3(0.2 + i * 0.18, Props.WAIST + 0.05, -11.9), self)
 	B.put(B.cyl(0.09, 0.11, 0.3), ST.plastic(Color("cfe3ea"), 0.05, 0.0), Vector3(1.1, Props.WAIST + 0.15, -11.9), self)
-	_person(Vector2(-0.9, -9.6), Color("5b2a4a"), Color("d9a77f"), false)   # Hesta: plum cardigan
+	_person(Vector2(-0.9, -9.6), Color("4e1f3a"), Color("d9a77f"), false)   # Hesta: plum cardigan
 	_person(Vector2(2.8, -8.2), Color("e8dcc2"), Color("8a5a3c"), true)     # Len: cream porter jacket and cap
 	solids.append([Vector2(-0.9, -9.6), 0.45])
 	solids.append([Vector2(2.8, -8.2), 0.45])

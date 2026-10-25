@@ -14,9 +14,9 @@ extends CanvasLayer
 ## API: set_health(hp, max), set_biscuits(n), set_objective(text), show_prompt(action, text),
 ##      hide_prompt(), set_boss(name, tabs_left, tabs_max), clear_boss(), set_combat(on)
 
-const CREAM := Color("efe3c8")
+const CREAM := Color("eee6d4")
 const RED := Color("c0352c")
-const PLUM := Color("5b2a4a")
+const PLUM := Color("4e1f3a")
 const BRASS := Color("c9a14e")
 const INK := Color("17121a")
 const GREEN := Color("3fb07a")

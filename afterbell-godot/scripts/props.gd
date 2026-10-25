@@ -42,9 +42,9 @@ static func place(parent: Node3D, kind: String, at: Vector3, yaw := 0.0, variant
 	parent.add_child(node)
 	match kind:
 		"easel":
-			_label(node, text, Vector3(0, 1.12, 0.056), 0.0042 if text.length() <= 5 else 0.0026, Color("efe3c8"), 56, 0.0 if text.length() <= 5 else 0.52)
+			_label(node, text, Vector3(0, 1.12, 0.056), 0.0042 if text.length() <= 5 else 0.0026, Color("eee6d4"), 56, 0.0 if text.length() <= 5 else 0.52)
 		"sale_card":
-			_label(node, text if text != "" else "SALE", Vector3(0, 0.3, 0.012), 0.0022, Color("efe3c8"), 48)
+			_label(node, text if text != "" else "SALE", Vector3(0, 0.3, 0.012), 0.0022, Color("eee6d4"), 48)
 		"hanging_sign":
 			# Scale the lettering so the whole name fits inside the 2 m panel.
 			_label(node, text, Vector3(0, 0, 0.035), minf(0.0045, 1.8 / (maxf(text.length(), 1) * 0.55 * 64.0)), Color("4a2238"), 64)
@@ -510,7 +510,7 @@ static func plaque(parent: Node3D, at: Vector3, width: float, text: String, yaw 
 	parent.add_child(q)
 	_put(_box(width + 0.06, 0.36, 0.03), _m("brass"), Vector3(0, 0, 0.015), q)
 	_put(_box(width, 0.3, 0.04), _m("plum"), Vector3(0, 0, 0.02), q)
-	_label(q, text, Vector3(0, 0, 0.042), minf(0.0042, (width - 0.12) / (maxf(text.length(), 1) * 0.55 * 64.0)), Color("efe3c8"), 64)
+	_label(q, text, Vector3(0, 0, 0.042), minf(0.0042, (width - 0.12) / (maxf(text.length(), 1) * 0.55 * 64.0)), Color("eee6d4"), 64)
 	return q
 
 
@@ -777,22 +777,22 @@ static func _m(name: String) -> Material:
 		return _mats[name]
 	var m: StandardMaterial3D
 	match name:
-		"brass": m = ST.textured("brass", 2.0, ST.plastic(Color("b58d3f"), 0.35, 0.85), 0.85)
+		"brass": m = ST.textured("brass", 2.0, ST.plastic(Color("b39a5c"), 0.35, 0.85), 0.85)
 		"wood": m = ST.plastic(Color("8a6440"), 0.5, 0.0)
 		"walnut": m = ST.plastic(Color("5e3a22"), 0.55, 0.0)
 		"walnut_dark": m = ST.plastic(Color("40261a"), 0.6, 0.0)
 		"plinth": m = ST.plastic(Color("2a1420"), 0.7, 0.0)
-		"counter_top": m = ST.textured("marble_cream", 0.8, ST.plastic(Color("e9dcc0"), 0.45, 0.0))
+		"counter_top": m = ST.textured("marble_cream", 0.8, ST.plastic(Color("ece3d1"), 0.45, 0.0))
 		"door_glass":
 			m = StandardMaterial3D.new()
 			m.albedo_color = Color(0.85, 0.75, 0.6, 0.35)
 			m.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
 			m.roughness = 0.6
 		"rubber": m = ST.plastic(Color("17161b"), 0.6, 0.0)
-		"cream": m = ST.textured("plaster_cream", 0.6, ST.plastic(Color("efe3c8"), 0.55, 0.0))
-		"plum": m = ST.textured("laminate_plum", 1.0, ST.plastic(Color("5b2a4a"), 0.6, 0.0))
-		"velvet": m = ST.textured("velvet_red", 1.0, ST.plastic(Color("4a1a2c"), 0.9, 0.0))
-		"ivory": m = ST.plastic(Color("e6dccb"), 0.45, 0.0)
+		"cream": m = ST.textured("plaster_cream", 0.6, ST.plastic(Color("eee6d4"), 0.55, 0.0))
+		"plum": m = ST.textured("laminate_plum", 1.0, ST.plastic(Color("4e1f3a"), 0.6, 0.0))
+		"velvet": m = ST.textured("velvet_red", 1.0, ST.plastic(Color("4e1f3a"), 0.9, 0.0))
+		"ivory": m = ST.plastic(Color("ece4d6"), 0.45, 0.0)
 		"shirt": m = ST.plastic(Color("f2ece0"), 0.7, 0.0)
 		"shoe": m = ST.plastic(Color("1c1715"), 0.4, 0.0)
 		"hat": m = ST.plastic(Color("2a2422"), 0.75, 0.0)
@@ -815,7 +815,7 @@ static func _m(name: String) -> Material:
 		"lily": m = ST.plastic(Color("f6f0e4"), 0.7, 0.0)
 		"pollen": m = ST.plastic(Color("e2a43a"), 0.8, 0.0)
 		"sale_red": m = ST.plastic(Color("9e1b22"), 0.7, 0.0)
-		_: m = ST.plastic(Color("efe3c8"), 0.6, 0.0)
+		_: m = ST.plastic(Color("eee6d4"), 0.6, 0.0)
 	_mats[name] = m
 	return m
 

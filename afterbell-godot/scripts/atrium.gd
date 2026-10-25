@@ -9,11 +9,11 @@ extends RefCounted
 const ST := preload("res://scripts/style.gd")
 const Props := preload("res://scripts/props.gd")
 
-const CREAM := Color("efe3c8")
-const IVORY := Color("e6dccb")
-const PLUM := Color("5b2a4a")
-const PLUM_DEEP := Color("3a1a2f")
-const BRASS := Color("b58d3f")
+const CREAM := Color("eee6d4")
+const IVORY := Color("ece4d6")
+const PLUM := Color("4e1f3a")
+const PLUM_DEEP := Color("351428")
+const BRASS := Color("b39a5c")
 const WOOD := Color("8a6440")
 
 const OUTER_X := 13.0         # outer walls of the side galleries
@@ -485,10 +485,10 @@ static func _m(name: String) -> StandardMaterial3D:
 		return _mats[name]
 	var m: StandardMaterial3D
 	match name:
-		"floor": m = ST.textured("tile_cream", 0.6, ST.plastic(Color("d8ccb0"), 0.5, 0.0))
-		"carpet": m = ST.textured("carpet_forest", 0.5, ST.plastic(Color("2f4a3a"), 0.9, 0.0))
+		"floor": m = ST.textured("tile_cream", 0.6, ST.plastic(Color("ddd4c2"), 0.5, 0.0))
+		"carpet": m = ST.textured("carpet_forest", 0.5, ST.plastic(Color("23443f"), 0.9, 0.0))
 		"plum_wall": m = ST.textured("plaster_cream", 0.3, ST.plastic(CREAM, 0.7, 0.0))
-		"stone": m = ST.textured("stone_cream", 0.35, ST.plastic(Color("ddd0b4"), 0.75, 0.0))
+		"stone": m = ST.textured("stone_cream", 0.35, ST.plastic(Color("ddd5c3"), 0.75, 0.0))
 		"slab": m = ST.plastic(Color("d9ccb0"), 0.7, 0.0)
 		"ceiling": m = ST.plastic(Color("cbbd9f"), 0.8, 0.0)
 		"cream": m = ST.textured("plaster_cream", 0.6, ST.plastic(CREAM, 0.55, 0.0))
