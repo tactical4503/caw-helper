@@ -160,7 +160,7 @@ func _build_room() -> void:
 	var cream := B.mat(B.CREAM, 0.5)
 	var wall := ST.textured("plaster_cream", 0.3, B.mat(B.CREAM, 0.7))
 	B.put(B.box(HALF_W * 2 + 2, 0.1, HALF_D * 2 + 2), ST.textured("tile_cream", 0.6, cream), Vector3(0, -0.05, 0), self, false)
-	B.put(B.box(HALF_W * 2 - 1, 0.02, HALF_D * 2 - 1), ST.textured("carpet_forest", 0.5, B.mat(B.CARPET, 0.95)), Vector3(0, 0.01, 0), self, false)
+	B.shop_carpet(self, Vector2(HALF_W * 2 - 1, HALF_D * 2 - 1))
 	var ceil := B.put(B.box(HALF_W * 2 + 2, 0.2, HALF_D * 2 + 2), B.mat(Color("cbbd9f"), 0.8), Vector3(0, 4.0, 0), self, false)
 	ceil.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 	# Walls. East wall has the opening from Cosmetics at z 4.1–5.9; north wall the staff door.
@@ -237,7 +237,7 @@ func _build_room() -> void:
 		solids.append(Props.footprint(p[0], p[1], p[2]))
 	# Lamps.
 	for l in [[-1.0, -6.0], [-1.0, 0.0], [-1.0, 6.0], [1.0, -6.0], [1.0, 0.0]]:
-		ST.sconce(self, Vector3(l[0] * HALF_W, 2.2, l[1]), Vector3(-l[0], 0, 0), 0.85)
+		ST.lantern(self, Vector3(l[0] * HALF_W, 2.2, l[1]), Vector3(-l[0], 0, 0), 0.85 * 1.2, 5.5)
 	# Ceiling fixtures down the room; the brightest pool sits over the rack and the staff door.
 	for z in [6.0, 1.0, -2.6, -7.0]:
 		ST.ceiling_light(self, Vector3(0, 3.6, z), 0.95 if z == -2.6 else 0.7, 6.0)
@@ -769,7 +769,7 @@ func _render_actors(dt: float) -> void:
 
 func _place_camera(delta: float) -> void:
 	var walls := Rect2(-HALF_W + 0.35, -HALF_D + 0.35, HALF_W * 2.0 - 0.7, HALF_D * 2.0 - 0.7)
-	ShoulderCam.place(camera, p_pos, Vector2(0, -1), delta, walls, 62.0)
+	ShoulderCam.place(camera, p_pos, Vector2(0, -1), delta, walls, 58.0, 1.0, 0.0, 1.0, 7.5)   # boots clear of the frame edge, as in the court
 
 
 ## A short line from the chapter shell (errand complete, item found); quiet without it.

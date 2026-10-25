@@ -196,7 +196,7 @@ func _build_room() -> void:
 	var wall := ST.textured("plaster_cream", 0.3, B.mat(B.CREAM, 0.7))
 	var laminate := ST.textured("laminate_plum", 1.0, B.mat(B.PLUM, 0.3))
 	B.put(B.box(HALF_W * 2 + 2, 0.1, HALF_D * 2 + 2), ST.textured("tile_cream", 0.6, cream), Vector3(0, -0.05, 0), self, false)
-	B.put(B.box(HALF_W * 2 - 1, 0.02, HALF_D * 2 - 1), ST.textured("carpet_forest", 0.5, B.mat(B.CARPET, 0.95)), Vector3(0, 0.01, 0), self, false)
+	B.shop_carpet(self, Vector2(HALF_W * 2 - 1, HALF_D * 2 - 1))
 	var ceil := B.put(B.box(HALF_W * 2 + 2, 0.2, HALF_D * 2 + 2), B.mat(Color("cbbd9f"), 0.8), Vector3(0, 4.3, 0), self, false)
 	ceil.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 	# Walls: south (vestibule, with an opening), north (atrium, closed shutter), east, west (hats gate).
@@ -289,7 +289,7 @@ func _build_room() -> void:
 	# Wall sconces: brass mounts, frosted tulip shades, a soft wash on the ivory walls.
 	for l in [[Vector3(-4, 2.2, -HALF_D), Vector3(0, 0, 1)], [Vector3(4, 2.2, -HALF_D), Vector3(0, 0, 1)],
 			[Vector3(HALF_W, 2.2, 0.6), Vector3(-1, 0, 0)], [Vector3(-HALF_W, 2.2, -2), Vector3(1, 0, 0)]]:
-		ST.sconce(self, l[0], l[1], 0.85)
+		ST.lantern(self, l[0], l[1], 0.85 * 1.2, 5.5)
 	_place_props()
 	# Ceiling fixtures over each counter and the aisle.
 	for x in [-4.6, 0.0, 4.6]:
@@ -599,7 +599,7 @@ func _update_subs(dt: float) -> void:
 
 func _place_camera(delta: float) -> void:
 	var walls := Rect2(-HALF_W + 0.35, -HALF_D + 0.35, HALF_W * 2.0 - 0.7, HALF_D * 2.0 - 0.7)
-	ShoulderCam.place(camera, p_pos, Vector2(0, -1), delta, walls, 62.0)
+	ShoulderCam.place(camera, p_pos, Vector2(0, -1), delta, walls, 58.0, 1.0, 0.0, 1.0, 7.5)   # boots clear of the frame edge, as in the court
 	if intro_t > 0.0:
 		intro_t = maxf(0.0, intro_t - delta)
 		var k := smoothstep(0.0, 1.0, clampf(intro_t / 2.0, 0.0, 1.0))

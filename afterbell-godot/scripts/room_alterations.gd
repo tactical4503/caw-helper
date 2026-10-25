@@ -134,7 +134,7 @@ func _build_rooms() -> void:
 	var card := ST.textured("cardboard", 1.2, B.mat(Color("a57a4c"), 0.9))
 	# Floors: carpet in Alterations, worn tile in Receiving.
 	B.put(B.box(14, 0.1, 20), ST.textured("tile_cream", 0.6, cream), Vector3(1, -0.05, -4), self, false)
-	B.put(B.box(9.6, 0.02, 9.6), ST.textured("carpet_forest", 0.5, B.mat(B.CARPET, 0.9)), Vector3(0, 0.01, 0), self, false)
+	B.shop_carpet(self, Vector2(9.6, 9.6))
 	# Receiving's floor: the same tile, but older and greyer, so the back room sits darker and
 	# cooler than the shop floor.
 	var worn := ST.textured("tile_cream", 0.6, B.mat(Color("bdb6a8"), 0.8))
@@ -280,7 +280,7 @@ func _build_rooms() -> void:
 	Props.place(self, "hanging_sign", Vector3(STALL.x, 2.85, STALL.y + 1.0), 0.0, 0, "FITTING  ROOM").scale = Vector3.ONE * 0.8
 	# Lamps.
 	for l in [[Vector3(-5.0, 2.2, -1), Vector3(1, 0, 0)], [Vector3(5.0, 2.2, 3), Vector3(-1, 0, 0)]]:
-		ST.sconce(self, l[0], l[1], 0.85)
+		ST.lantern(self, l[0], l[1], 0.85 * 1.2, 5.5)
 	# Ceiling dishes over the fitting platform and the socket.
 	for c in [Vector3(-2.4, 3.2, 1.4), Vector3(3.0, 3.2, -1.0)]:
 		ST.ceiling_light(self, c, 0.85, 5.5)
@@ -308,7 +308,7 @@ func _build_rooms() -> void:
 	ST.pendant(self, Vector3(4.6, 2.75, -11.2), 3.5, 0.45, 4.5)
 	ST.pendant(self, Vector3(-3.4, 2.75, -7.0), 3.5, 0.4, 4.5)
 	Finish.done(fin)
-	ST.sconce(self, Vector3(-5.0, 2.2, -11.4), Vector3(1, 0, 0), 0.6)
+	ST.lantern(self, Vector3(-5.0, 2.2, -11.4), Vector3(1, 0, 0), 0.6 * 1.2, 5.5)
 	interactables = [
 		[Vector2(STALL.x, STALL.y + 1.5), "tailor"], [Vector2(DOOR_X + 0.65, -4.3), "sleeve"],
 		[SOCKET, "socket"], [Vector2(0.6, -11.2), "tins"], [Vector2(2.8, -7.5), "len"], [Vector2(-0.9, -8.9), "hesta"],
@@ -590,7 +590,7 @@ func _leave() -> void:
 func _place_camera(delta: float) -> void:
 	# Alterations (south) and receiving (north) each keep the camera inside their own walls.
 	var walls := Rect2(-4.65, -4.65, 9.3, 9.3) if p_pos.y > -5.0 else Rect2(-4.65, -12.65, 11.3, 7.25)
-	ShoulderCam.place(camera, p_pos, Vector2(0, -1), delta, walls, 62.0)
+	ShoulderCam.place(camera, p_pos, Vector2(0, -1), delta, walls, 58.0, 1.0, 0.0, 1.0, 7.5)   # boots clear of the frame edge, as in the court
 
 
 ## A short line from the chapter shell (errand complete, item found); quiet without it.

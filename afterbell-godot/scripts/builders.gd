@@ -107,6 +107,17 @@ static func brass() -> StandardMaterial3D:
 	return _brass
 
 
+## A shop floor in the atrium's style: the blue-teal carpet field with the cream / dark-teal /
+## cream border just inside its edge. `size` is (x, z), centred on `at`.
+static func shop_carpet(root: Node3D, size: Vector2, at := Vector3.ZERO) -> void:
+	var field := ST.textured("carpet_forest", 0.5, mat(CARPET, 0.95))
+	field.albedo_color = Color(1.0, 1.2, 1.34)
+	put(box(size.x, 0.02, size.y), field, at + Vector3(0, 0.01, 0), root, false)
+	var border: Material = Atrium.Props._m("counter_top")
+	var dark := ST.textured("carpet_forest", 0.5, mat(Color("1d3a36"), 0.9))
+	_band(root, Rect2(Vector2(at.x, at.z) - size * 0.5 + Vector2(0.15, 0.15), size - Vector2(0.3, 0.3)), border, dark)
+
+
 ## A carpet border just inside `r` (x, z): a broad cream band, a dark teal band, a fine cream line.
 static func _band(root: Node3D, r: Rect2, cream: Material, dark: Material) -> void:
 	for ring in [[0.0, 0.26, cream, 0.033], [0.26, 0.16, dark, 0.03], [0.48, 0.05, cream, 0.033]]:
