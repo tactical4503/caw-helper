@@ -134,7 +134,7 @@ static func textured(name: String, _legacy_scale: float, fallback: StandardMater
 	if CG:
 		m.albedo_color = Color(1.06, 1.02, 0.98)   # a touch warmer and brighter
 	elif DECO:
-		m.albedo_color = Color(1.0, 0.94, 0.84) if name.begins_with("plaster") else Color(1.03, 1.0, 0.95)   # warm cream walls
+		m.albedo_color = Color(0.9, 0.82, 0.7) if name.begins_with("plaster") else Color(1.0, 0.97, 0.92)   # warm, deeper cream walls
 	m.uv1_triplanar = true
 	m.uv1_scale = Vector3.ONE / TEXTURE_TILE_M
 	m.texture_filter = BaseMaterial3D.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS_ANISOTROPIC   # no shimmer at grazing angles
@@ -239,11 +239,14 @@ static func deco_environment(e: Environment) -> void:
 	e.glow_bloom = 0.03
 	e.glow_hdr_threshold = 0.9
 	e.glow_blend_mode = Environment.GLOW_BLEND_MODE_SOFTLIGHT
+	# A soft grey haze down the hall (the reference's air): the far end, the mezzanine and the
+	# window lose contrast and lift toward warm grey, while the foreground stays crisp.
 	e.fog_enabled = true
-	e.fog_light_color = Color("c99a6c")
-	e.fog_light_energy = 0.5
-	e.fog_density = 0.0022
-	e.fog_aerial_perspective = 0.1
+	e.fog_light_color = Color("aaa39b")
+	e.fog_light_energy = 0.75
+	e.fog_density = 0.011
+	e.fog_aerial_perspective = 0.35
+	e.fog_sky_affect = 0.3
 	e.adjustment_enabled = true
 	e.adjustment_saturation = 1.1
 	e.adjustment_contrast = 1.2

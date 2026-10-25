@@ -109,6 +109,14 @@ loose static meshes merged (`Atrium.merge_direct`).
   - controller glyphs follow the active device.
 - Grade: exposure 0.94, contrast 1.2.
 
+**Haze and shade pass:**
+- Grey haze: fog 0.011, warm grey, aerial perspective 0.35.
+- Shade: the atrium key drops to 0.45 and ambient to 0.24, so the upper storeys fall into warm shade.
+- Ceiling: deeper cream plaster, walnut ceiling beams and ribs, and a dimmer skylight.
+- MENSWEAR floor: brighter, with display tables, suit forms, racks and two more pendants.
+- Carpet: tinted further toward blue-teal.
+- `ref_shot`: Ren is turned three-quarters up the aisle, as in the reference.
+
 **Not identical:** the reference is a painting. The atrium is deeper than it shows, the court's side columns sit outside the frame, the shop under the mezzanine is less lit, and Ren is the game's model.
 
 **Checks:** all six test suites pass, and the fight and door views were re-rendered.

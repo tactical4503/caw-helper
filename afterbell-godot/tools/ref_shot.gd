@@ -43,7 +43,7 @@ func _process(_d: float) -> bool:
 			room.step(1.0 / 60.0)
 		room.p_pos = pos
 		room.m_pos = Vector2(pos.x, pos.y - 20.0)
-		room.p_yaw = PI
+		room.p_yaw = PI - 0.45   # turned three-quarters up the aisle, as in the reference
 		for i in 60:
 			room._render(1.0 / 30.0)
 		room.boss.visible = show_boss

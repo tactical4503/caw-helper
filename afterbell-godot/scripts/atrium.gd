@@ -454,16 +454,16 @@ static func _roof(a: Node3D) -> void:
 	light.albedo_color = Color("fff3dc")
 	light.emission_enabled = true
 	light.emission = Color("ffd2a6")
-	light.emission_energy_multiplier = 0.45
+	light.emission_energy_multiplier = 0.2 if ST.DECO else 0.45
 	var skylight := _put(_box(6.0, 0.05, depth - 6.0), light, Vector3(0, ROOF - 0.02, mid_z), a, false)
 	skylight.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 	var z := NORTH_Z + 2.0
 	while z < SOUTH_Z:
-		var beam := _put(_box(OUTER_X * 2.0, 0.45, 0.35), _m("cream"), Vector3(0, ROOF - 0.22, z), a, false)
+		var beam := _put(_box(OUTER_X * 2.0, 0.45, 0.35), _m("walnut" if ST.DECO else "cream"), Vector3(0, ROOF - 0.22, z), a, false)
 		beam.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 		z += 3.0
 	for x in [-GALLERY_X, -3.0, 3.0, GALLERY_X]:
-		var rib := _put(_box(0.35, 0.45, depth), _m("cream"), Vector3(x, ROOF - 0.22, mid_z), a, false)
+		var rib := _put(_box(0.35, 0.45, depth), _m("walnut" if ST.DECO else "cream"), Vector3(x, ROOF - 0.22, mid_z), a, false)
 		rib.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 
 
@@ -527,12 +527,21 @@ static func _colonnade(a: Node3D) -> void:
 	_amber(ST.pendant(a, Vector3(0, 3.7, MEZZ_Z - 1.6), LEVELS[0] - SLAB, 1.4, 8.0))
 	var shop_glow := OmniLight3D.new()
 	shop_glow.light_color = AMBER
-	shop_glow.light_energy = 1.6
-	shop_glow.omni_range = 9.0
+	shop_glow.light_energy = 3.2
+	shop_glow.omni_range = 10.0
 	shop_glow.position = Vector3(0, 3.0, NORTH_Z + 3.0)
 	a.add_child(shop_glow)
 	for x in [-6.2, -4.9, -3.6, 3.6, 4.9, 6.2]:
 		Props.place(a, "shelf_unit", Vector3(x, 0, NORTH_Z + 0.25), 0.0, [1, 0, 1, 0, 1, 0][int(absf(x) * 2.0) % 6])
+	# The floor itself: display tables of shirts and hats, suits on forms, a rack, more light.
+	for p in [[Vector3(-3.4, 0, -22.4), 0], [Vector3(3.4, 0, -22.4), 3], [Vector3(-1.6, 0, -24.0), 1], [Vector3(1.6, 0, -24.0), 2]]:
+		Props.place(a, "folded_table", p[0], 0.0, p[1])
+	for p in [[Vector3(-5.6, 0, -21.4), 0.4, 0], [Vector3(5.6, 0, -21.4), -0.4, 2], [Vector3(-2.6, 0, -25.0), 0.2, 2], [Vector3(2.6, 0, -25.0), -0.2, 0]]:
+		Props.place(a, "mannequin", p[0], p[1], p[2] + 4 * 2)
+	rack(a, Vector3(-6.0, 0, -24.0), 0.0)
+	rack(a, Vector3(6.0, 0, -24.0), 0.0)
+	for x in [-4.5, 4.5]:
+		_amber(ST.pendant(a, Vector3(x, 3.7, -22.6), LEVELS[0] - SLAB, 1.0, 6.0))
 
 
 ## The broad central aisle: a lighter runner with ivory borders from the court to the mezzanine.
@@ -684,8 +693,9 @@ static func light_environment(e: Environment, key: DirectionalLight3D) -> void:
 	elif ST.DECO:   # golden hour (Style.LOOK); same sun direction and reach
 		ST.deco_environment(e)
 		ST.deco_key(key)
-		key.light_energy = 0.6
+		key.light_energy = 0.45   # the upper storeys fall into warm shade; the lamps carry the hall
 		key.light_specular = 0.3
+		e.ambient_light_energy = 0.24
 
 
 static func _lights(a: Node3D) -> void:
