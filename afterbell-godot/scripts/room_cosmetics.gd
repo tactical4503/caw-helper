@@ -254,13 +254,15 @@ func _build_room() -> void:
 	# Padded catcher on the west counter.
 	var catcher := B.put(B.box(0.2, 0.9, 1.1), B.mat(Color("6b2620"), 0.85), Vector3(CATCH_AT.x - 0.4, 1.45, CATCH_AT.y), self)
 	catcher.name = "Catcher"
-	# Lamps on the walls.
-	for p in [Vector3(-4, 2.6, -HALF_D + 0.3), Vector3(4, 2.6, -HALF_D + 0.3), Vector3(HALF_W - 0.3, 2.6, 0), Vector3(-HALF_W + 0.3, 2.6, -2)]:
-		ST.lamp(self, p)
+	# Wall sconces: brass mounts, frosted tulip shades, a soft wash on the ivory walls.
+	for l in [[Vector3(-4, 2.2, -HALF_D), Vector3(0, 0, 1)], [Vector3(4, 2.2, -HALF_D), Vector3(0, 0, 1)],
+			[Vector3(HALF_W, 2.2, 0.6), Vector3(-1, 0, 0)], [Vector3(-HALF_W, 2.2, -2), Vector3(1, 0, 0)]]:
+		ST.sconce(self, l[0], l[1], 0.85)
 	_place_props()
 	# Ceiling fixtures over each counter and the aisle.
 	for x in [-4.6, 0.0, 4.6]:
 		ST.ceiling_light(self, Vector3(x, 3.9, -0.6), 0.75, 6.0)
+		ST.ceiling_fixture(self, Vector3(x, 3.95, -0.6), 4.2)
 	# The attendant (placeholder figure until the Meshy staff mannequin arrives).
 	attendant = Node3D.new()
 	attendant.name = "Attendant"

@@ -86,8 +86,7 @@ static func _galleries(a: Node3D) -> void:
 			for z in [-17.0, -9.0, -1.0, 6.5]:
 				mannequin(a, Vector3(s * (GALLERY_X + 1.0), level, z), -s * PI / 2.0, int(z + level) % 3)
 			for z in [-24.0, -15.0, -7.0, 1.0, 8.0]:
-				ST.globe(a, Vector3(s * (OUTER_X - 0.12), level + 2.6, z), 0.16)
-				_put(_box(0.08, 0.08, 0.08), _m("brass"), Vector3(s * (OUTER_X - 0.04), level + 2.6, z), a)
+				ST.sconce(a, Vector3(s * OUTER_X, level + 2.3, z), Vector3(-s, 0, 0), 0.0)
 
 
 static func _mezzanine(a: Node3D) -> void:
@@ -358,7 +357,7 @@ static func _lights(a: Node3D) -> void:
 	# Sunset through the window: a long warm wash down the atrium onto the bell area.
 	var sun_in := SpotLight3D.new()
 	sun_in.light_color = Color("ffb48c")   # peach
-	sun_in.light_energy = 3.4
+	sun_in.light_energy = 4.2
 	sun_in.light_specular = 0.2
 	sun_in.spot_range = 34.0
 	sun_in.spot_angle = 42.0
@@ -375,7 +374,79 @@ static func _lights(a: Node3D) -> void:
 	for s in [-1.0, 1.0]:
 		ST.ceiling_light(a, Vector3(s * 3.5, LEVELS[0] + 3.5, -22.0), 0.8, 8.0)
 		ST.ceiling_light(a, Vector3(s * 3.5, LEVELS[0] - 0.6, -14.0), 0.7, 7.0)
-		ST.ceiling_light(a, Vector3(s * 10.8, LEVELS[0] - 0.6, -2.0), 0.6, 7.0)
+	_under_balconies(a)
+	_window_shafts(a)
+
+
+## Gentle light under every balcony: recessed glass discs in the slab soffits, with a few soft
+## warm lights so the aisles beneath the galleries and the mezzanine aren't dark caves.
+static func _under_balconies(a: Node3D) -> void:
+	var disc := StandardMaterial3D.new()
+	disc.albedo_color = Color("f3ebde")
+	disc.emission_enabled = true
+	disc.emission = Color("ffdcb4")
+	disc.emission_energy_multiplier = 0.6
+	for level in LEVELS:
+		var soffit: float = level - SLAB - 0.01
+		for s in [-1.0, 1.0]:
+			var z := NORTH_Z + 2.0
+			while z < SOUTH_Z - 1.0:
+				_put(_cyl(0.13, 0.13, 0.02, 20), disc, Vector3(s * 10.8, soffit, z), a, false)
+				_put(_cyl(0.15, 0.15, 0.012, 20), _m("brass"), Vector3(s * 10.8, soffit + 0.004, z), a, false)
+				z += 3.0
+			if level == LEVELS[0]:
+				for lz in [-20.0, -11.0, -2.0, 6.0]:
+					var l := OmniLight3D.new()
+					l.light_color = Color("ffdcb4")
+					l.light_energy = 0.5
+					l.light_specular = 0.05
+					l.omni_range = 5.0
+					l.omni_attenuation = 1.2
+					l.position = Vector3(s * 10.8, soffit - 0.5, lz)
+					a.add_child(l)
+	# Under the mezzanine.
+	var mz: float = LEVELS[0] - SLAB - 0.01
+	for x in [-6.0, -2.0, 2.0, 6.0]:
+		for z in [-20.0, -23.5]:
+			_put(_cyl(0.13, 0.13, 0.02, 20), disc, Vector3(x, mz, z), a, false)
+	for x in [-4.0, 4.0]:
+		var l := OmniLight3D.new()
+		l.light_color = Color("ffdcb4")
+		l.light_energy = 0.6
+		l.omni_range = 6.0
+		l.omni_attenuation = 1.2
+		l.position = Vector3(x, mz - 0.6, -21.5)
+		a.add_child(l)
+
+
+## Peach sunset shafts from the window: a few soft additive planes slanting down from the glass
+## toward the bell, brightest at the window and fading out before the floor.
+static func _window_shafts(a: Node3D) -> void:
+	var g := Gradient.new()
+	g.offsets = PackedFloat32Array([0.0, 0.35, 1.0])
+	g.colors = PackedColorArray([Color(1.0, 0.72, 0.55, 0.0), Color(1.0, 0.72, 0.55, 0.16), Color(1.0, 0.72, 0.55, 0.0)])
+	var tex := GradientTexture2D.new()
+	tex.gradient = g
+	tex.fill_from = Vector2(0, 0)
+	tex.fill_to = Vector2(0, 1)
+	tex.width = 4
+	tex.height = 64
+	var m := StandardMaterial3D.new()
+	m.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	m.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	m.blend_mode = BaseMaterial3D.BLEND_MODE_ADD
+	m.cull_mode = BaseMaterial3D.CULL_DISABLED
+	m.albedo_texture = tex
+	m.disable_receive_shadows = true
+	var top := Vector3(0, 12.0, NORTH_Z + 0.3)
+	var foot := Vector3(0, 0.5, -11.0)
+	var length := top.distance_to(foot)
+	for x in [-2.2, -0.7, 0.8, 2.3]:
+		var q := QuadMesh.new()
+		q.size = Vector2(0.9 + absf(x) * 0.1, length)
+		var mi := _put(q, m, (top + foot) * 0.5 + Vector3(x, 0, 0), a, false)
+		mi.rotation.x = atan2(top.z - foot.z, top.y - foot.y)   # local +y runs from the floor up to the window
+		mi.rotation.y = x * 0.02
 
 
 # ---------------------------------------------------------------- dressing

@@ -147,20 +147,22 @@ static func environment() -> Environment:
 	e.background_mode = Environment.BG_COLOR
 	e.background_color = Color("1c1416")
 	e.ambient_light_source = Environment.AMBIENT_SOURCE_COLOR
-	e.ambient_light_color = Color("ebe4dc")   # a warm-neutral fill: shade stays clean, not brown
-	e.ambient_light_energy = 0.36
+	e.ambient_light_color = Color("d9dde6")   # a slightly cool fill: shade reads cooler than the lamps
+	e.ambient_light_energy = 0.34
 	e.reflected_light_source = Environment.REFLECTION_SOURCE_BG
 	e.tonemap_mode = Environment.TONE_MAPPER_FILMIC
 	e.tonemap_exposure = 0.92   # keeps cream walls off pure white
 	e.tonemap_white = 6.0
 	e.ssr_enabled = false           # expensive; off by default (glossy materials still catch lamp highlights)
 	e.ssao_enabled = true           # contact shadows: corners, under counters, around feet
-	e.ssao_radius = 1.2
-	e.ssao_intensity = 1.5
-	e.ssao_power = 1.3
+	e.ssao_radius = 0.9             # tight and firm: under furniture, where walls meet floor and ceiling
+	e.ssao_intensity = 2.4
+	e.ssao_power = 1.6
+	e.ssao_detail = 0.6
+	e.ssao_light_affect = 0.15      # a touch of contact shadow even in direct lamplight
 	e.glow_enabled = true           # a soft halo round the window and lamps, never a white blob
-	e.glow_intensity = 0.18
-	e.glow_strength = 0.9
+	e.glow_intensity = 0.1
+	e.glow_strength = 0.8
 	e.glow_bloom = 0.0
 	e.glow_hdr_threshold = 1.2
 	e.fog_enabled = true            # faint depth falloff, not a milky haze
@@ -178,7 +180,7 @@ static func sun() -> DirectionalLight3D:
 	var key := DirectionalLight3D.new()
 	key.light_color = Color("ffe4d2")   # soft peach: late sun through the skylights
 	key.light_energy = 0.4
-	key.light_specular = 0.6
+	key.light_specular = 0.12   # the overhead key lights; it shouldn't streak Ren's back white
 	key.shadow_enabled = true
 	key.shadow_blur = 5.0
 	key.light_angular_distance = 4.0   # wide source: shadow edges soften with distance
@@ -220,7 +222,7 @@ static func globe(parent: Node3D, at: Vector3, radius := 0.14) -> MeshInstance3D
 		_lamp_glass.roughness = 0.75
 		_lamp_glass.emission_enabled = true
 		_lamp_glass.emission = Color("ff9448")
-		_lamp_glass.emission_energy_multiplier = 0.45
+		_lamp_glass.emission_energy_multiplier = 0.3
 		_lamp_cap = StandardMaterial3D.new()
 		_lamp_cap.albedo_color = Color("b39a5c")
 		_lamp_cap.metallic = 0.85
@@ -249,6 +251,142 @@ static func globe(parent: Node3D, at: Vector3, radius := 0.14) -> MeshInstance3D
 	cap.position = at + Vector3(0, radius * 0.85, 0)
 	parent.add_child(cap)
 	return g
+
+
+static var _fx := {}
+
+
+## A wall sconce: an oval brass backplate, a swan-neck brass arm, a cup and a frosted glass tulip
+## shade opening upward, with a warm light set out from the wall so the wall gets a soft wash
+## instead of a hot spot. `face` points out of the wall. energy 0 = fixture only (distant lamps).
+static func sconce(parent: Node3D, at: Vector3, face: Vector3, energy := 0.8, reach := 5.5) -> OmniLight3D:
+	var s := Node3D.new()
+	s.position = at
+	parent.add_child(s)
+	var f := face.normalized() if face.length() > 0.01 else Vector3(0, 0, 1)
+	s.basis = Basis.looking_at(-f, Vector3.UP)   # local +z out of the wall (in the parent's space)
+	var brass := _fx_mat("brass")
+	var plate := _fx_put(_fx_cyl(0.06, 0.06, 0.018, 20), brass, Vector3(0, 0, 0.009), s)
+	plate.rotation.x = PI / 2.0
+	plate.scale = Vector3(1.0, 1.0, 1.7)
+	_fx_put(_fx_sphere(0.022), brass, Vector3(0, 0, 0.025), s)
+	var arm := _fx_put(_fx_cyl(0.011, 0.011, 0.16, 8), brass, Vector3(0, -0.02, 0.1), s)
+	arm.rotation.x = PI / 2.0 - 0.35
+	_fx_put(_fx_sphere(0.018), brass, Vector3(0, 0.005, 0.175), s)
+	_fx_put(_fx_cyl(0.011, 0.011, 0.07, 8), brass, Vector3(0, 0.04, 0.18), s)
+	_fx_put(_fx_cyl(0.035, 0.022, 0.03, 16), brass, Vector3(0, 0.085, 0.18), s)           # cup
+	_fx_put(_fx_cyl(0.095, 0.045, 0.15, 20), _fx_mat("frost"), Vector3(0, 0.17, 0.18), s)  # tulip shade
+	_fx_put(_fx_cyl(0.097, 0.097, 0.008, 20), brass, Vector3(0, 0.245, 0.18), s)           # rim
+	if energy <= 0.0:
+		return null
+	var light := OmniLight3D.new()
+	light.light_color = Color("ffd2a4")
+	light.light_energy = energy * 0.6
+	light.light_specular = 0.08
+	light.omni_range = reach
+	light.omni_attenuation = 1.0
+	light.position = Vector3(0, 0.2, 0.55)   # out from the wall: an even wash, no hot spot
+	s.add_child(light)
+	return light
+
+
+## A flush ceiling dish: brass ring and short stem, frosted glass bowl, hung at `at` below a
+## ceiling at `ceiling_y`.
+static func ceiling_fixture(parent: Node3D, at: Vector3, ceiling_y: float) -> void:
+	var brass := _fx_mat("brass")
+	var stem := maxf(ceiling_y - at.y, 0.02)
+	_fx_put(_fx_cyl(0.06, 0.06, 0.02, 16), brass, Vector3(at.x, ceiling_y - 0.01, at.z), parent)
+	_fx_put(_fx_cyl(0.012, 0.012, stem, 8), brass, Vector3(at.x, at.y + stem * 0.5, at.z), parent)
+	var bowl := _fx_put(_fx_sphere(0.19), _fx_mat("frost_dim"), Vector3(at.x, at.y - 0.02, at.z), parent)
+	bowl.scale = Vector3(1.0, 0.38, 1.0)
+	_fx_put(_fx_cyl(0.195, 0.195, 0.02, 24), brass, Vector3(at.x, at.y + 0.05, at.z), parent)
+
+
+## An industrial pendant for back rooms: rod, green enamel cone shade, white inside, a bulb, and
+## a neutral working light under it.
+static func pendant(parent: Node3D, at: Vector3, ceiling_y: float, energy := 1.0, reach := 6.0) -> OmniLight3D:
+	var rod := maxf(ceiling_y - at.y, 0.05)
+	_fx_put(_fx_cyl(0.008, 0.008, rod, 6), _fx_mat("iron"), Vector3(at.x, at.y + rod * 0.5, at.z), parent)
+	_fx_put(_fx_cyl(0.05, 0.25, 0.2, 20), _fx_mat("enamel"), Vector3(at.x, at.y - 0.1, at.z), parent)
+	_fx_put(_fx_cyl(0.045, 0.235, 0.19, 20), _fx_mat("enamel_in"), Vector3(at.x, at.y - 0.105, at.z), parent)
+	_fx_put(_fx_sphere(0.05), _fx_mat("frost"), Vector3(at.x, at.y - 0.17, at.z), parent)
+	var light := OmniLight3D.new()
+	light.light_color = Color("ffe6c8")
+	light.light_energy = energy
+	light.light_specular = 0.05
+	light.omni_range = reach
+	light.omni_attenuation = 1.2
+	light.position = at - Vector3(0, 0.35, 0)
+	parent.add_child(light)
+	return light
+
+
+static func _fx_mat(name: String) -> StandardMaterial3D:
+	if _fx.has(name):
+		return _fx[name]
+	var m := StandardMaterial3D.new()
+	match name:
+		"brass":
+			m.albedo_color = Color("b39a5c")
+			m.metallic = 0.85
+			m.roughness = 0.38
+		"frost":   # frosted glass: a gentle self-glow kept under the bloom threshold
+			m.albedo_color = Color("f3ebde")
+			m.roughness = 0.85
+			m.emission_enabled = true
+			m.emission = Color("ffd6ac")
+			m.emission_energy_multiplier = 0.35
+		"frost_dim":   # ceiling bowls are seen from below: glow less, or they read as white blobs
+			m.albedo_color = Color("e9e1d4")
+			m.roughness = 0.85
+			m.emission_enabled = true
+			m.emission = Color("ffd6ac")
+			m.emission_energy_multiplier = 0.15
+		"iron":
+			m.albedo_color = Color("2a2a2c")
+			m.metallic = 0.6
+			m.roughness = 0.5
+		"enamel":
+			m.albedo_color = Color("2f4a42")
+			m.roughness = 0.45
+		"enamel_in":
+			m.albedo_color = Color("f1ece2")
+			m.roughness = 0.6
+			m.emission_enabled = true
+			m.emission = Color("fff0dc")
+			m.emission_energy_multiplier = 0.25
+			m.cull_mode = BaseMaterial3D.CULL_FRONT
+	_fx[name] = m
+	return m
+
+
+static func _fx_put(mesh: Mesh, m: Material, pos: Vector3, parent: Node3D) -> MeshInstance3D:
+	var mi := MeshInstance3D.new()
+	mi.mesh = mesh
+	mi.material_override = m
+	mi.position = pos
+	mi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	parent.add_child(mi)
+	return mi
+
+
+static func _fx_cyl(top: float, bottom: float, h: float, seg: int) -> CylinderMesh:
+	var c := CylinderMesh.new()
+	c.top_radius = top
+	c.bottom_radius = bottom
+	c.height = h
+	c.radial_segments = seg
+	c.rings = 1
+	return c
+
+
+static func _fx_sphere(r: float) -> SphereMesh:
+	var s := SphereMesh.new()
+	s.radius = r
+	s.height = r * 2.0
+	s.radial_segments = 16
+	s.rings = 8
+	return s
 
 
 ## Overhead fill from the ceiling fixtures: neutral-warm pools on the floor, falling off at walls.

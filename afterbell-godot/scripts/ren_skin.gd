@@ -194,7 +194,7 @@ func _restyle(skin: Node) -> void:
 				m.roughness_texture_channel = BaseMaterial3D.TEXTURE_CHANNEL_GREEN
 				m.roughness = 1.0
 			m.clearcoat_enabled = false
-			m.metallic_specular = 0.4
+			m.metallic_specular = 0.25   # no bright streaks across his back from overhead lights
 			m3.set_surface_override_material(i, m)
 
 

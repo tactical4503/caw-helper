@@ -239,11 +239,12 @@ func _build_room() -> void:
 		Props.place(self, p[0], p[1], p[2], p[3], "HATS  &  GLOVES")
 		solids.append(Props.footprint(p[0], p[1], p[2]))
 	# Lamps.
-	for p in [Vector3(-HALF_W + 0.3, 2.5, -6), Vector3(-HALF_W + 0.3, 2.5, 0), Vector3(-HALF_W + 0.3, 2.5, 6), Vector3(HALF_W - 0.3, 2.5, -6), Vector3(HALF_W - 0.3, 2.5, 0)]:
-		ST.lamp(self, p)
+	for l in [[-1.0, -6.0], [-1.0, 0.0], [-1.0, 6.0], [1.0, -6.0], [1.0, 0.0]]:
+		ST.sconce(self, Vector3(l[0] * HALF_W, 2.2, l[1]), Vector3(-l[0], 0, 0), 0.85)
 	# Ceiling fixtures down the room; the brightest pool sits over the rack and the staff door.
 	for z in [6.0, 1.0, -2.6, -7.0]:
 		ST.ceiling_light(self, Vector3(0, 3.6, z), 0.95 if z == -2.6 else 0.7, 6.0)
+		ST.ceiling_fixture(self, Vector3(0, 3.65, z), 3.9)
 
 
 func _hat(at: Vector3, color: Color) -> void:

@@ -358,10 +358,8 @@ static func _build_hall(arena_root: Node3D) -> void:
 			var bb := put(box(0.75 if not on_side else 0.06, b[1], 0.06 if not on_side else 0.75), banner, Vector3(spot.x, b[0], spot.y) + face * 0.4, root)
 			put(box(0.79 if not on_side else 0.07, 0.08, 0.07 if not on_side else 0.79), brass(), bb.position + Vector3(0, b[1] * 0.5, 0), root)
 			Atrium.fleur(root, bb.position + Vector3(0, b[1] * 0.12, 0) + face * 0.05, face, 0.36)
-		var lamp_pos := Vector3(spot.x, 2.6, spot.y) + face * 0.55
-		put(sphere(0.06), brass(), lamp_pos - face * 0.15, root)
-		ST.lamp(root, lamp_pos, 0.8, 5.5, face * 0.5)
-		ST.globe(root, Vector3(spot.x, 12.6, spot.y) + face * 0.55)
+		ST.sconce(root, Vector3(spot.x, 2.3, spot.y) + face * 0.35, face, 0.8, 5.5)
+		ST.sconce(root, Vector3(spot.x, 12.3, spot.y) + face * 0.35, face, 0.0)   # upper: fixture only
 	# Chandeliers on long drops from the roof: pools of light down the court and over the bell.
 	for z in [5.0, 0.0, -5.0]:
 		put(cyl(0.02, 0.02, Atrium.ROOF - 5.6, 6), brass(), Vector3(0, (Atrium.ROOF + 5.6) * 0.5, z), root, false)

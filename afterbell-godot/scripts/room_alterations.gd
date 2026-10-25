@@ -126,6 +126,11 @@ func _build_rooms() -> void:
 	# Floors: carpet in Alterations, worn tile in Receiving.
 	B.put(B.box(14, 0.1, 20), ST.textured("tile_cream", 0.6, cream), Vector3(1, -0.05, -4), self, false)
 	B.put(B.box(9.6, 0.02, 9.6), ST.textured("carpet_forest", 0.5, B.mat(B.CARPET, 0.9)), Vector3(0, 0.01, 0), self, false)
+	# Receiving's floor: the same tile, but older and greyer, so the back room sits darker and
+	# cooler than the shop floor.
+	var worn := ST.textured("tile_cream", 0.6, B.mat(Color("bdb6a8"), 0.8))
+	worn.albedo_color = Color(0.7, 0.7, 0.68)
+	B.put(B.box(12.0, 0.02, 7.7), worn, Vector3(1.0, 0.005, -9.15), self, false)
 	var ceil := B.put(B.box(14, 0.2, 20), B.mat(Color("cbbd9f"), 0.8), Vector3(1, 3.6, -4), self, false)
 	ceil.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 	# Alterations walls: cream plaster like the rest of the store.
@@ -274,12 +279,18 @@ func _build_rooms() -> void:
 		solids.append(Props.footprint(p[0], p[1], p[2]))
 	Props.place(self, "hanging_sign", Vector3(STALL.x, 2.85, STALL.y + 1.0), 0.0, 0, "FITTING  ROOM").scale = Vector3.ONE * 0.8
 	# Lamps.
-	for p in [Vector3(-4.7, 2.4, -1), Vector3(4.7, 2.4, 3), Vector3(-4.7, 2.4, -11)]:
-		ST.lamp(self, p)
-	# Ceiling fixtures: a work light over the fitting platform, the socket, and Receiving's table.
-	ST.ceiling_light(self, Vector3(-2.4, 3.2, 1.4), 0.9, 5.5)
-	ST.ceiling_light(self, Vector3(3.0, 3.2, -1.0), 0.8, 5.5)
-	ST.ceiling_light(self, Vector3(0.5, 3.2, -9.5), 0.85, 7.0)
+	for l in [[Vector3(-5.0, 2.2, -1), Vector3(1, 0, 0)], [Vector3(5.0, 2.2, 3), Vector3(-1, 0, 0)]]:
+		ST.sconce(self, l[0], l[1], 0.85)
+	# Ceiling dishes over the fitting platform and the socket.
+	for c in [Vector3(-2.4, 3.2, 1.4), Vector3(3.0, 3.2, -1.0)]:
+		ST.ceiling_light(self, c, 0.85, 5.5)
+		ST.ceiling_fixture(self, c + Vector3(0, 0.05, 0), 3.5)
+	# Receiving is a working room: green enamel pendants over the table and the cartons, neutral
+	# light, and one sconce by the loading door.
+	ST.pendant(self, Vector3(0.5, 2.75, -10.6), 3.5, 0.7, 5.5)
+	ST.pendant(self, Vector3(4.6, 2.75, -11.2), 3.5, 0.45, 4.5)
+	ST.pendant(self, Vector3(-3.4, 2.75, -7.0), 3.5, 0.4, 4.5)
+	ST.sconce(self, Vector3(-5.0, 2.2, -11.4), Vector3(1, 0, 0), 0.6)
 	interactables = [
 		[Vector2(STALL.x, STALL.y + 1.5), "tailor"], [Vector2(DOOR_X + 0.65, -4.3), "sleeve"],
 		[SOCKET, "socket"], [Vector2(0.6, -11.2), "tins"], [Vector2(2.8, -7.5), "len"], [Vector2(-0.9, -8.9), "hesta"],

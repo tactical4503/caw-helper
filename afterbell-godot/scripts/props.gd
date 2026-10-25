@@ -40,6 +40,9 @@ static func place(parent: Node3D, kind: String, at: Vector3, yaw := 0.0, variant
 	node.position = at
 	node.rotation.y = yaw
 	parent.add_child(node)
+	if HALF.has(kind):
+		var h: Vector2 = HALF[kind]
+		contact_shadow(node, Vector2(h.x * 2.0 + 0.35, h.y * 2.0 + 0.35))
 	match kind:
 		"easel":
 			_label(node, text, Vector3(0, 1.12, 0.056), 0.0042 if text.length() <= 5 else 0.0026, Color("eee6d4"), 56, 0.0 if text.length() <= 5 else 0.52)
@@ -57,6 +60,35 @@ static func footprint(kind: String, at: Vector3, yaw := 0.0) -> Rect2:
 	if absf(sin(yaw)) > 0.7:
 		h = Vector2(h.y, h.x)
 	return Rect2(Vector2(at.x, at.z) - h, h * 2.0)
+
+
+static var _shadow_tex: GradientTexture2D
+
+
+## A soft contact shadow under a piece of furniture: a decal that darkens the floor (and the
+## bottom few centimetres of the piece) in a soft-edged oval `size` across, so it sits on the
+## carpet instead of floating.
+static func contact_shadow(parent: Node3D, size: Vector2, at := Vector3.ZERO) -> Decal:
+	if _shadow_tex == null:
+		var g := Gradient.new()
+		g.offsets = PackedFloat32Array([0.0, 0.55, 1.0])
+		g.colors = PackedColorArray([Color(0, 0, 0, 0.6), Color(0, 0, 0, 0.35), Color(0, 0, 0, 0.0)])
+		_shadow_tex = GradientTexture2D.new()
+		_shadow_tex.gradient = g
+		_shadow_tex.fill = GradientTexture2D.FILL_RADIAL
+		_shadow_tex.fill_from = Vector2(0.5, 0.5)
+		_shadow_tex.fill_to = Vector2(0.5, 0.0)
+		_shadow_tex.width = 64
+		_shadow_tex.height = 64
+	var d := Decal.new()
+	d.size = Vector3(size.x, 0.3, size.y)
+	d.texture_albedo = _shadow_tex
+	d.albedo_mix = 1.0
+	d.upper_fade = 0.6
+	d.lower_fade = 0.3
+	d.position = at + Vector3(0, 0.1, 0)
+	parent.add_child(d)
+	return d
 
 
 ## Pushes `p` out of any rect in `rects` grown by `pad` (rooms' prop collision).
@@ -436,6 +468,7 @@ static func counter(parent: Node3D, at: Vector3, size: Vector3, top := "cream", 
 	_put(rounded_block(w + 0.02, 0.04, d + 0.02, r + 0.01), _m("brass"), Vector3(0, 0.44, 0), c)
 	_put(rounded_block(w - 0.02, h - 0.6, d - 0.02, r), _m("cream"), Vector3(0, 0.48, 0), c)
 	_put(rounded_block(w + 0.03, 0.035, d + 0.03, r + 0.015), _m("brass"), Vector3(0, h - 0.125, 0), c)
+	contact_shadow(c, Vector2(w + 0.45, d + 0.45))
 	var tops := {"cream": "counter_top", "walnut": "walnut", "plum": "plum"}
 	_put(rounded_block(w + 0.1, 0.09, d + 0.1, r + 0.05, 0.025), _m(tops[top]), Vector3(0, h - 0.09, 0), c)
 	return c

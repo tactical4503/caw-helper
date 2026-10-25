@@ -168,7 +168,7 @@ static func _cosmetics(g: Node3D, w: float, d: float, h: float) -> void:
 	Props.place(g, "mannequin", Vector3(w * 0.32, 0, -d + 0.8), -0.4, 1)
 	Props.place(g, "flower_display", Vector3(-w * 0.36, 0, -d * 0.4))
 	Props.plaque(g, Vector3(0, 2.3, -d + 0.02), 1.6, "COSMETICS  ·  FRAGRANCE")
-	ST.globe(g, Vector3(-w * 0.12, 2.0, -d + 0.15))
+	ST.sconce(g, Vector3(-w * 0.12, 1.9, -d), Vector3(0, 0, 1), 0.0)
 	_light(g, Vector3(-w * 0.1, 2.2, -d + 0.8), Color("ffbfa0"), 1.4, maxf(w, d) + 1.0)
 
 
