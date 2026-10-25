@@ -117,6 +117,70 @@ static func footprint(kind: String, at: Vector3, yaw := 0.0) -> Rect2:
 
 
 static var _shadow_tex: GradientTexture2D
+static var _actor_tex: GradientTexture2D
+
+
+## Characters render on this visual layer too, so a light can be aimed at them alone.
+const ACTOR_LAYER := 12
+
+
+## A promo-render key on a character: a warm-white light that follows it and lights only the
+## characters (layer ACTOR_LAYER), so armour and clothes read bright and glossy against the
+## shaded hall, as in the reference, without lifting the room. Call `actor_light_follow` each
+## frame with the camera so the light sits up and to one side of it.
+static func actor_light(parent: Node, figure: Node) -> OmniLight3D:
+	for v in figure.find_children("*", "VisualInstance3D", true, false):
+		(v as VisualInstance3D).layers |= 1 << (ACTOR_LAYER - 1)
+	var l := OmniLight3D.new()
+	l.light_color = Color("fff0dc")
+	l.light_energy = 1.6
+	l.light_specular = 0.9
+	l.omni_range = 7.0
+	l.omni_attenuation = 0.8
+	l.light_cull_mask = 1 << (ACTOR_LAYER - 1)
+	parent.add_child(l)
+	return l
+
+
+static func actor_light_follow(l: OmniLight3D, figure: Node3D, cam: Camera3D) -> void:
+	var to_cam := cam.global_position - figure.global_position
+	to_cam.y = 0.0
+	var side := to_cam.normalized().cross(Vector3.UP)
+	l.global_position = figure.global_position + to_cam.normalized() * 1.6 - side * 1.1 + Vector3(0, 2.4, 0)
+
+
+## A character's contact shadow: denser and tighter than furniture's, so a figure reads as
+## standing on the carpet (the floor under a person is the darkest spot in the reference). Add
+## one under the body, and `foot_shadow` ones that follow each foot.
+static func actor_shadow(parent: Node3D, size: Vector2, at := Vector3.ZERO, strength := 0.78) -> MeshInstance3D:
+	if _actor_tex == null:
+		var g := Gradient.new()
+		g.offsets = PackedFloat32Array([0.0, 0.45, 0.8, 1.0])   # a firm core, a soft edge
+		g.colors = PackedColorArray([Color(0, 0, 0, 1.0), Color(0, 0, 0, 0.85), Color(0, 0, 0, 0.3), Color(0, 0, 0, 0.0)])
+		_actor_tex = GradientTexture2D.new()
+		_actor_tex.gradient = g
+		_actor_tex.fill = GradientTexture2D.FILL_RADIAL
+		_actor_tex.fill_from = Vector2(0.5, 0.5)
+		_actor_tex.fill_to = Vector2(0.5, 0.0)
+		_actor_tex.width = 64
+		_actor_tex.height = 64
+	# A soft dark blob lying on the floor (a mesh, not a decal: it renders the same everywhere).
+	var m := StandardMaterial3D.new()
+	m.albedo_texture = _actor_tex
+	m.albedo_color = Color(1, 1, 1, strength)   # the texture carries the black and the falloff
+	m.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	m.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	m.depth_draw_mode = BaseMaterial3D.DEPTH_DRAW_DISABLED
+	m.render_priority = -1
+	var q := PlaneMesh.new()
+	q.size = size
+	var mi := MeshInstance3D.new()
+	mi.mesh = q
+	mi.material_override = m
+	mi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	mi.position = at + Vector3(0, 0.035, 0)   # just above the carpet and its border bands
+	parent.add_child(mi)
+	return mi
 
 
 ## A soft contact shadow under a piece of furniture: a decal that darkens the floor (and the

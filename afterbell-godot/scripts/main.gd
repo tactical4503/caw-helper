@@ -147,6 +147,8 @@ var boss_chain: Array = []
 var boss_chain_i := 0
 var paddle_mat: StandardMaterial3D
 var ren: Node3D
+var ren_spread: MeshInstance3D
+var ren_key: OmniLight3D
 var ren_anim: AnimationPlayer
 var ren_ring_mat: StandardMaterial3D
 var ren_clip := ""
@@ -179,7 +181,11 @@ func _ready() -> void:
 	paddle_mat = (boss.get_node("Chair/Paddle") as MeshInstance3D).material_override
 	ren = REN_RIG.instantiate()
 	add_child(ren)
-	B.Atrium.Props.contact_shadow(ren, Vector2(1.0, 0.8))   # a soft pool under his boots, as in the reference
+	# His shadow, as in the reference: a dense pool at the boots and a broad soft spread round it.
+	B.Atrium.Props.actor_shadow(ren, Vector2(1.1, 0.95), Vector3(0, 0, 0.05), 0.95)
+	# The broad oval the hall's light lays out to his left (world-aligned, as in the reference).
+	ren_spread = B.Atrium.Props.actor_shadow(self, Vector2(2.3, 1.3), Vector3.ZERO, 0.9)
+	ren_key = B.Atrium.Props.actor_light(self, ren)
 	ren_anim = ren.get_node("AnimationPlayer")
 	ren_ring_mat = StandardMaterial3D.new()
 	ren_ring_mat.albedo_color = Color(B.CREAM, 0.0)
@@ -1110,6 +1116,9 @@ func _render(dt: float) -> void:
 
 	# Ren
 	ren.position = Vector3(p_pos.x, 0, p_pos.y)
+	if ren_spread:
+		ren_spread.position = Vector3(p_pos.x - 0.4, 0.034, p_pos.y + 0.2)
+		B.Atrium.Props.actor_light_follow(ren_key, ren, camera)
 	ren.rotation.y = p_yaw
 	hurt_t = maxf(0.0, hurt_t - dt)
 	reflect_t = maxf(0.0, reflect_t - dt)

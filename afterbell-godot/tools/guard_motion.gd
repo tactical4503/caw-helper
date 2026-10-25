@@ -11,6 +11,7 @@ const SCRIPT := [["approach", 2.0, Vector2(0.0, 0.9)], ["post", 1.0, Vector2.ZER
 
 var out_dir := "user://motion"
 var every := 3
+var feet := false   # --view=feet: a low camera on the first guard's legs and shadow
 var room: Node
 var frame := 0
 var seg := 0
@@ -21,6 +22,8 @@ func _initialize() -> void:
 	for arg in OS.get_cmdline_user_args():
 		if arg.begins_with("--out="):
 			out_dir = arg.substr(6)
+		elif arg == "--view=feet":
+			feet = true
 		elif arg.begins_with("--every="):
 			every = int(arg.substr(8))
 	DirAccess.make_dir_recursive_absolute(out_dir)
@@ -53,8 +56,12 @@ func _process(_d: float) -> bool:
 	room._render_actors(dt)
 	room.ren.visible = false
 	var g0 = room.guards[0]
-	room.camera.position = Vector3(g0.pos.x + 1.6, 1.3, g0.pos.y + 2.6)   # a three-quarter view of the first guard
-	room.camera.look_at(Vector3(g0.pos.x + 0.2, 0.95, g0.pos.y), Vector3.UP)
+	if feet:
+		room.camera.position = Vector3(g0.pos.x + 1.5, 0.55, g0.pos.y + 1.4)
+		room.camera.look_at(Vector3(g0.pos.x, 0.3, g0.pos.y), Vector3.UP)
+	else:
+		room.camera.position = Vector3(g0.pos.x + 1.6, 1.3, g0.pos.y + 2.6)   # a three-quarter view of the first guard
+		room.camera.look_at(Vector3(g0.pos.x + 0.2, 0.95, g0.pos.y), Vector3.UP)
 	if frame > 1 and frame % every == 0:
 		var path := out_dir.path_join("f%04d.png" % frame)
 		root.get_texture().get_image().save_png(path)

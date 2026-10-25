@@ -84,6 +84,7 @@ class Guard:
 	var mocap: RefCounted = null  # Retarget: its motion capture
 	var clip := ""
 	var idle_w := 0.0
+	var foot_shadows: Array = []
 	var baton: Node3D
 	var stool: Node3D
 	var stride := 0.0
@@ -103,6 +104,7 @@ var pressed := {}
 var virtual := {}
 
 var ren: Node3D
+var ren_key: OmniLight3D
 var ren_anim: AnimationPlayer
 var ren_clip := ""
 var p_pos := ENTRY
@@ -157,6 +159,10 @@ func _ready() -> void:
 	add_child(fade)
 	ren = REN_RIG.instantiate()
 	add_child(ren)
+	ren_key = Props.actor_light(self, ren)
+	# His shadow, as in the reference: a dense pool at the boots and a broad soft spread round it.
+	Props.actor_shadow(ren, Vector2(1.0, 0.85), Vector3(0, 0, 0.05), 0.85)
+	Props.actor_shadow(ren, Vector2(2.2, 1.8), Vector3(0.1, -0.002, 0.15), 0.4)
 	ren_anim = ren.get_node("AnimationPlayer")
 	camera = Camera3D.new()
 	camera.fov = 66.0
@@ -302,6 +308,12 @@ func _make_guard(at: Vector2, state: String, which := 0) -> Guard:
 	var figure: Node3D = Imported.make(GUARD_MODELS[which][0])
 	if figure:
 		body.add_child(figure)
+		Props.actor_shadow(g.node, Vector2(1.0, 0.85), Vector3.ZERO, 0.7)   # the body's pool, a soft spread...
+		for v in figure.find_children("*", "VisualInstance3D", true, false):   # lit by Ren's key too
+			(v as VisualInstance3D).layers |= 1 << (Props.ACTOR_LAYER - 1)
+		Props.actor_shadow(g.node, Vector2(2.0, 1.6), Vector3(0, -0.002, 0.1), 0.35)
+		for k in 2:   # ...and one under each foot, following it
+			g.foot_shadows.append(Props.actor_shadow(self, Vector2(0.4, 0.5), Vector3.ZERO, 0.9))
 		g.pose = SkinPose.new(figure, GUARD_MODELS[which][1])
 		g.mocap = Retarget.new(figure, GUARD_MODELS[which][1], GUARD_CLIPS, g.node)
 		if not g.mocap.ok():
@@ -790,6 +802,8 @@ func _leave() -> void:
 
 func _render_actors(dt: float) -> void:
 	ren.position = Vector3(p_pos.x, 0, p_pos.y)
+	if camera:
+		Props.actor_light_follow(ren_key, ren, camera)
 	ren.rotation.y = p_yaw
 	ren.visible = not (inv > 0.0 and int(time * 20.0) % 2 == 0)
 	var clip := "idle"
@@ -910,6 +924,17 @@ func _mocap_figure(g: Guard, dt: float, sit: float) -> void:
 			"r_fore": Vector3(-0.85 * s2 - 0.25, 0.0, 0.0), "l_fore": Vector3(-0.85 * s2 - 0.2, 0.0, 0.0)})
 	g.idle_w = lerpf(g.idle_w, ow, 1.0 - exp(-4.0 * dt))   # ease the stance change in and out
 	g.mocap.update(dt, overlay, g.idle_w if sit <= 0.01 else ow)
+	g.mocap.plant_feet(dt, 1.0 - smoothstep(0.0, 0.3, sit))
+	# Foot shadows sit under each foot, darkest when it's on the floor, fading as it lifts.
+	for k in mini(g.foot_shadows.size(), g.mocap.legs.size()):
+		var leg: Array = g.mocap.legs[k]
+		var fp: Vector3 = g.mocap.skel.global_transform * g.mocap.skel.get_bone_global_pose(leg[2]).origin
+		var lift: float = maxf(fp.y - g.mocap.ankle_h[leg[2]], 0.0)
+		var d: MeshInstance3D = g.foot_shadows[k]
+		d.visible = g.node.visible
+		d.global_position = Vector3(fp.x, 0.036, fp.z) + g.node.global_basis.z * 0.05
+		d.global_rotation.y = g.vis_yaw
+		(d.material_override as StandardMaterial3D).albedo_color.a = 0.9 * clampf(1.0 - lift / 0.25, 0.15, 1.0)
 	# The baton follows the right hand, held as the capture holds its sword: along the grip.
 	var rt: RefCounted = g.mocap
 	var src_hand: int = rt.src_skel.find_bone("mixamorig_RightHand")

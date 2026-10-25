@@ -41,6 +41,7 @@ var pressed := {}
 var virtual := {}
 
 var ren: Node3D
+var ren_key: OmniLight3D
 var ren_anim: AnimationPlayer
 var ren_clip := ""
 var p_pos := ENTRY
@@ -94,6 +95,10 @@ func _ready() -> void:
 	add_child(fade)
 	ren = REN_RIG.instantiate()
 	add_child(ren)
+	ren_key = Props.actor_light(self, ren)
+	# His shadow, as in the reference: a dense pool at the boots and a broad soft spread round it.
+	Props.actor_shadow(ren, Vector2(1.0, 0.85), Vector3(0, 0, 0.05), 0.85)
+	Props.actor_shadow(ren, Vector2(2.2, 1.8), Vector3(0.1, -0.002, 0.15), 0.4)
 	ren_anim = ren.get_node("AnimationPlayer")
 	camera = Camera3D.new()
 	camera.fov = 66.0
@@ -534,6 +539,8 @@ func _update_crank(dt: float) -> void:
 
 func _update_world(dt: float) -> void:
 	ren.position = Vector3(p_pos.x, 0, p_pos.y)
+	if camera:
+		Props.actor_light_follow(ren_key, ren, camera)
 	ren.rotation.y = p_yaw
 	var clip := "guard" if crank_t >= 0.0 else ("run" if speed > 0.5 else "idle")
 	if clip != ren_clip:
