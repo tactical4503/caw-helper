@@ -213,7 +213,7 @@ func _build_rooms() -> void:
 	curtain = Node3D.new()
 	curtain.position = Vector3(STALL.x, 0, STALL.y + 0.9)
 	add_child(curtain)
-	B.put(B.box(1.7, 2.3, 0.05), ST.textured("velvet_red", 1.0, B.mat(B.RED, 0.8)), Vector3(0, 1.17, 0), curtain)
+	Props.curtain(curtain, Vector3.ZERO, 1.7, 2.3)   # pleated burgundy velvet on a brass rod
 	tailor = Node3D.new()
 	tailor.position = Vector3(STALL.x, 0, STALL.y - 0.2)
 	add_child(tailor)

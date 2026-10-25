@@ -452,13 +452,15 @@ static func door_frame(parent: Node3D, at: Vector3, width: float, height: float,
 	var cw := 0.14     # casing width
 	var proud := 0.05  # how far the casing stands off the wall
 	for s in [-1.0, 1.0]:
-		_put(_box(0.04, height, wall + 0.02), _m("walnut"), Vector3(s * (width * 0.5 + 0.02), height * 0.5, 0), f)   # reveal lining
+		# Reveal lining sits 1 cm inside the opening so it never shares a face with the wall's
+		# cut end (coplanar faces flicker as speckle).
+		_put(_box(0.04, height, wall + 0.02), _m("walnut"), Vector3(s * (width * 0.5 + 0.01), height * 0.5, 0), f)
 		for face in [-1.0, 1.0]:
 			var z: float = face * (wall * 0.5 + proud * 0.5)
 			_put(_box(cw, height + cw * 0.5, proud), _m("walnut"), Vector3(s * (width * 0.5 + cw * 0.5), (height + cw * 0.5) * 0.5, z), f)
 			_put(_box(cw * 0.35, height, proud + 0.02), _m("walnut"), Vector3(s * (width * 0.5 + cw * 0.25), height * 0.5, z + face * 0.005), f)   # bead
 			_put(_box(cw + 0.03, 0.24, proud + 0.025), _m("walnut"), Vector3(s * (width * 0.5 + cw * 0.5), 0.12, z), f)   # plinth block
-	_put(_box(width + 0.04, 0.04, wall + 0.02), _m("walnut"), Vector3(0, height + 0.02, 0), f)   # head lining
+	_put(_box(width + 0.04, 0.04, wall + 0.02), _m("walnut"), Vector3(0, height + 0.01, 0), f)   # head lining, 1 cm below the lintel
 	for face in [-1.0, 1.0]:
 		var z: float = face * (wall * 0.5 + proud * 0.5)
 		_put(_box(width + cw * 2.0, 0.2, proud), _m("walnut"), Vector3(0, height + 0.1, z), f)
@@ -586,6 +588,30 @@ static func lattice_gate(parent: Node3D, at: Vector3, width: float, height: floa
 ## Bakes a static assembly into a few meshes (the atrium's merge, without a preload cycle).
 static func Atrium_merge(node: Node3D) -> void:
 	load("res://scripts/atrium.gd").merge(node)
+
+
+## A pleated velvet curtain on a brass rod with rings: soft vertical folds instead of a flat
+## slab. `at` is the floor centre of the curtain line; it hangs `height` tall across `width`.
+static func curtain(parent: Node3D, at: Vector3, width: float, height: float) -> Node3D:
+	var c := Node3D.new()
+	c.name = "Curtain"
+	c.position = at
+	parent.add_child(c)
+	var folds := maxi(4, int(width / 0.11))
+	var pitch := width / folds
+	for i in folds:
+		var x := -width * 0.5 + pitch * (i + 0.5)
+		var fold := _put(_cyl(pitch * 0.62, pitch * 0.7, height - 0.04, 12), _m("velvet"), Vector3(x, (height - 0.04) * 0.5 + 0.02, 0.025 * (1 if i % 2 else -1)), c)
+		fold.scale = Vector3(1.0, 1.0, 0.45)
+	var rod := _put(_cyl(0.014, 0.014, width + 0.16, 10), _m("brass"), Vector3(0, height + 0.03, 0), c)
+	rod.rotation.z = PI / 2.0
+	for s in [-1.0, 1.0]:
+		_put(_sphere(0.028, 10), _m("brass"), Vector3(s * (width * 0.5 + 0.09), height + 0.03, 0), c)
+	for i in folds:
+		var ring := _put(_cyl(0.022, 0.022, 0.012, 12), _m("brass"), Vector3(-width * 0.5 + pitch * (i + 0.5), height + 0.03, 0), c)
+		ring.rotation.z = PI / 2.0
+	Atrium_merge(c)
+	return c
 
 
 ## A brass pull bar on two standoffs, for shutters and roller gates. Local x along the bar,

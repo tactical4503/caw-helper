@@ -246,7 +246,7 @@ func _build_room() -> void:
 			glass.albedo_color = Color(0.85, 0.95, 0.92, 0.25)
 			glass.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
 			glass.roughness = 0.03
-			B.put(B.box(size.x - 0.1, 0.03, size.z - 0.1), glass, Vector3(pos.x, 1.015, pos.z), self, false)
+			B.put(B.box(size.x - 0.1, 0.03, size.z - 0.1), glass, Vector3(pos.x, 1.017, pos.z), self, false)   # 2 mm proud of the top: no shared face
 			# Perfume boxes and testers along the long runs.
 			if size.x > 1:
 				for k in [-0.85, 0.85]:

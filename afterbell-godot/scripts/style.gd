@@ -80,9 +80,16 @@ static func procedural(dark: Color, light: Color, kind: String, scale := 0.5) ->
 	return m
 
 
-## A texture set made by tools/make_texture.py (assets/textures/NAME/{albedo,normal,roughness}.png).
-## Triplanar, so any box gets the same texel density. Falls back to `fallback` if it's missing.
-static func textured(name: String, scale: float, fallback: StandardMaterial3D, metal := 0.0) -> StandardMaterial3D:
+## Every surface texture covers this many metres per repeat, so detail is equally sharp on
+## neighbouring objects (1024 px over 2 m = about 5 px per cm everywhere).
+const TEXTURE_TILE_M := 2.0
+
+
+## A texture set made by tools/quiet_textures.py (assets/textures/NAME/{albedo,normal,roughness}.png).
+## Triplanar at one shared density (TEXTURE_TILE_M), so any box and any material match.
+## `_legacy_scale` is ignored: per-call scales made neighbouring surfaces disagree.
+## Falls back to `fallback` if the set is missing.
+static func textured(name: String, _legacy_scale: float, fallback: StandardMaterial3D, metal := 0.0) -> StandardMaterial3D:
 	var dir := "res://assets/textures/%s/" % name
 	if not ResourceLoader.exists(dir + "albedo.png"):
 		return fallback
@@ -96,7 +103,7 @@ static func textured(name: String, scale: float, fallback: StandardMaterial3D, m
 	m.metallic = metal
 	m.metallic_specular = 0.5 if metal >= 0.5 else 0.35
 	m.uv1_triplanar = true
-	m.uv1_scale = Vector3.ONE * scale
+	m.uv1_scale = Vector3.ONE / TEXTURE_TILE_M
 	m.texture_filter = BaseMaterial3D.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS_ANISOTROPIC   # no shimmer at grazing angles
 	return m
 

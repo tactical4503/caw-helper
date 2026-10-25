@@ -2,6 +2,7 @@
 """Regenerate the store's surface textures as quiet, readable sets.
 
     python3 tools/quiet_textures.py [name ...]      (default: all of them)
+    python3 tools/quiet_textures.py --calm          (quiet the hand-made sets: brass, metal, ...)
 
 Writes assets/textures/NAME/{albedo,normal,roughness}.png. Every texture follows the same rules:
 a calm base colour, soft large-scale variation, a little wear, and one larger detail you can read
@@ -76,47 +77,48 @@ def wear_mask(seed, coverage=0.25, scale=180):
 # ---------------------------------------------------------------- carpets
 
 def carpet(name, base, accent, seed, lattice=True):
-    """Pile carpet: soft mottling, faint pile direction, worn traffic patches and, optionally, a
-    tone-on-tone diamond lattice with a small medallion, repeating every quarter of the tile."""
+    """Woven carpet: a soft twill weave (threads about 1.5 cm apart at the game's 2 m tile), broad
+    gentle mottling and light traffic wear; optionally a tone-on-tone diamond lattice with a
+    medallion every 50 cm. No pixel noise, so at a distance it reads as cloth, never gravel."""
     x, y = grid()
-    light = noise(140, seed) * 0.035 + noise(28, seed + 1) * 0.012
-    light += noise(10, seed + 2, stretch=(0.25, 1.0)) * 0.012          # pile direction
+    twill = np.sin((x + y) * np.pi / 4.0) * 0.5 + np.sin((x - 2.0 * y) * np.pi / 8.0) * 0.25
+    light = noise(200, seed) * 0.03 + twill * 0.018
     pattern = np.zeros((N, N))
     if not lattice:   # border runner: two quiet bands along its length
         band = np.abs(((x % (N / 2.0)) - N / 4.0))
-        pattern = (1.0 - smooth(4.0, 9.0, np.abs(band - 150.0))) * 0.8
+        pattern = (1.0 - smooth(6.0, 12.0, np.abs(band - 150.0))) * 0.8
     if lattice:
         p = N / 4.0
         u = np.abs(((x + y) % p) - p / 2.0)
         v = np.abs(((x - y) % p) - p / 2.0)
-        line = 1.0 - smooth(2.0, 6.0, np.minimum(u, v))                # diamond lines
+        line = 1.0 - smooth(4.0, 9.0, np.minimum(u, v))                 # broad, soft diamond lines
         cx = np.abs((x % p) - p / 2.0)
         cy = np.abs((y % p) - p / 2.0)
-        medal = 1.0 - smooth(10.0, 16.0, np.hypot(cx, cy))              # medallion in each diamond
-        ring = 1.0 - smooth(1.5, 4.0, np.abs(np.hypot(cx, cy) - 24.0))
-        pattern = line * 0.9 + medal * 0.7 + ring * 0.5
+        medal = 1.0 - smooth(12.0, 20.0, np.hypot(cx, cy))
+        ring = 1.0 - smooth(3.0, 6.0, np.abs(np.hypot(cx, cy) - 30.0))
+        pattern = line * 0.8 + medal * 0.6 + ring * 0.45
     a = tint(base, light)
-    a = a * (1.0 - pattern[..., None] * 0.35) + accent[None, None, :] * pattern[..., None] * 0.35
-    wear = wear_mask(seed + 3, 0.2)
+    a = a * (1.0 - pattern[..., None] * 0.28) + accent[None, None, :] * pattern[..., None] * 0.28
+    wear = wear_mask(seed + 3, 0.18, 220)
     grey = a.mean(-1, keepdims=True)
-    a = a * (1.0 - wear[..., None] * 0.25) + (grey * 1.12) * wear[..., None] * 0.25   # flattened, faded pile
-    height = noise(10, seed + 2, stretch=(0.25, 1.0)) * 0.3 + noise(28, seed + 1) * 0.3 - pattern * 0.6 - wear * 0.3
-    rough = 0.9 + noise(60, seed + 4) * 0.03 - wear * 0.05
-    save(name, a, height, rough, 1.6)
+    a = a * (1.0 - wear[..., None] * 0.18) + (grey * 1.1) * wear[..., None] * 0.18
+    height = twill * 0.25 - pattern * 0.25
+    rough = np.full((N, N), 0.92)
+    save(name, a, height, rough, 0.8)
 
 
 # ---------------------------------------------------------------- walls and floors
 
 def plaster(name, base, seed):
-    """Smooth painted plaster: broad soft clouding, faint trowel sweeps, scuffs low on the wall."""
+    """Quiet painted plaster: only very broad, faint clouding, a soft scuff low on the wall.
+    Practically flat to the eye, so it never speckles edge-on."""
     x, y = grid()
-    light = noise(220, seed) * 0.03 + noise(60, seed + 1) * 0.012
-    sweep = noise(40, seed + 2, stretch=(0.35, 1.0)) * 0.012            # trowel direction
-    scuff = wear_mask(seed + 3, 0.12, 120) * smooth(0.7, 1.0, y / N)    # lower part of each tile
-    a = tint(base, light + sweep - scuff * 0.05)
-    height = noise(60, seed + 1) * 0.4 + noise(40, seed + 2, stretch=(0.35, 1.0)) * 0.3
-    rough = 0.8 + noise(120, seed + 4) * 0.04
-    save(name, a, height, rough, 0.8)
+    light = noise(300, seed) * 0.018 + noise(90, seed + 1) * 0.005
+    scuff = wear_mask(seed + 3, 0.1, 160) * smooth(0.75, 1.0, y / N)
+    a = tint(base, light - scuff * 0.03)
+    height = noise(90, seed + 1) * 0.2
+    rough = np.full((N, N), 0.82)
+    save(name, a, height, rough, 0.3)
 
 
 def stone(name, base, seed):
@@ -134,15 +136,15 @@ def stone(name, base, seed):
     mortar = 1.0 - smooth(2.0, 4.0, edge)
     bevel = smooth(3.0, 10.0, edge)
     rng = np.random.default_rng(seed)
-    tones = rng.uniform(-0.05, 0.05, (rows, cols))
+    tones = rng.uniform(-0.03, 0.03, (rows, cols))
     block = tones[row.astype(int) % rows, col.astype(int)]
-    light = block + noise(90, seed + 1) * 0.025 + noise(24, seed + 2) * 0.008
+    light = block + noise(120, seed + 1) * 0.015
     a = tint(base, light)
     a = a * (1.0 - mortar[..., None] * 0.22)
     weather = wear_mask(seed + 3, 0.18, 160)
     a = a * (1.0 - weather[..., None] * 0.04)
-    height = bevel * 0.8 + noise(24, seed + 2) * 0.08 - mortar * 0.4
-    rough = 0.78 + mortar * 0.15 + noise(90, seed + 4) * 0.03
+    height = bevel * 0.8 - mortar * 0.4
+    rough = 0.8 + mortar * 0.12
     save(name, a, height, rough, 3.0)
 
 
@@ -170,22 +172,20 @@ def tile(name, base, seed):
 
 
 def laminate(name, base, seed):
-    """Plum display-base laminate: near-flat colour with long faint streaks and soft rub marks."""
-    light = noise(30, seed, stretch=(0.12, 1.0)) * 0.03 + noise(200, seed + 1) * 0.025
-    rub = wear_mask(seed + 2, 0.15, 150)
-    a = tint(base, light + rub * 0.06)
-    height = noise(30, seed, stretch=(0.12, 1.0)) * 0.15
-    rough = 0.65 + rub * 0.08 + noise(150, seed + 3) * 0.03
-    save(name, a, height, rough, 0.6)
+    """Plum display-base laminate: smooth satin, one even sheen. No surface texture at all in
+    the normal or roughness maps, which is what made it glitter."""
+    light = noise(300, seed) * 0.012
+    a = tint(base, light)
+    save(name, a, np.zeros((N, N)), np.full((N, N), 0.6), 0.0)
 
 
 def velvet(name, base, seed):
-    """Velvet: soft broad sheen changes where the nap has been brushed different ways."""
-    light = noise(120, seed) * 0.07 + noise(30, seed + 1) * 0.015
+    """Deep burgundy velvet: soft broad shading where the nap lies different ways, nothing fine."""
+    light = noise(160, seed) * 0.05
     a = tint(base, light)
-    height = noise(30, seed + 1) * 0.2
-    rough = 0.93 + noise(120, seed + 2) * 0.03
-    save(name, a, height, rough, 0.6)
+    height = noise(160, seed) * 0.2
+    rough = np.full((N, N), 0.94)
+    save(name, a, height, rough, 0.3)
 
 
 def linen(name, base, seed):
@@ -211,10 +211,41 @@ SETS = {
     "stone_cream": lambda: stone("stone_cream", hexc("#d9cbad"), 31),
     "tile_cream": lambda: tile("tile_cream", hexc("#dccfb3"), 41),
     "laminate_plum": lambda: laminate("laminate_plum", hexc("#5a1c34"), 51),
-    "velvet_red": lambda: velvet("velvet_red", hexc("#7a1b2a"), 61),
+    "velvet_red": lambda: velvet("velvet_red", hexc("#5a1424"), 61),
     "linen_cream": lambda: linen("linen_cream", hexc("#e6dac2"), 71),
 }
 
-if __name__ == "__main__":
+if __name__ == "__main__" and "--calm" not in sys.argv:
     for name in (sys.argv[1:] or SETS):
         SETS[name]()
+
+
+# ---------------------------------------------------------------- calming existing sets
+
+def calm(name, keep=0.5, blur=2.0):
+    """Quiet a hand-made texture set in place: blur away pixel grain and keep `keep` of its
+    contrast in albedo, normal and roughness, so it reads as a material, not as noise."""
+    from PIL import ImageFilter
+    d = os.path.join(ROOT, name)
+    for part in ("albedo", "normal", "roughness"):
+        p = os.path.join(d, part + ".png")
+        if not os.path.exists(p):
+            continue
+        img = Image.open(p)
+        mode = img.mode
+        a = np.asarray(img.convert("RGB" if mode != "L" else "L").filter(ImageFilter.GaussianBlur(blur))).astype(float)
+        if part == "normal":
+            flat = np.array([128.0, 128.0, 255.0])
+            a = flat + (a - flat) * keep
+        else:
+            m = a.reshape(-1, a.shape[-1]).mean(0) if a.ndim == 3 else a.mean()
+            a = m + (a - m) * keep
+        Image.fromarray(np.clip(a, 0, 255).astype(np.uint8)).save(p)
+    print(f"{name}: calmed (contrast x{keep}, blur {blur}px)")
+
+
+CALM = {"brass": 0.6, "metal_charcoal": 0.5, "marble_cream": 0.6, "cardboard": 0.6, "canopy_green": 0.5}
+
+if __name__ == "__main__" and "--calm" in sys.argv:
+    for name, keep in CALM.items():
+        calm(name, keep)
