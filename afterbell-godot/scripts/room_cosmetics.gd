@@ -126,6 +126,10 @@ func _ready() -> void:
 	say("MIKA", "It's feeding the gate release. Catch the sign with the flat of Knock — send it to the receiver over the west door.", 4.2)
 	say("", "Tap guard (K) just as the bordered sign reaches you.", 3.0)
 	_place_camera(1.0)
+	var game := get_node_or_null("/root/Game")
+	if game:
+		game.enter_room("res://rooms/cosmetics.tscn", "Cosmetics & Directory")
+		settings.reflect_assist = game.settings.reflect_assist
 
 
 # ---------------------------------------------------------------- building
@@ -336,12 +340,7 @@ func _build_room() -> void:
 func _build_hud() -> void:
 	var layer := CanvasLayer.new()
 	add_child(layer)
-	var title := B._label("DS-01  COSMETICS AND DIRECTORY  ·  demonstration build", 12, B.BRASS)
-	title.position = Vector2(16, 12)
-	layer.add_child(title)
-	var keys := B._label("WASD move  ·  K guard  ·  E examine  ·  T reflection assist", 12, Color(B.IVORY, 0.7))
-	keys.position = Vector2(16, 30)
-	layer.add_child(keys)
+	# Controls live in the pause menu (Esc) and in context prompts; no development labels.
 	var bottom := VBoxContainer.new()
 	bottom.set_anchors_preset(Control.PRESET_BOTTOM_WIDE)
 	bottom.offset_top = -150
@@ -382,6 +381,7 @@ func step(dt: float) -> void:
 	_update_placard(dt)
 	_update_gate(dt)
 	_update_subs(dt)
+	sfx.track(p_pos)
 
 
 func _update_player(dt: float) -> void:
@@ -550,7 +550,8 @@ func _open_gate() -> void:
 	gate_open = true
 	gauge.set_objective("Head west through Hats")
 	sfx.spring()
-	sfx.pip()
+	sfx.chime_errand()
+	_toast("Errand complete  ·  the hats gate is open")
 	say("", "The receiver tilts. Its linkage rises. The hats gate rolls into the wall.", 2.6)
 	say("", "Notebook: \"Return marked signs with the flat of the blade.\"", 3.0)
 	say("MIKA", "That cable runs to the escalators. West, through Hats.", 2.8)
@@ -577,3 +578,10 @@ func _update_subs(dt: float) -> void:
 func _place_camera(delta: float) -> void:
 	var walls := Rect2(-HALF_W + 0.35, -HALF_D + 0.35, HALF_W * 2.0 - 0.7, HALF_D * 2.0 - 0.7)
 	ShoulderCam.place(camera, p_pos, Vector2(0, -1), delta, walls, 62.0)
+
+
+## A short line from the chapter shell (errand complete, item found); quiet without it.
+func _toast(text: String) -> void:
+	var game := get_node_or_null("/root/Game")
+	if game:
+		game.toast(text)

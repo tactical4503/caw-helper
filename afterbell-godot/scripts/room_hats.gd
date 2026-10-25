@@ -142,6 +142,9 @@ func _ready() -> void:
 	guards.append(_make_guard(Vector2(-3.4, 6.6), "dormant"))
 	say("MIKA", "Hats. Staff doors are north, past that rack.", 2.6)
 	_place_camera(1.0)
+	var game := get_node_or_null("/root/Game")
+	if game:
+		game.enter_room("res://rooms/hats.tscn", "Hats & Gloves")
 
 
 # ---------------------------------------------------------------- building
@@ -288,12 +291,7 @@ func _make_guard(at: Vector2, state: String) -> Guard:
 func _build_hud() -> void:
 	var layer := CanvasLayer.new()
 	add_child(layer)
-	var title := B._label("DS-02  HATS AND GLOVES  ·  demonstration build", 12, B.BRASS)
-	title.position = Vector2(16, 100)
-	layer.add_child(title)
-	var keys := B._label("J attack (hold to wind)  ·  K guard  ·  Space dodge  ·  E examine / biscuit", 12, Color(B.IVORY, 0.7))
-	keys.position = Vector2(16, 118)
-	layer.add_child(keys)
+	# Controls live in the pause menu (Esc) and in context prompts; no development labels.
 	var bottom := VBoxContainer.new()
 	bottom.set_anchors_preset(Control.PRESET_BOTTOM_WIDE)
 	bottom.offset_top = -120
@@ -334,6 +332,7 @@ func step(dt: float) -> void:
 	_check_clear()
 	dialogue.update(dt)
 	_render_actors(dt)
+	sfx.track(p_pos)
 
 
 func _update_player(dt: float) -> void:
@@ -677,6 +676,8 @@ func _check_clear() -> void:
 			return
 	cleared = true
 	gauge.set_objective("North — to Alterations")
+	sfx.chime_errand()
+	_toast("The etiquette guards are sitting down  ·  the aisle is clear")
 	say("MIKA", "They'll be fine. Breaks were overdue.", 2.4)
 	for g in guards:
 		var gg: Guard = g
@@ -690,9 +691,13 @@ func _check_clear() -> void:
 func _take_pin() -> void:
 	pin_taken = true
 	pin_node.visible = false
-	sfx.spring()
+	sfx.register()
 	sfx.pip()
 	Engine.set_meta("afterbell_sv01", true)
+	_toast("Souvenir pin SV-01 found")
+	var game := get_node_or_null("/root/Game")
+	if game:
+		game.set_flag("souvenir_sv01")
 	say("", "Souvenir pin SV-01: a tiny cream umbrella — the rooftop lunchroom's.", 3.0)
 
 
@@ -752,3 +757,10 @@ func _render_actors(dt: float) -> void:
 func _place_camera(delta: float) -> void:
 	var walls := Rect2(-HALF_W + 0.35, -HALF_D + 0.35, HALF_W * 2.0 - 0.7, HALF_D * 2.0 - 0.7)
 	ShoulderCam.place(camera, p_pos, Vector2(0, -1), delta, walls, 62.0)
+
+
+## A short line from the chapter shell (errand complete, item found); quiet without it.
+func _toast(text: String) -> void:
+	var game := get_node_or_null("/root/Game")
+	if game:
+		game.toast(text)

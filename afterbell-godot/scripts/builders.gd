@@ -796,6 +796,7 @@ class Sfx extends Node:
 		_player = AudioStreamPlayer.new()
 		_player.stream = gen
 		_player.volume_db = -6.0
+		_player.bus = _bus("Effects")
 		add_child(_player)
 		_player.play()
 		_playback = _player.get_stream_playback() as AudioStreamGeneratorPlayback
@@ -860,6 +861,34 @@ class Sfx extends Node:
 		if not play_file("spring"): tone(300, 0.35, 0.15, 0.0, 1200, "tri")
 	func pip() -> void:
 		if not play_file("pip"): tone(1568, 0.11, 0.15, 0.05); tone(2093, 0.16, 0.15, 0.2)
+	## Department chime: three soft bell notes for a completed errand.
+	func chime_errand() -> void:
+		if not play_file("chime_errand", -3.0): tone(1046, 0.6, 0.2, 0.0, -1, "tri"); tone(784, 0.6, 0.2, 0.28, -1, "tri"); tone(659, 0.9, 0.2, 0.56, -1, "tri")
+	## Cash register: drawer and bell, for rewards.
+	func register() -> void:
+		if not play_file("register", -2.0): noise(0.2, 0.15); tone(2093, 0.8, 0.15, 0.32)
+	## Examining or using something.
+	func interact() -> void:
+		if not play_file("interact", -8.0): tone(660, 0.08, 0.1)
+
+	# Footsteps follow Ren's actual travel: one per ~0.8 m, varied, quiet under dialogue.
+	var surface := "carpet"
+	var _walk := 0.0
+	var _last := Vector2.INF
+	func track(p: Vector2) -> void:
+		if _last == Vector2.INF or p.distance_to(_last) > 1.0:   # first frame, or a teleport
+			_last = p
+			return
+		_walk += p.distance_to(_last)
+		_last = p
+		if _walk > 0.8:
+			_walk = 0.0
+			if not play_file("step_%s_%d" % [surface, randi() % 4], -11.0):
+				noise(0.04, 0.04)
+
+	static func _bus(name: String) -> StringName:
+		return StringName(name) if AudioServer.get_bus_index(name) != -1 else &"Master"
+
 	func bell() -> void:
 		if play_file("bell"):
 			return
@@ -898,6 +927,7 @@ class Sfx extends Node:
 				player = _players[0]
 			else:
 				player = AudioStreamPlayer.new()
+				player.bus = _bus("Effects")
 				add_child(player)
 				_players.append(player)
 		player.stream = stream
@@ -910,9 +940,12 @@ class Sfx extends Node:
 	func ambience(name: String, volume_db := -12.0) -> bool:
 		var stream := _stream(name)
 		if stream == null:
+			stream = _stream("amb_store")   # the shared store room tone
+		if stream == null:
 			return false
 		if _ambience == null:
 			_ambience = AudioStreamPlayer.new()
+			_ambience.bus = _bus("Ambience")
 			add_child(_ambience)
 		if stream is AudioStreamOggVorbis:
 			stream.loop = true

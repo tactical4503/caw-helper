@@ -206,7 +206,17 @@ func _ready() -> void:
 		box.toggled.connect(func(on: bool) -> void: settings[key] = on)
 	reset_attempt(false)
 	_render(0.0)
-	# Arriving from the cosmetics room: skip the title card.
+	var game := get_node_or_null("/root/Game")
+	if game:   # one set of options for the whole chapter
+		for k in settings:
+			if game.settings.has(k):
+				settings[k] = game.settings[k]
+				if hud.options.has(k):
+					hud.options[k].button_pressed = settings[k]
+	# Arriving from the chapter (Alterations, Continue, a restart): skip the court's own title card.
+	if game and not Engine.has_meta("afterbell_testing"):
+		Engine.set_meta("afterbell_skip_title", true)
+		game.enter_room(game.COURT, "Menswear Court")
 	if Engine.has_meta("afterbell_skip_title"):
 		Engine.remove_meta("afterbell_skip_title")
 		_on_start.call_deferred()
@@ -357,7 +367,7 @@ func _process(delta: float) -> void:
 ## One fixed simulation tick. Public so headless tests can drive the fight deterministically.
 func step(dt: float) -> void:
 	_poll_input()
-	if was_pressed("pause"):
+	if was_pressed("pause") and get_node_or_null("/root/Game") == null:   # the chapter shell owns Esc
 		mode = "paused"
 		hud.title.visible = true
 		hud.start_button.text = "Resume"
@@ -375,12 +385,21 @@ func step(dt: float) -> void:
 		victory_t += dt
 		if victory_t > 15.0 and not reward_shown:
 			reward_shown = true
-			sfx.spring()
+			sfx.register()
 			sfx.pip()
 			mode = "end"
-			_show_end("Key item · Q-01", "Store Governor",
-				"A brass cylinder the length of Ren's palm, cream inspection sleeve, silver fork, Meridian Works mark. Mika takes it by the sleeve. — End of the greybox slice.",
-				"Replay")
+			var game := get_node_or_null("/root/Game")
+			if game and not Engine.has_meta("afterbell_testing"):
+				game.chapter_complete([
+					"The Floor Manager has stopped his closing procedure. Hesta is counting her people.",
+					"Key item Q-01, the Store Governor: a brass cylinder the length of Ren's palm, cream inspection sleeve, silver fork, a Meridian Works mark. Mika takes it by the sleeve.",
+					"Suit unlocked: Night Receipt. Ada's unfinished demonstration shell, black lacquer with a cream stripe, released to Mika's shop on Hesta's say-so.",
+				])
+			else:
+				_show_end("Key item · Q-01", "Store Governor",
+					"A brass cylinder the length of Ren's palm, cream inspection sleeve, silver fork, Meridian Works mark. Mika takes it by the sleeve.",
+					"Replay")
+	sfx.track(p_pos)
 
 
 func _show_end(eyebrow: String, title: String, body: String, button: String) -> void:

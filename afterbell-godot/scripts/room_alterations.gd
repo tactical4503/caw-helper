@@ -110,6 +110,9 @@ func _ready() -> void:
 	_build_hud()
 	say("MIKA", "Alterations. The atrium gate's on the east wall — and its crank has snapped.", 3.2)
 	_place_camera(1.0)
+	var game := get_node_or_null("/root/Game")
+	if game:
+		game.enter_room("res://rooms/alterations.tscn", "Alterations  ·  Receiving")
 
 
 # ---------------------------------------------------------------- building
@@ -328,12 +331,7 @@ func _person(at: Vector2, clothes: Color, skin: Color, cap: bool) -> void:
 func _build_hud() -> void:
 	var layer := CanvasLayer.new()
 	add_child(layer)
-	var title := B._label("DS-03 ALTERATIONS  ·  DS-04 RECEIVING  ·  demonstration build", 12, B.BRASS)
-	title.position = Vector2(16, 100)
-	layer.add_child(title)
-	var keys := B._label("WASD move  ·  E use / talk", 12, Color(B.IVORY, 0.7))
-	keys.position = Vector2(16, 118)
-	layer.add_child(keys)
+	# Controls live in the pause menu (Esc) and in context prompts; no development labels.
 	var bottom := VBoxContainer.new()
 	bottom.set_anchors_preset(Control.PRESET_BOTTOM_WIDE)
 	bottom.offset_top = -120
@@ -373,6 +371,7 @@ func step(dt: float) -> void:
 		_update_player(dt)
 	_update_world(dt)
 	dialogue.update(dt)
+	sfx.track(p_pos)
 
 
 func _update_player(dt: float) -> void:
@@ -512,6 +511,8 @@ func _update_crank(dt: float) -> void:
 		cranked_once = true
 		gate_open = true
 		sfx.spring()
+		sfx.chime_errand()
+		_toast("Errand complete  ·  the atrium gate is open")
 		gauge.set_objective("Reach the service bell")
 		say("MIKA", "There. The cable runs from here to the escalators — east, through the atrium.", 3.2)
 
@@ -575,3 +576,10 @@ func _place_camera(delta: float) -> void:
 	# Alterations (south) and receiving (north) each keep the camera inside their own walls.
 	var walls := Rect2(-4.65, -4.65, 9.3, 9.3) if p_pos.y > -5.0 else Rect2(-4.65, -12.65, 11.3, 7.25)
 	ShoulderCam.place(camera, p_pos, Vector2(0, -1), delta, walls, 62.0)
+
+
+## A short line from the chapter shell (errand complete, item found); quiet without it.
+func _toast(text: String) -> void:
+	var game := get_node_or_null("/root/Game")
+	if game:
+		game.toast(text)

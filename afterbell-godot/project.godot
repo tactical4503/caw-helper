@@ -5,9 +5,13 @@ config_version=5
 
 [application]
 
-config/name="AFTERBELL — Closing Time (greybox)"
-config/description="Installment 002 boss greybox: BS-01, the Floor Manager."
-run/main_scene="res://rooms/cosmetics.tscn"
+config/name="AFTERBELL — Closing Time"
+config/description="Chapter One of AFTERBELL: Bellwether's Department Store, from Cosmetics to the Floor Manager's court."
+run/main_scene="res://rooms/title.tscn"
+
+[autoload]
+
+Game="*res://scripts/game.gd"
 
 [display]
 
@@ -15,6 +19,10 @@ window/size/viewport_width=1280
 window/size/viewport_height=960
 window/stretch/mode="canvas_items"
 window/stretch/aspect="keep"
+
+[gui]
+
+theme/custom_font="res://assets/fonts/LiberationSerif-Regular.ttf"
 
 [rendering]
 
