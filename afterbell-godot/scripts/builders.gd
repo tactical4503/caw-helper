@@ -373,12 +373,12 @@ static func build_rack(index: int) -> Rack:
 	var r := Rack.new()
 	r.node = Node3D.new()
 	var frame := ST.textured("metal_charcoal", 2.0, mat(Color("2b2b2e"), 0.4, 0.7), 0.6)
-	for z in [-0.8, 0.8]:
-		put(box(0.05, 1.6, 0.05), frame, Vector3(0, 0.85, z), r.node)
-		put(box(0.6, 0.05, 0.05), frame, Vector3(0, 0.08, z), r.node)
-		for x in [-0.27, 0.27]:
-			put(sphere(0.05, 8), mat(BLACK, 0.6), Vector3(x, 0.05, z), r.node)
-	put(box(0.05, 0.05, 1.7), frame, Vector3(0, 1.65, 0), r.node)
+	# Charcoal tube frame on bolted fittings and swivel casters, the store racks' construction.
+	var tubes := Node3D.new()
+	tubes.rotation.y = PI / 2.0   # rail along z
+	r.node.add_child(tubes)
+	Atrium.Props.rack_frame(tubes, 1.6, 1.65, 0.6, frame, mat(Color("1f1f22"), 0.35, 0.8))
+	Atrium.merge(tubes)
 	r.cloth = Node3D.new()
 	r.cloth.position.y = 1.62
 	r.node.add_child(r.cloth)

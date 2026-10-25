@@ -156,7 +156,7 @@ static func _mezzanine(a: Node3D) -> void:
 		rack(a, Vector3(x, level, -23.4), 0.0)
 	for x in [-5.3, 5.3]:
 		palm(a, Vector3(x, level, -25.1))
-	Props.counter(a, Vector3(0, level, -21.5), Vector3(2.4, Props.WAIST, 0.8))
+	Props.counter(a, Vector3(0, level, -21.5), Vector3(2.4, Props.WAIST, 0.8), "cream", 0.08, Vector3(0, 0, -1))
 
 
 ## A balcony edge with real depth: a cornice lip, two brass bands, a cream frieze with brass

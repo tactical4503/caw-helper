@@ -184,24 +184,14 @@ func _build_rooms() -> void:
 	add_child(socket_disc)
 	B.put(B.cyl(0.18, 0.18, 0.04), B.mat(B.BLACK, 0.3), Vector3.ZERO, socket_disc).rotation.z = PI / 2.0
 	B.put(B.box(0.05, 0.05, 0.3), B.brass(), Vector3(-0.02, 0, 0), socket_disc)            # the broad slot
-	# Fitting platform with chalk dust; triple mirror.
-	var dais := StandardMaterial3D.new()   # waxed, not lacquered: no mirror highlights on the fitting platform
-	dais.albedo_color = Color("6e4326")
-	dais.roughness = 0.55
-	B.put(B.cyl(0.9, 0.95, 0.22), dais, Vector3(-2.6, 0.11, 1.6), self)
-	solids.append([Vector2(-2.6, 1.6), 0.95])
-	var chalk := StandardMaterial3D.new()   # faint, matte chalk dust
-	chalk.albedo_color = Color(0.93, 0.9, 0.85, 0.45)
-	chalk.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
-	chalk.roughness = 1.0
-	for d in [[Vector2(-2.4, 1.4), 0.22], [Vector2(-2.9, 1.9), 0.15], [Vector2(-2.2, 1.95), 0.1]]:
-		var dust := B.put(B.cyl(d[1], d[1], 0.005), chalk, Vector3(d[0].x, 0.225, d[0].y), self, false)
-		dust.scale = Vector3(1.0, 1.0, 0.6)
+	# The cutting table, work laid out on it; triple mirror.
+	Props.cutting_table(self, Vector3(-2.6, 0, 1.6))
+	solids.append([Vector2(-2.6, 1.6), 0.9])
 	for k in 3:
 		var m := B.put(B.box(0.04, 1.6, 0.6), ST.plastic(Color("c8d8e0"), 0.02, 0.9), Vector3(-4.85, 0.95, 0.9 + k * 0.62), self)
 		m.rotation.y = (k - 1) * 0.25
 	# Sewing counter, pincushion in a saucer, a fan that turns its head but doesn't spin.
-	Props.counter(self, Vector3(-4.5, 0, -2.2), Vector3(0.8, Props.WAIST, 2.6), "walnut")
+	Props.counter(self, Vector3(-4.5, 0, -2.2), Vector3(0.8, Props.WAIST, 2.6), "walnut", 0.08, Vector3(1, 0, 0))   # notions drawers face the room
 	solids.append(Rect2(Vector2(-4.9, -3.5), Vector2(0.8, 2.6)))
 	B.put(B.cyl(0.1, 0.08, 0.02), B.mat(B.CREAM, 0.3), Vector3(-4.5, 1.0, -1.4), self)
 	B.put(B.sphere(0.07), B.mat(B.RED, 0.6), Vector3(-4.5, 1.06, -1.4), self)
@@ -260,7 +250,7 @@ func _build_rooms() -> void:
 	load_sign.position = Vector3(-4.9, 3.15, -9.0)
 	add_child(load_sign)
 	# Biscuit table: red tins with cream sleeves, and the water jug.
-	Props.counter(self, Vector3(0.6, 0, -11.9), Vector3(1.4, Props.WAIST, 0.7), "walnut")
+	Props.counter(self, Vector3(0.6, 0, -11.9), Vector3(1.4, Props.WAIST, 0.7), "walnut", 0.08, Vector3(0, 0, 1))
 	solids.append(Rect2(Vector2(-0.1, -12.25), Vector2(1.4, 0.7)))
 	for i in 3:
 		B.put(B.cyl(0.07, 0.07, 0.1), B.mat(B.RED, 0.3), Vector3(0.2 + i * 0.18, Props.WAIST + 0.05, -11.9), self)

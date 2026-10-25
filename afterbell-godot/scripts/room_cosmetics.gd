@@ -253,11 +253,12 @@ func _build_room() -> void:
 	# Two horseshoe counters, one each side of the central aisle.
 	for s in [-1.0, 1.0]:
 		var cx: float = s * 4.6
-		for part in [[Vector3(cx, 0.5, -2.3), Vector3(3.4, 1.0, 0.7)], [Vector3(cx, 0.5, 0.6), Vector3(3.4, 1.0, 0.7)],
-				[Vector3(cx + s * 1.35, 0.5, -0.85), Vector3(0.7, 1.0, 2.2)]]:
+		# Each run's staff side faces into the horseshoe, where the attendant works.
+		for part in [[Vector3(cx, 0.5, -2.3), Vector3(3.4, 1.0, 0.7), Vector3(0, 0, 1)], [Vector3(cx, 0.5, 0.6), Vector3(3.4, 1.0, 0.7), Vector3(0, 0, -1)],
+				[Vector3(cx + s * 1.35, 0.5, -0.85), Vector3(0.7, 1.0, 2.2), Vector3(-s, 0, 0)]]:
 			var pos: Vector3 = part[0]
 			var size: Vector3 = part[1]
-			Props.counter(self, Vector3(pos.x, 0, pos.z), size)   # plinth, plum base, brass trim, rounded top
+			Props.counter(self, Vector3(pos.x, 0, pos.z), size, "cream", 0.08, part[2])   # panelled outside, drawers and stock shelf inside
 			var glass := StandardMaterial3D.new()
 			glass.albedo_color = Color(0.85, 0.95, 0.92, 0.25)
 			glass.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA

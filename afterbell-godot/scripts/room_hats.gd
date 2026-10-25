@@ -219,12 +219,8 @@ func _build_room() -> void:
 	add_child(rack)
 	# Hat trees interrupt sightlines without hiding enemies.
 	for t in [Vector2(-2.4, 2.4), Vector2(1.6, 1.0), Vector2(-1.2, 6.2), Vector2(2.6, 6.8)]:
+		Props.hat_stand(self, Vector3(t.x, 0, t.y), trees.size())   # walnut bentwood stand, brass hooks, four different hats
 		trees.append(t)
-		B.put(B.cyl(0.025, 0.025, 1.7), B.brass(), Vector3(t.x, 0.85, t.y), self)
-		B.put(B.cyl(0.25, 0.28, 0.05), B.mat(B.BLACK, 0.3), Vector3(t.x, 0.03, t.y), self)
-		for k in 3:
-			var a := k * TAU / 3.0
-			_hat(Vector3(t.x + cos(a) * 0.18, 1.45 + k * 0.12, t.y + sin(a) * 0.18), [B.PLUM, B.RED, B.CREAM][k])
 	# Dressing along the walls, clear of the guards' posts, the hat trees and the rack's run.
 	for p in [["rack", Vector3(-4.3, 0, 3.4), PI / 2.0, 1], ["rack", Vector3(4.3, 0, -6.6), PI / 2.0, 0],
 			["mannequin", Vector3(-4.3, 0, 8.3), 0.6, 0], ["mannequin", Vector3(4.3, 0, 8.3), -0.6, 1],
@@ -251,11 +247,6 @@ func _build_room() -> void:
 	Finish.shelf(fin, Vector3(-3.2, 0, -HALF_D), Vector3(0, 0, 1), 1.4, 1.45, "hats")
 	Finish.ceiling_beams(fin, Rect2(-HALF_W, -HALF_D, HALF_W * 2.0, HALF_D * 2.0), top, true, [-8.3, -4.8, -0.8, 3.5, 7.7])
 	Finish.done(fin)
-
-
-func _hat(at: Vector3, color: Color) -> void:
-	B.put(B.cyl(0.15, 0.17, 0.02), ST.plastic(color, 0.4, 0.0), at, self)
-	B.put(B.cyl(0.09, 0.1, 0.1), ST.plastic(color, 0.4, 0.0), at + Vector3(0, 0.06, 0), self)
 
 
 func _make_guard(at: Vector2, state: String) -> Guard:

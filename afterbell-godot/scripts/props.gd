@@ -163,14 +163,7 @@ static func _build(kind: String, v: int) -> Node3D:
 
 static func _rack(n: Node3D, v: int) -> void:
 	var len := 1.7
-	for s in [-1.0, 1.0]:
-		_put(_cyl(0.022, 0.022, 1.62, 8), _m("brass"), Vector3(s * len * 0.5, 0.83, 0), n)
-		_put(_box(0.05, 0.035, 0.56), _m("brass"), Vector3(s * len * 0.5, 0.02, 0), n)
-		for z in [-0.26, 0.26]:
-			_put(_sphere(0.03, 8), _m("rubber"), Vector3(s * len * 0.5, 0.03, z), n)
-		_put(_sphere(0.035, 10), _m("brass"), Vector3(s * len * 0.5, 1.66, 0), n)
-	var rail := _put(_cyl(0.024, 0.024, len + 0.04, 10), _m("brass"), Vector3(0, 1.62, 0), n)
-	rail.rotation.z = PI / 2.0
+	rack_frame(n, len, 1.62, 0.56)
 	# Sorted into colour blocks of three, evenly spaced and hung square.
 	var blocks := ["suit_navy", "suit_charcoal", "suit_brown"] if v == 0 else ["dress_cream", "dress_rose", "plum"]
 	var count := 9
@@ -243,10 +236,7 @@ static func _mannequin(n: Node3D, v: int) -> void:
 static func _perfume_counter(n: Node3D, v: int) -> void:
 	var w := 1.7
 	var d := 0.62
-	counter(n, Vector3.ZERO, Vector3(w, WAIST, d), "plum" if v % 2 else "cream")
-	for s in [-1.0, 1.0]:   # inset panels on the cabinet front
-		_put(_box(w * 0.4, 0.26, 0.012), _m("plum"), Vector3(s * w * 0.23, 0.68, d * 0.5 - 0.005), n)
-		_put(_box(w * 0.4 + 0.03, 0.015, 0.016), _m("brass"), Vector3(s * w * 0.23, 0.825, d * 0.5 - 0.003), n)
+	counter(n, Vector3.ZERO, Vector3(w, WAIST, d), "plum" if v % 2 else "cream", 0.08, Vector3(0, 0, -1), false)   # panelled front, drawers behind
 	_perfume_boxes(n, Vector3(0, WAIST, 0), Vector2(w - 0.25, d - 0.18), v)
 
 
@@ -456,7 +446,13 @@ static func _hanging_sign(n: Node3D) -> void:
 ## band, a cream cabinet, a brass trim line and an overhanging countertop with a softened edge.
 ## Every layer has rounded corners. `at` is the floor centre; size is (width, height, depth).
 ## `top` picks the countertop: "cream" (stone), "walnut" or "plum".
-static func counter(parent: Node3D, at: Vector3, size: Vector3, top := "cream", r := 0.08) -> Node3D:
+## A shop counter about Ren's belt height: recessed toe plinth, plum base, brass bands, a
+## panelled cream cabinet and an 8 cm top with a softened edge, lifted off the cabinet on a dark
+## reveal so it reads as a separate slab. Every face but `service` carries framed, recessed
+## panels with brass beading. `service` (a local axis: ±x or ±z; zero for none) is the staff
+## side: drawers with brass pulls over cupboard doors, and on long runs an open stock shelf.
+## `merge` bakes the parts together; pass false when the caller bakes the counter itself.
+static func counter(parent: Node3D, at: Vector3, size: Vector3, top := "cream", r := 0.08, service := Vector3.ZERO, merge := true) -> Node3D:
 	var c := Node3D.new()
 	c.position = at
 	parent.add_child(c)
@@ -468,10 +464,341 @@ static func counter(parent: Node3D, at: Vector3, size: Vector3, top := "cream", 
 	_put(rounded_block(w + 0.02, 0.04, d + 0.02, r + 0.01), _m("brass"), Vector3(0, 0.44, 0), c)
 	_put(rounded_block(w - 0.02, h - 0.6, d - 0.02, r), _m("cream"), Vector3(0, 0.48, 0), c)
 	_put(rounded_block(w + 0.03, 0.035, d + 0.03, r + 0.015), _m("brass"), Vector3(0, h - 0.125, 0), c)
-	contact_shadow(c, Vector2(w + 0.45, d + 0.45))
+	_put(rounded_block(w + 0.04, 0.014, d + 0.04, r + 0.02), _m("walnut_dark"), Vector3(0, h - 0.094, 0), c)
 	var tops := {"cream": "counter_top", "walnut": "walnut", "plum": "plum"}
-	_put(rounded_block(w + 0.1, 0.09, d + 0.1, r + 0.05, 0.025), _m(tops[top]), Vector3(0, h - 0.09, 0), c)
+	_put(rounded_block(w + 0.1, 0.08, d + 0.1, r + 0.05, 0.03), _m(tops[top]), Vector3(0, h - 0.08, 0), c)
+	for face in [Vector3(0, 0, 1), Vector3(0, 0, -1), Vector3(1, 0, 0), Vector3(-1, 0, 0)]:
+		var along: float = (d if face.x != 0.0 else w) - 0.02 - 2.0 * r   # the flat run between the rounded corners
+		if along < 0.3:
+			continue
+		var f := Node3D.new()
+		f.position = face * (((w if face.x != 0.0 else d) - 0.02) * 0.5)   # on the cabinet face, +z outward
+		f.basis = Basis(Vector3.UP, atan2(face.x, face.z))
+		c.add_child(f)
+		if face.is_equal_approx(service):
+			_service_face(f, along, h)
+		else:
+			_panelled_face(f, along, h)
+	contact_shadow(c, Vector2(w + 0.45, d + 0.45))
+	if merge:
+		Atrium_merge(c)
 	return c
+
+
+## Rails and stiles standing 12 mm proud of the cabinet, so each field reads as recessed behind
+## them, with a brass bead inside every opening. Face-local: x along the face, +z outward.
+static func _panelled_face(f: Node3D, along: float, h: float) -> void:
+	var y0 := 0.48
+	var y1 := h - 0.12
+	var stile := 0.05
+	var n := maxi(1, roundi(along / 0.7))
+	var pw := (along - stile * (n + 1)) / n
+	for y in [y0 + stile * 0.5, y1 - stile * 0.5]:
+		_put(_box(along, stile, 0.024), _m("cream"), Vector3(0, y, 0), f)
+	for i in n + 1:
+		_put(_box(stile, y1 - y0 - stile * 2.0, 0.024), _m("cream"), Vector3(-along * 0.5 + stile * 0.5 + i * (pw + stile), (y0 + y1) * 0.5, 0), f)
+	for i in n:
+		_bead(f, Vector3(-along * 0.5 + stile + pw * 0.5 + i * (pw + stile), (y0 + y1) * 0.5, 0.004), Vector2(pw - 0.03, y1 - y0 - stile * 2.0 - 0.03))
+
+
+## A thin brass bead framing a rectangle `size` centred on `at` (face-local).
+static func _bead(f: Node3D, at: Vector3, size: Vector2) -> void:
+	for s in [-1.0, 1.0]:
+		_put(_box(size.x + 0.012, 0.012, 0.01), _m("brass"), at + Vector3(0, s * size.y * 0.5, 0), f)
+		_put(_box(0.012, size.y, 0.01), _m("brass"), at + Vector3(s * size.x * 0.5, 0, 0), f)
+
+
+## The staff side: bays of two drawers over a cupboard door, with an open stock shelf in the
+## middle bay of a long run.
+static func _service_face(f: Node3D, along: float, h: float) -> void:
+	var n := maxi(1, roundi(along / 0.55))
+	var bay := along / n
+	var open_bay := n / 2 if n >= 3 else -1
+	for i in n:
+		var cx := -along * 0.5 + bay * (i + 0.5)
+		if i == open_bay:
+			_stock_shelf(f, cx, bay - 0.05, h)
+			continue
+		var y0 := 0.5
+		var dh := (h - 0.14 - y0 - 0.02) * 0.5
+		for k in 2:
+			_front(f, Vector3(cx, y0 + dh * 0.5 + k * (dh + 0.02), 0), Vector2(bay - 0.05, dh), "cream", true)
+		_front(f, Vector3(cx, 0.27, 0.01), Vector2(bay - 0.05, 0.28), "plum", false)   # on the plum base, 1 cm further out
+
+
+## A drawer or door front over a dark shadow gap. Drawers get a brass bar pull; doors a knob
+## and escutcheon near the meeting edge.
+static func _front(f: Node3D, at: Vector3, size: Vector2, mat: String, drawer: bool) -> void:
+	_put(_box(size.x + 0.012, size.y + 0.012, 0.006), _m("walnut_dark"), at + Vector3(0, 0, 0.002), f)
+	_put(_box(size.x, size.y, 0.018), _m(mat), at + Vector3(0, 0, 0.009), f)
+	if drawer:
+		var length := minf(0.16, size.x * 0.4)
+		var bar := _put(_cyl(0.007, 0.007, length, 8), _m("brass"), at + Vector3(0, 0, 0.034), f)
+		bar.rotation.z = PI / 2.0
+		for s in [-1.0, 1.0]:
+			var post := _put(_cyl(0.005, 0.006, 0.016, 6), _m("brass"), at + Vector3(s * length * 0.4, 0, 0.026), f)
+			post.rotation.x = PI / 2.0
+	else:
+		var knob := at + Vector3(size.x * 0.36, size.y * 0.2, 0)
+		var plate := _put(_box(0.03, 0.06, 0.004), _m("brass"), knob + Vector3(0, 0, 0.02), f)
+		plate.position.y -= 0.01
+		_put(_sphere(0.014, 8), _m("brass"), knob + Vector3(0, 0, 0.032), f)
+
+
+## An open bay on the staff side: shadowed interior, two walnut shelves, brass-beaded opening,
+## and the stock a counter keeps under it (cartons, tissue, a ledger).
+static func _stock_shelf(f: Node3D, cx: float, w: float, h: float) -> void:
+	var y0 := 0.13
+	var y1 := h - 0.14
+	var mid := (y0 + y1) * 0.5
+	_put(_box(w, y1 - y0, 0.004), _m("walnut_dark"), Vector3(cx, mid, 0.013), f)
+	_bead(f, Vector3(cx, mid, 0.017), Vector2(w, y1 - y0))
+	for y in [y0, mid]:
+		_put(_box(w - 0.02, 0.02, 0.05), _m("walnut"), Vector3(cx, y + 0.01, 0.03), f)
+	for k in 2:   # cartons on the lower shelf
+		_put(_box(w * 0.36, 0.16, 0.036), _m("carton"), Vector3(cx - w * 0.22 + k * w * 0.42, y0 + 0.1, 0.034), f)
+	for k in 3:   # folded tissue, then the ledger on top
+		_put(_box(w * 0.4, 0.022, 0.04), _m("shirt"), Vector3(cx - w * 0.2, mid + 0.031 + k * 0.024, 0.034), f)
+	_put(_box(w * 0.34, 0.2, 0.034), _m("walnut_dark"), Vector3(cx + w * 0.24, mid + 0.12, 0.035), f)
+	_put(_box(w * 0.34, 0.03, 0.036), _m("brass"), Vector3(cx + w * 0.24, mid + 0.16, 0.035), f)   # the ledger's label band
+
+
+## A tube between two points.
+static func _tube(parent: Node3D, a: Vector3, b: Vector3, r: float, mat: Material, segments := 10) -> MeshInstance3D:
+	var t := _put(_cyl(r, r, a.distance_to(b), segments), mat, (a + b) * 0.5, parent)
+	t.basis = _aim_y(b - a)
+	return t
+
+
+## A hex bolt head at `at`, its shank pointing back along -`dir`.
+static func _bolt(parent: Node3D, at: Vector3, dir: Vector3, mat: Material) -> void:
+	var b := _put(_cyl(0.008, 0.008, 0.008, 6), mat, at + dir * 0.004, parent)
+	b.basis = _aim_y(dir)
+
+
+## A swivel caster standing on the floor at `at`: top plate, fork, rubber wheel, axle.
+static func _caster(parent: Node3D, at: Vector3, mat: Material, plate_y: float) -> void:
+	_put(_box(0.05, 0.008, 0.05), mat, at + Vector3(0, plate_y, 0), parent)
+	_put(_cyl(0.008, 0.008, plate_y - 0.04, 6), mat, at + Vector3(0, (plate_y + 0.04) * 0.5, 0), parent)   # swivel stem
+	for s in [-1.0, 1.0]:
+		_put(_box(0.005, 0.04, 0.034), mat, at + Vector3(s * 0.014, 0.034, 0), parent)
+	var wheel := _put(_cyl(0.025, 0.025, 0.018, 14), _m("rubber"), at + Vector3(0, 0.026, 0), parent)
+	wheel.rotation.z = PI / 2.0
+	var axle := _put(_cyl(0.006, 0.006, 0.036, 6), mat, at + Vector3(0, 0.026, 0), parent)
+	axle.rotation.z = PI / 2.0
+
+
+## A garment-rail frame put together the way real ones are: tube uprights socketed into
+## bolted T-fittings on caster feet, ball elbows at the top, a lower stretcher on tees, and a
+## height collar with a thumb screw on each upright. Rail along x, uprights `length` apart,
+## rail centre at `rail_y`, feet `foot` deep.
+static func rack_frame(parent: Node3D, length: float, rail_y: float, foot := 0.56, tube: Material = null, fitting: Material = null) -> void:
+	var t: Material = tube if tube else _m("brass")
+	var j: Material = fitting if fitting else _m("steel_dark")
+	var fy := 0.085                     # foot tube centre
+	var low := 0.27                     # stretcher height
+	for s in [-1.0, 1.0]:
+		var x: float = s * length * 0.5
+		_tube(parent, Vector3(x, fy, -foot * 0.5), Vector3(x, fy, foot * 0.5), 0.016, t)
+		for e in [-1.0, 1.0]:
+			var cap := _put(_cyl(0.019, 0.019, 0.02, 10), _m("rubber"), Vector3(x, fy, e * (foot * 0.5 + 0.008)), parent)
+			cap.rotation.x = PI / 2.0
+			_caster(parent, Vector3(x, 0, e * (foot * 0.5 - 0.05)), j, fy - 0.02)
+		# T-fitting where the upright sockets into the foot, bolted through from the outside.
+		_tube(parent, Vector3(x, fy, -0.055), Vector3(x, fy, 0.055), 0.024, j, 12)
+		_tube(parent, Vector3(x, fy, 0), Vector3(x, fy + 0.09, 0), 0.024, j, 12)
+		_bolt(parent, Vector3(x + s * 0.024, fy + 0.055, 0), Vector3(s, 0, 0), j)
+		_tube(parent, Vector3(x, fy, 0), Vector3(x, rail_y, 0), 0.016, t)
+		# Tee for the stretcher.
+		_tube(parent, Vector3(x, low - 0.035, 0), Vector3(x, low + 0.035, 0), 0.023, j, 12)
+		_tube(parent, Vector3(x, low, 0), Vector3(x - s * 0.055, low, 0), 0.021, j, 12)
+		# Height collar with its thumb screw.
+		_tube(parent, Vector3(x, 0.93, 0), Vector3(x, 0.99, 0), 0.022, j, 12)
+		_tube(parent, Vector3(x + s * 0.02, 0.96, 0), Vector3(x + s * 0.046, 0.96, 0), 0.005, j, 6)
+		_put(_sphere(0.014, 8), j, Vector3(x + s * 0.052, 0.96, 0), parent).scale = Vector3(0.6, 1.0, 1.0)
+		# Ball elbow, collared on both legs, bolted.
+		_put(_sphere(0.028, 12), j, Vector3(x, rail_y, 0), parent)
+		_tube(parent, Vector3(x, rail_y - 0.065, 0), Vector3(x, rail_y, 0), 0.022, j, 12)
+		_tube(parent, Vector3(x, rail_y, 0), Vector3(x - s * 0.065, rail_y, 0), 0.022, j, 12)
+		_bolt(parent, Vector3(x, rail_y - 0.04, 0.022), Vector3(0, 0, 1), j)
+	_tube(parent, Vector3(-length * 0.5, rail_y, 0), Vector3(length * 0.5, rail_y, 0), 0.017, t, 12)
+	_tube(parent, Vector3(-length * 0.5, low, 0), Vector3(length * 0.5, low, 0), 0.013, t)
+
+
+## A bentwood hat stand to just under Ren's height (finial at 1.8 m): four splayed walnut legs
+## in brass shoes, a turned pole with beads, two tiers of brass hooks that curl up to a ball,
+## and four hats hung on them. `variant` (0-3) picks the hats.
+static func hat_stand(parent: Node3D, at: Vector3, variant := 0) -> Node3D:
+	var n := Node3D.new()
+	n.name = "HatStand"
+	n.position = at
+	parent.add_child(n)
+	var wood := _m("walnut")
+	for k in 4:
+		var a := TAU * k / 4.0 + PI / 4.0
+		var out := Vector3(cos(a), 0, sin(a))
+		var foot := out * 0.31 + Vector3(0, 0.026, 0)
+		_tube(n, Vector3(0, 0.38, 0) + out * 0.035, foot, 0.024, wood, 8)
+		_put(_sphere(0.028, 8), _m("brass"), foot, n).scale = Vector3(1, 0.9, 1)   # brass shoe
+	_put(_cyl(0.045, 0.055, 0.14, 14), wood, Vector3(0, 0.38, 0), n)     # leg collar
+	_put(_cyl(0.022, 0.027, 1.3, 12), wood, Vector3(0, 1.13, 0), n)      # shaft
+	for y in [0.52, 1.06]:
+		_put(_sphere(0.036, 12), wood, Vector3(0, y, 0), n).scale = Vector3(1, 0.55, 1)   # turned beads
+	_put(_cyl(0.026, 0.03, 0.05, 12), wood, Vector3(0, 1.77, 0), n)
+	_put(_sphere(0.04, 14), wood, Vector3(0, 1.82, 0), n)                # finial
+	var hats: Array = [[["fedora", "hat", "plum"], ["cloche", "plum", "dress_cream"], ["boater", "straw", "suit_navy"], ["bowler", "shoe", "rubber"]],
+			[["bowler", "shoe", "plum"], ["boater", "straw", "plum"], ["fedora", "suit_brown", "shoe"], ["cloche", "dress_rose", "plum"]],
+			[["cloche", "dress_cream", "plum"], ["fedora", "suit_charcoal", "shoe"], ["bowler", "suit_brown", "shoe"], ["boater", "straw", "sale_red"]],
+			[["boater", "straw", "suit_navy"], ["bowler", "shoe", "rubber"], ["cloche", "dress_sage", "dress_cream"], ["fedora", "suit_navy", "plum"]]][variant % 4]
+	for tier in 2:
+		var y := 1.64 if tier == 0 else 1.36
+		_put(_cyl(0.032, 0.032, 0.05, 12), _m("brass"), Vector3(0, y, 0), n)   # hook boss
+		for k in 3:
+			var a := TAU * k / 3.0 + (0.0 if tier == 0 else PI / 3.0) + variant * 0.4
+			var tip := _hook(n, y, a, 0.15 if tier == 0 else 0.11)
+			if tier == 0 or k == 0:
+				var out := Vector3(cos(a), 0, sin(a))
+				var hat := Node3D.new()
+				hat.position = tip + out * 0.06 + Vector3(0, 0.03, 0)
+				hat.basis = _aim_y(Vector3.UP + out * 0.45)   # hangs tipped outward off the hook
+				n.add_child(hat)
+				var spec: Array = hats[k if tier == 0 else 3]
+				_hat(hat, spec[0], _m(spec[1]), _m(spec[2]))
+	contact_shadow(n, Vector2(0.75, 0.75))
+	Atrium_merge(n)
+	return n
+
+
+## One brass hook out of the pole at height `y`, bearing `a`: a stem rising outward, curling up
+## to a ball. Returns where a hat's crown rests.
+static func _hook(n: Node3D, y: float, a: float, length: float) -> Vector3:
+	var out := Vector3(cos(a), 0, sin(a))
+	var base := Vector3(0, y, 0) + out * 0.028
+	var tip := base + (out * 0.82 + Vector3.UP * 0.57).normalized() * length
+	_tube(n, base, tip, 0.008, _m("brass"), 8)
+	_tube(n, tip, tip + Vector3(0, 0.03, 0) + out * 0.006, 0.007, _m("brass"), 8)
+	_put(_sphere(0.012, 8), _m("brass"), tip + Vector3(0, 0.034, 0) + out * 0.006, n)
+	return tip
+
+
+## A hat with its crown top at the origin, hanging down local -y: fedora, cloche, boater or
+## bowler, in `felt` with a `band`.
+static func _hat(n: Node3D, kind: String, felt: Material, band: Material) -> void:
+	match kind:
+		"fedora":   # tapered, pinched crown, ribbon band, broad snap brim
+			_put(_cyl(0.078, 0.098, 0.11, 18), felt, Vector3(0, -0.055, 0), n).scale = Vector3(1, 1, 0.84)
+			_put(_box(0.1, 0.016, 0.03), felt, Vector3(0, 0.0, 0), n)                   # the crease along the top
+			for s in [-1.0, 1.0]:
+				_put(_sphere(0.022, 8), felt, Vector3(0.03, -0.012, s * 0.05), n).scale = Vector3(1.4, 0.6, 0.6)   # front pinch
+			_put(_cyl(0.1, 0.1, 0.026, 18), band, Vector3(0, -0.092, 0), n).scale = Vector3(1, 1, 0.85)
+			var brim := _put(_cyl(0.16, 0.16, 0.012, 24), felt, Vector3(0, -0.106, 0), n)
+			brim.scale = Vector3(1, 1, 0.88)
+			brim.rotation.z = 0.06
+		"cloche":   # deep bell crown, short brim turned down, flower pin
+			_put(_sphere(0.104, 18), felt, Vector3(0, -0.08, 0), n).scale = Vector3(1, 0.85, 1)
+			_put(_cyl(0.106, 0.128, 0.04, 20), felt, Vector3(0, -0.13, 0), n)
+			_put(_cyl(0.107, 0.107, 0.022, 20), band, Vector3(0, -0.1, 0), n)
+			_put(_sphere(0.024, 8), band, Vector3(0.09, -0.09, 0.05), n)
+		"boater":   # straw: flat top, straight sides, wide flat brim, ribbon
+			_put(_cyl(0.09, 0.092, 0.075, 20), felt, Vector3(0, -0.0375, 0), n)
+			_put(_cyl(0.094, 0.094, 0.032, 20), band, Vector3(0, -0.058, 0), n)
+			_put(_cyl(0.17, 0.17, 0.01, 28), felt, Vector3(0, -0.078, 0), n)
+		"bowler":   # rounded dome, narrow curled brim
+			_put(_sphere(0.096, 18), felt, Vector3(0, -0.052, 0), n).scale = Vector3(1, 0.55, 1)
+			_put(_cyl(0.096, 0.1, 0.06, 18), felt, Vector3(0, -0.082, 0), n)
+			_put(_cyl(0.101, 0.101, 0.018, 18), band, Vector3(0, -0.1, 0), n)
+			_put(_cyl(0.135, 0.135, 0.01, 24), felt, Vector3(0, -0.114, 0), n)
+			_put(_cyl(0.138, 0.138, 0.02, 24), felt, Vector3(0, -0.108, 0), n)   # the rolled edge
+
+
+## The tailor's cutting table: an oval walnut top with a moulded edge on a turned pedestal and
+## four splayed feet, set with the work in progress: a bolt of cloth half unrolled under a paper
+## pattern, shears, a tape measure, a tomato pincushion stuck with pins, tailor's chalk and
+## spools of thread. Top at 0.9 m, a hand's width under Ren's belt.
+static func cutting_table(parent: Node3D, at: Vector3) -> Node3D:
+	var n := Node3D.new()
+	n.name = "CuttingTable"
+	n.position = at
+	parent.add_child(n)
+	var top_y := 0.9
+	var oval := Vector3(1, 1, 0.72)
+	_put(_cyl(0.9, 0.9, 0.045, 48), _m("walnut"), Vector3(0, top_y - 0.0225, 0), n).scale = oval
+	_put(_cyl(0.9, 0.87, 0.02, 48), _m("walnut_dark"), Vector3(0, top_y - 0.055, 0), n).scale = oval   # moulded under-edge
+	_put(_cyl(0.78, 0.78, 0.08, 40), _m("walnut_dark"), Vector3(0, top_y - 0.1, 0), n).scale = oval    # apron
+	_put(_cyl(0.79, 0.79, 0.014, 40), _m("brass"), Vector3(0, top_y - 0.14, 0), n).scale = oval        # brass bead under the apron
+	# Pedestal: a block under the top, the turned column with beads, the foot hub.
+	_put(_cyl(0.16, 0.14, 0.06, 16), _m("walnut_dark"), Vector3(0, top_y - 0.17, 0), n)
+	_put(_cyl(0.075, 0.1, 0.56, 16), _m("walnut"), Vector3(0, 0.44, 0), n)
+	for y in [0.3, 0.62]:
+		_put(_sphere(0.11, 16), _m("walnut"), Vector3(0, y, 0), n).scale = Vector3(1, 0.4, 1)
+	_put(_cyl(0.13, 0.15, 0.1, 16), _m("walnut_dark"), Vector3(0, 0.16, 0), n)
+	for k in 4:   # splayed feet along the long and short axes, brass toe caps
+		var a := TAU * k / 4.0
+		var out := Vector3(cos(a), 0, sin(a))
+		var reach := 0.62 if k % 2 == 0 else 0.46
+		var toe := out * reach + Vector3(0, 0.035, 0)
+		var leg := _tube(n, out * 0.1 + Vector3(0, 0.17, 0), toe, 0.04, _m("walnut"), 10)
+		leg.scale = Vector3(1, 1, 0.7)
+		var cap := _put(_cyl(0.034, 0.034, 0.06, 12), _m("brass"), toe + out * 0.01, n)
+		cap.basis = _aim_y(out)
+	contact_shadow(n, Vector2(1.9, 1.4))
+	var y := top_y
+	# A bolt of plum wool, half unrolled toward the front, a paper pattern pinned on the cloth.
+	var bolt := _put(_cyl(0.06, 0.06, 0.62, 16), _m("plum"), Vector3(-0.2, y + 0.06, -0.3), n)
+	bolt.rotation.z = PI / 2.0
+	_put(_box(0.62, 0.004, 0.42), _m("plum"), Vector3(-0.2, y + 0.002, -0.06), n)
+	var pattern := _put(_box(0.3, 0.003, 0.24), _m("pattern"), Vector3(-0.24, y + 0.006, -0.04), n)
+	pattern.rotation.y = 0.18
+	for p in [Vector3(-0.36, 0, -0.12), Vector3(-0.12, 0, 0.06), Vector3(-0.1, 0, -0.14)]:
+		_put(_sphere(0.006, 6), _m("sale_red"), p + Vector3(0, y + 0.012, 0), n)   # pin heads holding the pattern
+	# Tailor's shears, open a little, beside the cloth.
+	var shears := Node3D.new()
+	shears.position = Vector3(0.28, y + 0.008, 0.1)
+	shears.rotation.y = 0.5
+	n.add_child(shears)
+	for s in [-1.0, 1.0]:
+		var half := Node3D.new()
+		half.rotation.y = s * 0.12
+		shears.add_child(half)
+		_put(_box(0.2, 0.006, 0.018), _m("steel"), Vector3(0.1, s * 0.003, 0), half)        # blade
+		var bow := _put(_cyl(0.03, 0.03, 0.01, 14), _m("shoe"), Vector3(-0.07, s * 0.003, s * 0.025), half)   # black bow handle
+		bow.scale = Vector3(1.3, 1, 0.8)
+		_put(_cyl(0.017, 0.017, 0.012, 12), _m("walnut"), Vector3(-0.07, s * 0.003, s * 0.025), half).scale = Vector3(1.3, 1, 0.8)   # the hole in the bow, showing the table
+	_put(_cyl(0.008, 0.008, 0.016, 8), _m("brass"), Vector3.ZERO, shears)                   # pivot screw
+	# Tape measure: a cream tape in loose loops ending at the rolled spool.
+	var path := [Vector3(0.05, 0, 0.28), Vector3(0.25, 0, 0.32), Vector3(0.42, 0, 0.22), Vector3(0.48, 0, 0.0), Vector3(0.4, 0, -0.16), Vector3(0.24, 0, -0.18)]
+	for i in path.size() - 1:
+		var a: Vector3 = path[i]
+		var b: Vector3 = path[i + 1]
+		var seg := _put(_box(a.distance_to(b) + 0.01, 0.002, 0.016), _m("tape"), (a + b) * 0.5 + Vector3(0, y + 0.002, 0), n)
+		seg.rotation.y = -atan2(b.z - a.z, b.x - a.x)
+	_put(_cyl(0.032, 0.032, 0.018, 18), _m("tape"), Vector3(0.24, y + 0.009, -0.18), n)
+	_put(_cyl(0.012, 0.012, 0.02, 10), _m("brass"), Vector3(0.24, y + 0.01, -0.18), n)
+	_put(_box(0.012, 0.004, 0.02), _m("brass"), path[0] + Vector3(-0.005, y + 0.003, 0), n)   # metal end tab
+	# Tomato pincushion with its strawberry, stuck with pins.
+	var cushion := Vector3(0.47, y, 0.28)
+	_put(_sphere(0.055, 14), _m("sale_red"), cushion + Vector3(0, 0.04, 0), n).scale = Vector3(1, 0.72, 1)
+	_put(_cyl(0.012, 0.016, 0.014, 8), _m("leaf"), cushion + Vector3(0, 0.08, 0), n)
+	var berry := _put(_sphere(0.016, 8), _m("sale_red"), cushion + Vector3(0.05, 0.075, 0.02), n)
+	berry.scale = Vector3(0.8, 1.3, 0.8)
+	for k in 7:
+		var a := TAU * k / 7.0
+		var dir := Vector3(cos(a) * 0.7, 0.75, sin(a) * 0.7).normalized()
+		var root := cushion + Vector3(0, 0.04, 0) + Vector3(dir.x * 0.05, dir.y * 0.036, dir.z * 0.05)
+		_tube(n, root, root + dir * 0.022, 0.0015, _m("steel"), 4)
+		_put(_sphere(0.005, 6), _m(["glass_amber", "dress_cream", "glass_lilac", "sale_red"][k % 4]), root + dir * 0.025, n)
+	# Tailor's chalk: two flat triangles.
+	for c in [[Vector3(-0.55, 0, 0.18), "chalk_blue", 0.3], [Vector3(-0.5, 0, 0.26), "dress_cream", -0.5]]:
+		var tri := _put(_cyl(0.035, 0.035, 0.008, 3), _m(c[1]), c[0] + Vector3(0, y + 0.004, 0), n)
+		tri.rotation.y = c[2]
+	# Spools of thread on their wooden ends.
+	for s in [[Vector3(-0.62, 0, -0.08), "sale_red"], [Vector3(-0.56, 0, -0.16), "suit_navy"], [Vector3(-0.66, 0, -0.18), "dress_cream"]]:
+		var p: Vector3 = s[0] + Vector3(0, y, 0)
+		_put(_cyl(0.016, 0.016, 0.034, 12), _m(s[1]), p + Vector3(0, 0.022, 0), n)
+		for e in [0.003, 0.041]:
+			_put(_cyl(0.021, 0.021, 0.006, 12), _m("wood"), p + Vector3(0, e, 0), n)
+	Atrium_merge(n)
+	return n
 
 
 ## A cased doorway in a wall: lined reveal, moulded casings with plinth blocks and a capped
@@ -860,6 +1187,11 @@ static func _m(name: String) -> Material:
 		"lily": m = ST.plastic(Color("f6f0e4"), 0.7, 0.0)
 		"pollen": m = ST.plastic(Color("e2a43a"), 0.8, 0.0)
 		"sale_red": m = ST.plastic(Color("9e1b22"), 0.7, 0.0)
+		"straw": m = ST.plastic(Color("d6bd86"), 0.85, 0.0)
+		"steel": m = ST.plastic(Color("a9abae"), 0.3, 0.85)
+		"tape": m = ST.plastic(Color("e9dcae"), 0.75, 0.0)
+		"pattern": m = ST.plastic(Color("d9c9a4"), 0.9, 0.0)
+		"chalk_blue": m = ST.plastic(Color("9fb4c8"), 0.95, 0.0)
 		_: m = ST.plastic(Color("eee6d4"), 0.6, 0.0)
 	_mats[name] = m
 	return m
