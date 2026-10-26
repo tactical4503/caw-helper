@@ -22,6 +22,8 @@ const Atrium := preload("res://scripts/atrium.gd")
 
 const RACK_HOME := [Vector2(-4.9, 0.6), Vector2(4.9, 0.6)]
 const BELL_POS := Vector3(0, 0, -7.0)
+## The store carpet's tint over its texture: the reference's soft grey-teal (measured against it).
+const CARPET_TINT := Color(1.7, 1.55, 2.05)
 ## The long perfume counters down the court's north end (the reference's foreground).
 const LILY_BACK := -2.3       # the lily table stands this far north of the striking post
 const GRAND_SCALE := 0.62     # the great bell and its pedestal, at the reference's size...
@@ -111,7 +113,7 @@ static func brass() -> StandardMaterial3D:
 ## cream border just inside its edge. `size` is (x, z), centred on `at`.
 static func shop_carpet(root: Node3D, size: Vector2, at := Vector3.ZERO) -> void:
 	var field := ST.textured("carpet_forest", 0.5, mat(CARPET, 0.95))
-	field.albedo_color = Color(1.0, 1.2, 1.34)
+	field.albedo_color = CARPET_TINT
 	put(box(size.x, 0.02, size.y), field, at + Vector3(0, 0.01, 0), root, false)
 	var border: Material = Atrium.Props._m("counter_top")
 	var dark := ST.textured("carpet_forest", 0.5, mat(Color("1d3a36"), 0.9))
@@ -199,7 +201,7 @@ static func build_arena(parent: Node3D) -> Arena:
 
 	put(box(18, 0.1, 20), ST.textured("tile_cream", 0.6, ST.procedural(Color("b9a98a"), TILE, "marble")), Vector3(0, -0.05, 0), root, false)
 	var field := ST.textured("carpet_forest", 0.5, ST.procedural(Color("1f3a2a"), CARPET_LIGHT, "carpet", 1.5))
-	field.albedo_color = Color(1.0, 1.2, 1.34)   # toward the reference's blue-teal
+	field.albedo_color = CARPET_TINT   # toward the reference's blue-teal
 	put(box(16, 0.02, 18), field, Vector3(0, 0.01, 0), root, false)
 	# The carpet as in the reference: a deep teal field, and round every counter and the court a
 	# border of a broad cream band, a dark teal band and a fine cream line.

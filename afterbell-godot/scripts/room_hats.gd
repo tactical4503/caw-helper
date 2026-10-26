@@ -84,6 +84,7 @@ class Guard:
 	var mocap: RefCounted = null  # Retarget: its motion capture
 	var clip := ""
 	var idle_w := 0.0
+	var baton_k := 0.0
 	var foot_shadows: Array = []
 	var baton: Node3D
 	var stool: Node3D
@@ -913,7 +914,7 @@ func _mocap_figure(g: Guard, dt: float, sit: float) -> void:
 		overlay = g.pose.compute({"spine": Vector3(0.02, 0.0, 0.0), "r_thigh": Vector3(-0.04, 0.0, 0.03),
 			"l_thigh": Vector3(0.02, 0.0, -0.03), "r_shin": Vector3(0.06, 0.0, 0.0), "l_shin": Vector3(0.04, 0.0, 0.0)},
 			{}, ["spine", "r_thigh", "l_thigh", "r_shin", "l_shin"])
-		ow = 0.6
+		ow = 0.9   # nearly upright: shop staff, not sword fighters
 	if sit > 0.01:
 		var s2 := sit
 		overlay = g.pose.compute({
@@ -940,7 +941,13 @@ func _mocap_figure(g: Guard, dt: float, sit: float) -> void:
 	var src_hand: int = rt.src_skel.find_bone("mixamorig_RightHand")
 	var delta: Basis = rt.src_skel.get_bone_global_pose(src_hand).basis.orthonormalized() * rt.src_skel.get_bone_global_rest(src_hand).basis.orthonormalized().inverse()
 	var hand: Vector3 = rt.skel.global_transform * rt.skel.get_bone_global_pose(rt.hand).origin
-	g.baton.global_transform = Transform3D(rt.skel.global_basis.orthonormalized() * delta, hand)
+	# Between strikes the baton hangs from the fist along the leg, tip down, like a carried cane;
+	# for the tell, strike and recovery it is held as the capture holds its sword.
+	var held: Basis = rt.skel.global_basis.orthonormalized() * delta
+	var carry: Basis = g.node.global_basis * Basis(Vector3.RIGHT, PI * 0.5 + 0.25)
+	g.baton_k = lerpf(g.baton_k, 1.0 if g.state in ["tell", "strike", "recover"] else 0.0, 1.0 - exp(-12.0 * dt))
+	var q := carry.get_rotation_quaternion().slerp(held.get_rotation_quaternion(), g.baton_k)
+	g.baton.global_transform = Transform3D(Basis(q), hand)
 
 
 ## Joint springs: stiffness (how fast a joint chases its pose) and damping ratio (below 1 it
