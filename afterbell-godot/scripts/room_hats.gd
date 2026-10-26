@@ -85,6 +85,7 @@ class Guard:
 	var clip := ""
 	var idle_w := 0.0
 	var baton_k := 0.0
+	var cap_local := Transform3D(Basis(), Vector3(0, 1.84, 0))
 	var foot_shadows: Array = []
 	var baton: Node3D
 	var stool: Node3D
@@ -335,6 +336,16 @@ func _make_guard(at: Vector2, state: String, which := 0) -> Guard:
 		g.cap = Node3D.new()
 		g.cap.position = Vector3(0, 1.84, 0)
 		body.add_child(g.cap)
+		# The cap rides on the head bone, so it stays on as the head moves with the capture.
+		if g.mocap:
+			var head_att := BoneAttachment3D.new()
+			head_att.bone_name = g.mocap.skel.get_bone_name(g.mocap.skel.find_bone(Retarget.RIGS[GUARD_MODELS[which][1]]["Head"]))
+			g.mocap.skel.add_child(head_att)
+			g.cap.reparent(head_att, false)
+			# The bone's own axes aren't the figure's: undo its rest rotation so the cap sits level.
+			var rest_b: Basis = g.mocap.skel.get_bone_global_rest(g.mocap.skel.find_bone(head_att.bone_name)).basis.orthonormalized()
+			g.cap_local = Transform3D(rest_b.inverse(), rest_b.inverse() * Vector3(0, 0.15, -0.01))
+			g.cap.transform = g.cap_local
 		B.put(B.cyl(0.12, 0.12, 0.07), B.mat(B.CREAM, 0.4), Vector3.ZERO, g.cap)     # staff usher cap
 		B.put(B.cyl(0.15, 0.15, 0.015), B.mat(B.BLACK, 0.3), Vector3(0, -0.035, 0), g.cap)
 		# "A short break": a folding stool appears under a guard that sits down.
@@ -779,8 +790,7 @@ func _check_clear() -> void:
 		gg.state = "standing"
 		gg.post = gg.pos + Vector2(-0.8, 0)
 		gg.cap.top_level = false
-		gg.cap.position = Vector3(0, 1.84, 0)
-		gg.cap.rotation = Vector3.ZERO
+		gg.cap.transform = gg.cap_local
 
 
 func _take_pin() -> void:

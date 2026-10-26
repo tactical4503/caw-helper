@@ -23,7 +23,7 @@ const Atrium := preload("res://scripts/atrium.gd")
 const RACK_HOME := [Vector2(-4.9, 0.6), Vector2(4.9, 0.6)]
 const BELL_POS := Vector3(0, 0, -7.0)
 ## The store carpet's tint over its texture: the reference's soft grey-teal (measured against it).
-const CARPET_TINT := Color(1.7, 1.55, 2.05)
+const CARPET_TINT := Color(1.72, 1.44, 1.7)
 ## The long perfume counters down the court's north end (the reference's foreground).
 const LILY_BACK := -2.3       # the lily table stands this far north of the striking post
 const GRAND_SCALE := 0.62     # the great bell and its pedestal, at the reference's size...
