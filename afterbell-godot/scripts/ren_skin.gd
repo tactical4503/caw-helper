@@ -60,6 +60,25 @@ const CHAIN := {
 const BORROW := {"Head": "Neck", "LeftHand": "LeftForeArm", "RightHand": "RightForeArm", "LeftToeBase": "LeftFoot", "RightToeBase": "RightFoot"}
 const MIX_TIME := 0.12
 @export var use_mocap := true
+## Ren's standing idle: a captured idle (natural weight shift, breathing and balance) for the
+## body, legs, head and free arm, with the sword arm kept on the keyframed idle so Knock hangs
+## low in his right hand as in the reference. "" uses the keyframed idle for everything.
+@export var idle_capture := "great_sword_idle"
+## Bones that stay on the keyframed idle while the captured one plays: both arms, so Knock hangs
+## low in the right hand and the left is a loose fist at the side (the capture holds a two-handed
+## sword in front of the belt).
+const IDLE_KEYFRAMED := ["RightShoulder", "RightArm", "RightForeArm", "RightHand",
+	"LeftShoulder", "LeftArm", "LeftForeArm", "LeftHand"]
+## The capture leans forward over the sword; easing these bones part-way back to the model's
+## upright rest stacks head over chest over hips (balance), while the hips, legs and the slow
+## weight shift and breathing stay captured. bone -> share of the way back to upright.
+const IDLE_UPRIGHT := {"Spine": 0.45, "Spine01": 0.45, "Spine02": 0.45, "neck": 0.55, "Head": 0.55}
+## Measured with tools/ren_balance.gd: the capture's chest leans this far forward of the hips;
+## the lowest spine bone is tilted back by it so his head stacks over his hips.
+@export var idle_lean_fix_deg := 20.0
+var _keep := {}
+var _upright := {}
+var _spine_root := -1
 
 @export var skin_path: NodePath = ^"../Skin"
 @export var sword_bone := "RightHand"
@@ -225,6 +244,23 @@ func _setup_mocap() -> void:
 		_strip_root_travel(anim)
 		lib.add_animation(clip, anim)
 		scene.free()
+	if idle_capture != "" and ResourceLoader.exists(MOCAP_DIR + idle_capture + ".fbx"):
+		var iscene: Node = load(MOCAP_DIR + idle_capture + ".fbx").instantiate()
+		var iap: AnimationPlayer = iscene.find_children("*", "AnimationPlayer", true, false)[0]
+		var ianim: Animation = iap.get_animation(iap.get_animation_list()[0]).duplicate()
+		ianim.loop_mode = Animation.LOOP_LINEAR
+		_strip_root_travel(ianim)
+		lib.add_animation("idle", ianim)
+		iscene.free()
+		for b in IDLE_KEYFRAMED:
+			var bi := _skel.find_bone(b)
+			if bi >= 0:
+				_keep[bi] = true
+		_spine_root = _skel.find_bone("Spine02")
+		for b in IDLE_UPRIGHT:
+			var bu := _skel.find_bone(b)
+			if bu >= 0:
+				_upright[bu] = IDLE_UPRIGHT[b]
 	_src_anim.add_animation_library("m", lib)
 	var to_char := _to_skel.inverse()
 	for mixamo in BONES:
@@ -284,7 +320,7 @@ func _follow_clip() -> void:
 	var restarted := cur == _cur and pos < _last_pos - 0.05
 	if cur != _cur or restarted:
 		_cur = cur
-		var want_mocap := MOCAP.has(cur) and _src_anim.has_animation("m/" + cur)
+		var want_mocap := (MOCAP.has(cur) or cur == "idle") and _src_anim.has_animation("m/" + cur)
 		if want_mocap:
 			_src_anim.play("m/" + cur, MIX_TIME if _grey_anim.is_playing() else 0.0, _mocap_speed(cur))
 			if restarted:
@@ -306,6 +342,8 @@ func _follow_clip() -> void:
 
 
 func _mocap_speed(clip: String) -> float:
+	if not MOCAP.has(clip):
+		return 1.0
 	var length := _src_anim.get_animation("m/" + clip).length
 	var fit: float = MOCAP[clip][2]
 	return length / fit if fit > 0.0 else 1.0
@@ -336,19 +374,25 @@ func _process(dt: float) -> void:
 		var parent := _skel.get_bone_parent(i)
 		var rest_local := _skel.get_bone_rest(i)
 		var local := rest_local
-		if _mocap and _src_of.has(i):
+		var arm_kf := _mocap and _cur == "idle" and _keep.has(i)   # the sword arm keeps its keyframes
+		if _mocap and _src_of.has(i) and not arm_kf:
 			var sb: int = _src_of[i]
 			var delta_c := _src_skel.get_bone_global_pose(sb).basis.orthonormalized() * _src_skel.get_bone_global_rest(sb).basis.orthonormalized().inverse()
 			var rest_c := to_char * _skel.get_bone_global_rest(i).basis.orthonormalized()
 			var want: Basis = _to_skel * (delta_c * (_mocap_fix[i] as Basis) * rest_c)
+			if _cur == "idle" and (i == _spine_root or _upright.has(i)):   # the whole chain, rigidly
+				want = _to_skel * Basis(Vector3.RIGHT, -deg_to_rad(idle_lean_fix_deg)) * _to_skel.inverse() * want
 			var parent_b := globals[parent].basis if parent >= 0 else Basis()
 			local.basis = parent_b.inverse() * want
+			if _cur == "idle" and _upright.has(i):
+				var up_q := local.basis.orthonormalized().get_rotation_quaternion().slerp(rest_local.basis.orthonormalized().get_rotation_quaternion(), _upright[i])
+				local.basis = Basis(up_q)
 			if sb == _src_hips:
 				var offset := (_src_skel.get_bone_global_pose(sb).origin - _src_skel.get_bone_global_rest(sb).origin) * _height_ratio
 				offset.x = 0.0
 				offset.z = 0.0
 				local.origin = rest_local.origin + _to_skel * offset * _unit
-		elif _joint_of_bone.has(i) and not _mocap:
+		elif _joint_of_bone.has(i) and (not _mocap or arm_kf):
 			var joint: Node3D = _joint_of_bone[i]
 			# Joint rotation relative to the rig root == the clip's pose delta for this segment.
 			var delta := root_inv * joint.global_basis.orthonormalized()
@@ -377,7 +421,7 @@ func _process(dt: float) -> void:
 		var grip := GRIP_LOCAL * Vector3(-1.0 if sword_bone == "RightHand" else 1.0, 1.0, 1.0) * HAND_SCALE
 		var hand_world := _skel.global_transform * (globals[_hand] * grip)
 		var basis := forearm.global_basis.orthonormalized() * _sword_src.basis
-		if _mocap and _src_hand >= 0:
+		if _mocap and _src_hand >= 0 and _cur != "idle":
 			basis = _rig.global_basis.orthonormalized() * _src_skel.get_bone_global_pose(_src_hand).basis.orthonormalized() * _mocap_sword
 		_sword_view.global_transform = Transform3D(basis, hand_world)
 
