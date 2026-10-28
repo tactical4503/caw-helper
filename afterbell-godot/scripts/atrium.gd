@@ -747,7 +747,7 @@ static func light_environment(e: Environment, key: DirectionalLight3D) -> void:
 	key.light_energy = 0.32
 	key.light_specular = 0.04   # no glare lines off the escalator glass at this angle
 	key.rotation = Vector3(deg_to_rad(-58), deg_to_rad(205), 0)   # from high above the window, slanting south-east
-	key.directional_shadow_max_distance = 48.0
+	key.directional_shadow_max_distance = 30.0   # the court and the near hall; the far end is in haze
 	key.directional_shadow_mode = DirectionalLight3D.SHADOW_PARALLEL_2_SPLITS   # half the shadow draws of 4 splits
 	key.shadow_blur = 3.0
 	if ST.CG:   # the promo-render grade (Style.LOOK); keeps this hall's sun direction and reach
@@ -771,9 +771,9 @@ static func _lights(a: Node3D) -> void:
 	sun_in.light_color = Color("ffb183")   # peach
 	sun_in.light_energy = 8.5
 	sun_in.light_specular = 0.04   # no glints off the escalator rails
-	sun_in.light_projector = _window_gobo()
-	sun_in.light_size = 1.2               # a wide source: soft shadow edges
-	sun_in.shadow_enabled = true
+	sun_in.light_projector = _window_gobo()   # the gobo draws the window's light pattern; no shadow pass
+	sun_in.light_size = 1.2
+	sun_in.shadow_enabled = false             # a second full shadow pass of the hall, for little visible gain
 	sun_in.shadow_blur = 1.5
 	sun_in.spot_range = 46.0
 	sun_in.spot_attenuation = 0.15        # flat falloff: near surfaces don't clip, the far end still gets light

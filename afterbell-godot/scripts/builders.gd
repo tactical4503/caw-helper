@@ -401,7 +401,26 @@ static func build_arena(parent: Node3D) -> Arena:
 	put(box(0.25, 0.01, 1.6), arrow_mat, Vector3(0, 0.05, 0.8), a.aim_arrow, false)
 	var head := put(box(0.6, 0.01, 0.6), arrow_mat, Vector3(0, 0.05, 1.7), a.aim_arrow, false)
 	head.rotation.y = PI / 4.0
+	optimize_static(root, [a.lever, a.cabinet_door, a.bell_dome] + a.tabs)
 	return a
+
+
+## Performance pass over a built level: static meshes batched by material per grid cell (only
+## the listed moving parts are left alone), small labels hidden at a distance, and every omni
+## light faded out beyond the range where its pool can still be seen.
+static func optimize_static(root: Node3D, keep: Array = []) -> void:
+	var stats: Dictionary = preload("res://scripts/batcher.gd").batch(root, keep)
+	if not stats.is_empty():
+		print_verbose("batched %d surfaces into %d" % [stats.before, stats.after])
+	for l in root.find_children("*", "OmniLight3D", true, false):
+		var o := l as OmniLight3D
+		o.distance_fade_enabled = true
+		o.distance_fade_begin = 26.0
+		o.distance_fade_length = 6.0
+	for t in root.find_children("*", "Label3D", true, false):
+		var lab := t as Label3D
+		if lab.pixel_size < 0.002:   # price cards and small print: unreadable past a few metres
+			lab.visibility_range_end = 9.0
 
 
 ## Finished lower wall: a dark skirting with a brass strip, a cream dado of raised panels with

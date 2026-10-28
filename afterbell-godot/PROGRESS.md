@@ -167,6 +167,24 @@ The atrium keeps its sun direction and reach; Ren gets a clear coat. To revert, 
 
 How it was checked: Forward+ renders of Cosmetics, Hats, Alterations, the court and the counters; all six test suites pass; draw calls unchanged (perf_probe). Not seen in real time.
 
+## Optimization pass (measured with tools/perf_probe.gd)
+| Scene | Draw calls before → after |
+|---|---|
+| court | 3025 → 2064 |
+| title | 1154 → 889 |
+
+- **Static batching** (`scripts/batcher.gd`): every non-moving mesh in the atrium and court is merged by material into 16 m cells, and identical materials are de-duplicated (104 instances → 86).
+- **Shadows:** the window spotlight no longer draws a second full shadow pass of the hall (its gobo still paints the light), and the sun's shadow distance is 30 m instead of 48.
+- **Lights and labels:** omni lights fade out past 26 m, and price-card labels are hidden past 9 m.
+- **Graphics presets** in Settings (default Medium):
+  | Preset | Render | Anti-aliasing | SSAO | Shadows |
+  |---|---|---|---|---|
+  | Low | 75% with FSR upscaling | FXAA | off, no glow | 1K, hard |
+  | Medium | 100% | FXAA | half-size | 2K, soft |
+  | High | 100% | 2× MSAA | full-size | 4K |
+
+Frame times here come from a CPU software renderer and don't reflect real hardware; fps on a real GPU still needs measuring.
+
 ## Release gate
 `tools/release_check.sh [--export]` must pass before a build ships. It runs:
 - the six test suites;

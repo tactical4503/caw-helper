@@ -11,6 +11,7 @@ var index := -1
 var frames := 0
 var t0 := 0
 var room: Node
+var proc_sum := 0.0
 
 
 func _initialize() -> void:
@@ -37,12 +38,26 @@ func _process(_d: float) -> bool:
 	frames += 1
 	if frames == 15:
 		t0 = Time.get_ticks_usec()
+		proc_sum = 0.0
+	if frames > 15:
+		proc_sum += Performance.get_monitor(Performance.TIME_PROCESS) * 1000.0
 	if frames == 45:
 		var ms := (Time.get_ticks_usec() - t0) / 30000.0
 		var rs := RenderingServer
-		print("%-32s draws %5d  objects %5d  triangles %8d  frame %.1f ms" % [SCENES[index].get_file(),
+		var lights := 0
+		var shadowed := 0
+		var omni := 0
+		for l in room.find_children("*", "Light3D", true, false):
+			if (l as Light3D).visible:
+				lights += 1
+				if (l as Light3D).shadow_enabled:
+					shadowed += 1
+				if l is OmniLight3D:
+					omni += 1
+		var meshes := room.find_children("*", "GeometryInstance3D", true, false).size()
+		print("%-24s draws %5d  objects %5d  tris %8d  frame %.1f ms  script %.2f ms  lights %d (omni %d, shadowed %d)  geo nodes %d" % [SCENES[index].get_file(),
 				rs.get_rendering_info(RenderingServer.RENDERING_INFO_TOTAL_DRAW_CALLS_IN_FRAME),
 				rs.get_rendering_info(RenderingServer.RENDERING_INFO_TOTAL_OBJECTS_IN_FRAME),
-				rs.get_rendering_info(RenderingServer.RENDERING_INFO_TOTAL_PRIMITIVES_IN_FRAME), ms])
+				rs.get_rendering_info(RenderingServer.RENDERING_INFO_TOTAL_PRIMITIVES_IN_FRAME), ms, proc_sum / 30.0, lights, omni, shadowed, meshes])
 		_next()
 	return false

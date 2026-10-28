@@ -35,7 +35,16 @@ const CONTROLS := [
 var checkpoint := ""
 var flags := {}
 var settings := {"master": 0.85, "effects": 0.9, "ambience": 0.7, "easy": false,
-		"reflect_assist": false, "aim_help": true, "shake": true, "keep_progress": true}
+		"reflect_assist": false, "aim_help": true, "shake": true, "keep_progress": true, "quality": 1}
+
+## Graphics presets (settings.quality): [name, render scale, MSAA, SSAO, half-size SSAO, glow,
+## directional shadow map size, shadow filter]. Low upscales from 75% with FSR and drops the
+## screen-space effects; Medium keeps the look at about half the cost of High.
+const QUALITY := [
+	["Low", 0.75, Viewport.MSAA_DISABLED, false, true, false, 1024, RenderingServer.SHADOW_QUALITY_HARD],
+	["Medium", 1.0, Viewport.MSAA_DISABLED, true, true, true, 2048, RenderingServer.SHADOW_QUALITY_SOFT_LOW],
+	["High", 1.0, Viewport.MSAA_2X, true, false, true, 4096, RenderingServer.SHADOW_QUALITY_SOFT_MEDIUM],
+]
 
 var _layer: CanvasLayer
 var _shade: ColorRect
@@ -57,6 +66,38 @@ func _ready() -> void:
 	load_game()
 	_apply_volumes()
 	_build_ui()
+	apply_quality()
+	get_tree().node_added.connect(_on_node_added)
+
+
+## Applies the graphics preset to the window and to whichever room is loaded (rooms make their
+## own WorldEnvironment, so it is re-applied as each one arrives).
+func apply_quality() -> void:
+	var q: Array = QUALITY[clampi(int(settings.quality), 0, QUALITY.size() - 1)]
+	var vp := get_viewport()
+	vp.scaling_3d_mode = Viewport.SCALING_3D_MODE_FSR if q[1] < 1.0 else Viewport.SCALING_3D_MODE_BILINEAR
+	vp.scaling_3d_scale = q[1]
+	vp.msaa_3d = q[2]
+	vp.screen_space_aa = Viewport.SCREEN_SPACE_AA_FXAA if q[2] == Viewport.MSAA_DISABLED else Viewport.SCREEN_SPACE_AA_DISABLED
+	RenderingServer.environment_set_ssao_quality(RenderingServer.ENV_SSAO_QUALITY_LOW if q[4] else RenderingServer.ENV_SSAO_QUALITY_MEDIUM,
+		q[4], 0.5, 2, 50.0, 300.0)
+	RenderingServer.directional_shadow_atlas_set_size(q[6], true)
+	RenderingServer.directional_soft_shadow_filter_set_quality(q[7])
+	RenderingServer.positional_soft_shadow_filter_set_quality(q[7])
+	for env in get_tree().root.find_children("*", "WorldEnvironment", true, false):
+		_quality_env(env)
+
+
+func _quality_env(we: WorldEnvironment) -> void:
+	var q: Array = QUALITY[clampi(int(settings.quality), 0, QUALITY.size() - 1)]
+	if we.environment:
+		we.environment.ssao_enabled = q[3]
+		we.environment.glow_enabled = q[5]
+
+
+func _on_node_added(n: Node) -> void:
+	if n is WorldEnvironment:
+		_quality_env.call_deferred(n)
 
 
 func testing() -> bool:
@@ -319,6 +360,21 @@ func show_settings(from_pause := false) -> void:
 			save_game())
 		row.add_child(slider)
 		_card_col.add_child(row)
+	var gfx := HBoxContainer.new()
+	var gcap := label("Graphics", 18, IVORY)
+	gcap.custom_minimum_size = Vector2(200, 0)
+	gfx.add_child(gcap)
+	for k in QUALITY.size():
+		var b := _menu_button(QUALITY[k][0], func() -> void:
+			settings.quality = k
+			apply_quality()
+			save_game()
+			show_settings(from_pause))
+		b.custom_minimum_size = Vector2(96, 0)
+		if k == int(settings.quality):
+			b.text = "• " + QUALITY[k][0]
+		gfx.add_child(b)
+	_card_col.add_child(gfx)
 	for opt in [["reflect_assist", "Reflection assist — a held guard always reflects"],
 			["easy", "Easy assist — longer openings in the court"],
 			["aim_help", "Aiming help — floor arrow while the Manager is exposed"],
