@@ -8,6 +8,7 @@ var out := "user://ref_shot.png"
 var ref := ""
 var pos := Vector2(0.0, -4.2)
 var show_boss := false
+var mpos := Vector2.INF   # --mpos=x,z puts the Floor Manager there (with --boss)
 var cam := Vector3.INF
 var look := Vector3.ZERO
 var room: Node
@@ -23,6 +24,9 @@ func _initialize() -> void:
 		elif arg.begins_with("--pos="):
 			var p := arg.substr(6).split(",")
 			pos = Vector2(float(p[0]), float(p[1]))
+		elif arg.begins_with("--mpos="):
+			var mp := arg.substr(7).split(",")
+			mpos = Vector2(float(mp[0]), float(mp[1]))
 		elif arg == "--boss":
 			show_boss = true
 		elif arg.begins_with("--cam="):   # free camera: --cam=x,y,z --look=x,y,z (no reference paste)
@@ -47,11 +51,11 @@ func _process(_d: float) -> bool:
 		room.p_pos = pos
 		for i in 120:
 			room.p_pos = pos
-			room.m_pos = Vector2(pos.x, pos.y - 20.0)   # face north
+			room.m_pos = mpos if mpos != Vector2.INF else Vector2(pos.x, pos.y - 20.0)   # face north
 			room.step(1.0 / 60.0)
 		room.p_pos = pos
-		room.m_pos = Vector2(pos.x, pos.y - 20.0)
-		room.p_yaw = PI - 0.45   # turned three-quarters up the aisle, as in the reference
+		room.m_pos = mpos if mpos != Vector2.INF else Vector2(pos.x, pos.y - 20.0)
+		room.p_yaw = PI - 0.45 if mpos == Vector2.INF else atan2(mpos.x - pos.x, mpos.y - pos.y)
 		for i in 60:
 			room._render(1.0 / 30.0)
 		room.boss.visible = show_boss

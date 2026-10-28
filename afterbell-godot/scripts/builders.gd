@@ -557,10 +557,23 @@ static func build_rack(index: int) -> Rack:
 static func build_placard() -> Node3D:
 	var g := Node3D.new()
 	g.name = "Placard"
-	put(box(0.92, 0.62, 0.035), mat(RED, 0.6), Vector3(0, 0, -0.005), g)
-	put(box(0.78, 0.48, 0.04), mat(CREAM, 0.6), Vector3.ZERO, g)
-	put(box(0.5, 0.07, 0.042), mat(RED, 0.6), Vector3(0, 0.08, 0), g)
-	put(box(0.36, 0.05, 0.042), mat(PLUM, 0.6), Vector3(0, -0.08, 0), g)
+	# The store's closing notice: a cream enamel card in a brass frame, lettered in plum and red.
+	put(box(0.92, 0.62, 0.035), brass(), Vector3(0, 0, -0.005), g)
+	put(box(0.84, 0.54, 0.04), mat(CREAM, 0.5), Vector3.ZERO, g)
+	put(box(0.76, 0.012, 0.042), mat(RED, 0.6), Vector3(0, 0.155, 0), g)
+	put(box(0.76, 0.012, 0.042), mat(RED, 0.6), Vector3(0, -0.155, 0), g)
+	for line in [["THE STORE IS", 0.09, 34, PLUM], ["CLOSED", -0.03, 72, RED], ["kindly proceed to the exits", -0.2, 22, PLUM]]:
+		for face in [1.0, -1.0]:   # lettered on both faces: it spins when thrown
+			var l := Label3D.new()
+			l.text = line[0]
+			l.font_size = line[2]
+			l.pixel_size = 0.0028
+			l.outline_size = 0
+			l.modulate = line[3]
+			l.shaded = true
+			l.position = Vector3(0, line[1], 0.022 * face)
+			l.rotation.y = 0.0 if face > 0 else PI
+			g.add_child(l)
 	return g
 
 
@@ -588,10 +601,11 @@ static func build_boss_rig() -> Node3D:
 		put(box(0.06, 0.05, 0.36), metal, Vector3(0, 0.12, 0.18), leg)
 		put(sphere(0.055, 10), mat(BLACK, 0.5), Vector3(0, 0.055, 0.36), leg)
 	put(cyl(0.05, 0.05, 0.32), metal, Vector3(0, 0.28, 0), chair)
-	put(cyl(0.34, 0.32, 0.12, 20), mat(GRAY, 0.95), Vector3(0, 0.5, 0), chair)
+	put(cyl(0.34, 0.32, 0.12, 24), Atrium.Props._m("velvet"), Vector3(0, 0.5, 0), chair)   # buttoned plum leather seat
+	put(cyl(0.35, 0.35, 0.02, 24), brass(), Vector3(0, 0.44, 0), chair)
 	for s in [-1.0, 1.0]:
 		put(box(0.05, 0.16, 0.05), metal, Vector3(s * 0.3, 0.62, 0), chair)
-		put(box(0.07, 0.04, 0.3), mat(BLACK, 0.6), Vector3(s * 0.3, 0.71, 0), chair)
+		put(box(0.07, 0.04, 0.3), Atrium.Props._m("walnut"), Vector3(s * 0.3, 0.71, 0), chair)
 	put(box(0.52, 0.16, 0.08), mat(Color("6b2620"), 0.85), Vector3(0, 0.22, 0.38), chair)  # padded front bumper
 	var paddle_mat := StandardMaterial3D.new()
 	paddle_mat.albedo_color = RED
@@ -608,14 +622,34 @@ static func build_boss_rig() -> Node3D:
 	var body := _joint("Body", Vector3.ZERO, flinch)
 	var ivory := mat(IVORY, 0.45)
 	var y0 := -1.45  # body-local offset: geometry authored in standing heights
-	put(cyl(0.065, 0.065, 0.95, 12), brass(), Vector3(0, 1.03 + y0, 0), body)
-	put(cyl(0.16, 0.2, 0.08), brass(), Vector3(0, 1.5 + y0, 0), body)
-	put(box(0.62, 0.95, 0.34), mat(CREAM, 0.6), Vector3(0, 2.0 + y0, 0), body)
-	for s in [-1.0, 1.0]:
-		put(box(0.025, 0.95, 0.36), mat(PLUM, 0.6), Vector3(s * 0.17, 2.0 + y0, 0.005), body)
-		put(box(0.06, 0.9, 0.08), brass(), Vector3(s * 0.42, 2.02 + y0, 0), body)  # shoulder rails
-	put(box(0.64, 0.025, 0.36), mat(PLUM, 0.6), Vector3(0, 1.53 + y0, 0), body)
-	put(cyl(0.07, 0.08, 0.16, 10), ivory, Vector3(0, 2.53 + y0, 0), body)
+	# A tailored floorwalker: a plum frock coat over a cream waistcoat, brass buttons, peaked
+	# lapels and a stand collar, on a telescoping brass column that rises out of the chair.
+	var P = Atrium.Props
+	var coat: Material = P._m("plum")
+	var vest: Material = P._m("cream")
+	put(cyl(0.065, 0.065, 0.95, 16), brass(), Vector3(0, 1.03 + y0, 0), body)
+	put(cyl(0.16, 0.2, 0.08, 24), brass(), Vector3(0, 1.5 + y0, 0), body)
+	var skirt := put(cyl(0.3, 0.36, 0.36, 28), coat, Vector3(0, 1.66 + y0, 0), body)   # coat tails
+	skirt.scale = Vector3(1, 1, 0.7)
+	var chest := put(cyl(0.33, 0.28, 0.66, 28), coat, Vector3(0, 2.13 + y0, 0), body)   # tapered torso
+	chest.scale = Vector3(1, 1, 0.62)
+	var front := put(cyl(0.2, 0.15, 0.62, 20), vest, Vector3(0, 2.12 + y0, 0.07), body)   # waistcoat
+	front.scale = Vector3(0.62, 1, 0.55)
+	for k in 4:   # brass waistcoat buttons
+		put(sphere(0.022, 10), brass(), Vector3(0, 1.92 + y0 + k * 0.11, 0.2), body)
+	for sx in [-1.0, 1.0]:
+		var lapel := put(box(0.09, 0.42, 0.03), coat, Vector3(sx * 0.12, 2.25 + y0, 0.19), body)
+		lapel.rotation = Vector3(0.12, 0, sx * 0.32)
+		put(box(0.3, 0.025, 0.36), P._m("counter_brass"), Vector3(sx * 0.0, 1.85 + y0, 0.0), body).visible = sx > 0   # belt line once
+		var shoulder := put(sphere(0.16, 18), coat, Vector3(sx * 0.33, 2.4 + y0, 0), body)   # rounded padded shoulders
+		shoulder.scale = Vector3(1.0, 0.62, 0.8)
+		put(box(0.06, 0.9, 0.08), brass(), Vector3(sx * 0.42, 2.02 + y0, -0.02), body)    # the arm rails, kept
+	var collar := put(cyl(0.1, 0.12, 0.08, 18), vest, Vector3(0, 2.49 + y0, 0), body)
+	collar.scale = Vector3(1, 1, 0.9)
+	for sx in [-1.0, 1.0]:   # a plum bow tie
+		var wing := put(box(0.08, 0.05, 0.03), P._m("velvet"), Vector3(sx * 0.045, 2.46 + y0, 0.12), body)
+		wing.rotation.z = sx * 0.3
+	put(cyl(0.07, 0.08, 0.16, 14), ivory, Vector3(0, 2.53 + y0, 0), body)
 	var head := _joint("Head", Vector3(0, 2.6 + y0, 0), body)  # pivot at the neck
 	var skull := put(sphere(1.0, 24), ivory, Vector3(0, 0.22, 0), head)
 	skull.scale = Vector3(0.18, 0.29, 0.2)
@@ -638,12 +672,13 @@ static func build_boss_rig() -> Node3D:
 		var level := 1
 		for y in [2.38, 2.06, 1.74]:
 			var sh := _joint("Arm%d%s" % [level, "L" if s > 0 else "R"], Vector3(s * 0.47, y + y0, 0), body)
-			put(sphere(0.055, 10), brass(), Vector3.ZERO, sh)
-			put(cyl(0.035, 0.03, 0.5, 10), ivory, Vector3(0, -0.25, 0), sh)
+			put(sphere(0.06, 12), brass(), Vector3.ZERO, sh)
+			put(cyl(0.045, 0.04, 0.5, 12), Atrium.Props._m("plum"), Vector3(0, -0.25, 0), sh)   # coat sleeve
 			var el := _joint("Elbow", Vector3(0, -0.5, 0), sh)
-			put(sphere(0.04, 8), brass(), Vector3.ZERO, el)
-			put(cyl(0.03, 0.026, 0.46, 10), ivory, Vector3(0, -0.23, 0), el)
-			put(sphere(0.05, 10), ivory, Vector3(0, -0.5, 0), el)
+			put(sphere(0.045, 10), brass(), Vector3.ZERO, el)
+			put(cyl(0.038, 0.034, 0.4, 12), Atrium.Props._m("plum"), Vector3(0, -0.2, 0), el)
+			put(cyl(0.042, 0.042, 0.06, 12), Atrium.Props._m("cream"), Vector3(0, -0.42, 0), el)   # shirt cuff
+			put(sphere(0.055, 12), ivory, Vector3(0, -0.5, 0), el).scale = Vector3(0.8, 1.0, 1.15)   # gloved hand
 			_joint("Hand", Vector3(0, -0.5, 0), el)
 			level += 1
 	body.add_child(build_placard())
