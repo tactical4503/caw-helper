@@ -329,8 +329,10 @@ func show_settings(from_pause := false) -> void:
 		cb.button_pressed = settings[opt[0]]
 		cb.add_theme_font_size_override("font_size", 17)
 		cb.add_theme_color_override("font_color", IVORY)
-		cb.add_theme_color_override("checkbox_unchecked_color", Color(IVORY, 0.75))   # visible on plum
-		cb.add_theme_color_override("checkbox_checked_color", BRASS)
+		cb.add_theme_color_override("font_hover_color", CREAM)
+		cb.add_theme_color_override("font_pressed_color", IVORY)
+		cb.add_theme_icon_override("unchecked", _check_icon(false))   # brass boxes that read on plum
+		cb.add_theme_icon_override("checked", _check_icon(true))
 		var key: String = opt[0]
 		cb.toggled.connect(func(on: bool) -> void:
 			settings[key] = on
@@ -362,6 +364,38 @@ func chapter_complete(lines: Array) -> void:
 
 
 # ---------------------------------------------------------------- shared style
+
+static var _check_icons := {}
+
+
+## A settings checkbox drawn in the store's colours: a brass-edged box, filled with a cream tick
+## on brass when on (the default theme's grey box vanished on the plum card).
+static func _check_icon(on: bool) -> ImageTexture:
+	if _check_icons.has(on):
+		return _check_icons[on]
+	var n := 22
+	var img := Image.create(n, n, false, Image.FORMAT_RGBA8)
+	img.fill(Color(0, 0, 0, 0))
+	for y in n:
+		for x in n:
+			var edge := x < 2 or y < 2 or x >= n - 2 or y >= n - 2
+			if edge:
+				img.set_pixel(x, y, BRASS)
+			elif on:
+				img.set_pixel(x, y, Color(BRASS, 0.9))
+			else:
+				img.set_pixel(x, y, Color(0, 0, 0, 0.35))
+	if on:   # a tick: down to the lower left third, then up to the top right
+		for t in 40:
+			var k := t / 39.0
+			var p := Vector2(5, 11).lerp(Vector2(9, 16), k) if k < 0.4 else Vector2(9, 16).lerp(Vector2(17, 6), (k - 0.4) / 0.6)
+			for dx in [-1, 0, 1]:
+				for dy in [-1, 0, 1]:
+					var q := Vector2i(int(p.x) + dx, int(p.y) + dy)
+					if q.x >= 2 and q.y >= 2 and q.x < n - 2 and q.y < n - 2:
+						img.set_pixel(q.x, q.y, CREAM)
+	_check_icons[on] = ImageTexture.create_from_image(img)
+	return _check_icons[on]
 
 static func card_style() -> StyleBoxFlat:
 	var s := StyleBoxFlat.new()

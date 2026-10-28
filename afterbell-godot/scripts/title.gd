@@ -81,7 +81,7 @@ func _build_menu() -> void:
 		b.custom_minimum_size = Vector2(340, 0)
 		col.add_child(b)
 	buttons[0].grab_focus.call_deferred()
-	var foot := GameShell.label("Move WASD  ·  Attack J  ·  Guard K  ·  Examine E  ·  Pause Esc", 15, Color(GameShell.IVORY, 0.7))
+	var foot := GameShell.label("Move WASD  ·  Attack J  ·  Guard K  ·  Examine E  ·  Pause Esc", 19, Color(GameShell.IVORY, 0.82))
 	foot.set_anchors_preset(Control.PRESET_BOTTOM_LEFT)
 	foot.offset_left = 84
 	foot.offset_top = -64
