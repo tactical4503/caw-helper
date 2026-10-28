@@ -167,6 +167,22 @@ The atrium keeps its sun direction and reach; Ren gets a clear coat. To revert, 
 
 How it was checked: Forward+ renders of Cosmetics, Hats, Alterations, the court and the counters; all six test suites pass; draw calls unchanged (perf_probe). Not seen in real time.
 
+## Release gate
+`tools/release_check.sh [--export]` must pass before a build ships. It runs:
+- the six test suites;
+- an asset-path check (`tools/asset_paths.py`);
+- every scene run with a real renderer (`tools/scene_check.gd`);
+- with `--export`: the Linux and Windows exports, and the Linux build booting the title and the court.
+
+Latest polish pass:
+- Settings checkboxes are now brass boxes that show on the plum card.
+- The title's controls line is readable.
+- The camera rises over Ren in tight rooms (Receiving no longer crops him).
+- The Floor Manager has been re-dressed: frock coat, waistcoat, gloved hands, leather chair.
+- His sign is lettered "THE STORE IS CLOSED".
+- The guards and mannequins use the supplied models.
+- Ren's idle is balanced.
+
 ## Current task
 Delivery: builds exported and the Linux build verified. Remaining polish is listed under
 known defects.
