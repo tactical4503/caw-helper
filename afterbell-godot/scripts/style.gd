@@ -135,6 +135,8 @@ static func textured(name: String, _legacy_scale: float, fallback: StandardMater
 		m.albedo_color = Color(1.06, 1.02, 0.98)   # a touch warmer and brighter
 	elif DECO:
 		m.albedo_color = Color(0.9, 0.82, 0.7) if name.begins_with("plaster") else Color(1.0, 0.97, 0.92)   # warm, deeper cream walls
+		if name.contains("plum") or name.contains("velvet"):
+			m.albedo_color = Color(1.32, 1.12, 1.28)   # a lively plum, as in the reference, not maroon-black
 	m.uv1_triplanar = true
 	m.uv1_scale = Vector3.ONE / TEXTURE_TILE_M
 	m.texture_filter = BaseMaterial3D.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS_ANISOTROPIC   # no shimmer at grazing angles
@@ -249,8 +251,8 @@ static func deco_environment(e: Environment) -> void:
 	e.fog_sky_affect = 0.3
 	e.adjustment_enabled = true
 	e.adjustment_saturation = 1.1
-	e.adjustment_contrast = 1.2
-	e.adjustment_brightness = 1.0
+	e.adjustment_contrast = 1.08   # the reference keeps its shade luminous; strong contrast crushed it to black
+	e.adjustment_brightness = 1.04
 
 
 ## A warm late-afternoon key: honey-coloured, soft-edged shadows, a gentle sheen on lacquer.

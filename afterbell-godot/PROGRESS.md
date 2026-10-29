@@ -167,6 +167,22 @@ The atrium keeps its sun direction and reach; Ren gets a clear coat. To revert, 
 
 How it was checked: Forward+ renders of Cosmetics, Hats, Alterations, the court and the counters; all six test suites pass; draw calls unchanged (perf_probe). Not seen in real time.
 
+## Why it looked bland (measured against the reference, tools via ref_shot)
+| Measure | Reference | Before | After |
+|---|---|---|---|
+| near-black pixels | 3.2% | 12.5% (crushed shade) | 3.7% |
+| plum brightness | 86 | 65 (maroon-black) | ~94 |
+| carpet | patterned, (52, 64, 57) | flat single colour | woven diamond lattice (tools/make_carpet.py), (52, 63, 59) |
+| Ren's armour | bright red lacquer | dark maroon | bright red with a clear coat |
+
+The changes that did it:
+- warm ambient fill 0.24 → 0.42;
+- SSAO 2.8 → 1.4;
+- grade contrast 1.2 → 1.08;
+- plum and velvet albedo lifted;
+- the new carpet texture;
+- Ren's lacquer.
+
 ## Optimization pass (measured with tools/perf_probe.gd)
 | Scene | Draw calls before → after |
 |---|---|

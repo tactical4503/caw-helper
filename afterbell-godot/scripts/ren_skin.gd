@@ -213,6 +213,13 @@ func _restyle(skin: Node) -> void:
 				m.roughness = 1.0
 			m.clearcoat_enabled = false
 			m.metallic_specular = 0.25   # no bright streaks across his back from overhead lights
+			if preload("res://scripts/style.gd").DECO:
+				# The reference's Ren: bright red lacquer that catches a crisp highlight, not maroon.
+				m.albedo_color = Color(1.4, 1.15, 1.15)
+				m.metallic_specular = 0.5
+				m.clearcoat_enabled = true
+				m.clearcoat = 0.45
+				m.clearcoat_roughness = 0.2
 			if preload("res://scripts/style.gd").CG:
 				# The promo-render look: lacquered plates under a clear coat, so the key leaves a
 				# hard white hotspot on each rounded plate while the paint underneath stays satin.

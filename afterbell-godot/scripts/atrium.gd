@@ -760,7 +760,8 @@ static func light_environment(e: Environment, key: DirectionalLight3D) -> void:
 		ST.deco_key(key)
 		key.light_energy = 0.45   # the upper storeys fall into warm shade; the lamps carry the hall
 		key.light_specular = 0.3
-		e.ambient_light_energy = 0.24
+		e.ambient_light_energy = 0.42   # warm fill: shade stays honey mid-tone, never black
+		e.ssao_intensity = 1.4          # contact shade, not soot
 
 
 static func _lights(a: Node3D) -> void:
