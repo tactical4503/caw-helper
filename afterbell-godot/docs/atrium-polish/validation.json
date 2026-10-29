@@ -1,0 +1,18 @@
+{
+  "baseline_commit": "66445bc6a537a7b959e3f9d82927ce2f496d8e03",
+  "engine": "4.3.stable.official.77dcf97d8",
+  "renderer": "Forward+ / llvmpipe software Vulkan",
+  "existing_assertions": 108,
+  "new_rendered_geometry_assertions": 6,
+  "release_check": "PASS",
+  "rendered_scenes": 6,
+  "asset_paths_checked": 55,
+  "screenshots": {
+    "before.png": "67613a3f79e2351a1a2fbac6c2284411fce83d783aa0f2022b9fccd287382e01",
+    "after.png": "d574da21a1ebd7cd0971c9fad6b9c948ab3f3363bb8fa6ce5b09f646af561e5a"
+  },
+  "exports_tested": false,
+  "real_hardware_performance_tested": false,
+  "frame_timing_comparison": "not measured on target hardware; no FPS claim",
+  "interactive_playtest": false
+}

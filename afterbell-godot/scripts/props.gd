@@ -1734,7 +1734,7 @@ static var _shapes := {}
 ## A block with rounded vertical corners (radius `r`) and, optionally, a softened top edge
 ## (`bevel`). Sits on y = 0, centred in x and z. Cached per size.
 static func rounded_block(w: float, h: float, d: float, r: float, bevel := 0.0, seg := 5) -> ArrayMesh:
-	var key := "%.3f/%.3f/%.3f/%.3f/%.3f" % [w, h, d, r, bevel]
+	var key := "%.3f/%.3f/%.3f/%.3f/%.3f/%d" % [w, h, d, r, bevel, seg]
 	if _shapes.has(key):
 		return _shapes[key]
 	r = clampf(r, 0.002, minf(w, d) * 0.5 - 0.001)

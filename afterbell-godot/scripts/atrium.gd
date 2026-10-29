@@ -534,10 +534,12 @@ static func _lower_hall(a: Node3D) -> void:
 ## balcony edge at each floor. Used by the court's columns and the atrium's own.
 static func pillar(a: Node3D, x: float, z: float, top: float = ROOF, brackets := 0.0, reach := 0.0) -> void:
 	var at := Vector3(x, 0, z)
-	_put(_box(1.08, 0.24, 1.08), _m("cream"), at + Vector3(0, 0.12, 0), a)
+	# Reuse the store's cached, bevelled cabinet geometry for dressed stone.
+	# rounded_block rests on y=0 (unlike BoxMesh, which is centred).
+	_put(Props.rounded_block(1.08, 0.24, 1.08, 0.065, 0.025, 2), _m("cream"), at, a)
 	_put(_box(0.94, 0.07, 0.94), _m("brass"), at + Vector3(0, 0.275, 0), a)
-	_put(_box(0.86, 0.3, 0.86), _m("cream"), at + Vector3(0, 0.46, 0), a)
-	_put(_box(0.7, top - 0.6, 0.7), _m("cream"), at + Vector3(0, 0.6 + (top - 0.6) * 0.5, 0), a)
+	_put(Props.rounded_block(0.86, 0.3, 0.86, 0.055, 0.025, 2), _m("cream"), at + Vector3(0, 0.31, 0), a)
+	_put(Props.rounded_block(0.7, top - 0.6, 0.7, 0.055, 0.02, 2), _m("cream"), at + Vector3(0, 0.6, 0), a)
 	var bands := [1.12]
 	var caps := []
 	for level in LEVELS:
@@ -546,18 +548,48 @@ static func pillar(a: Node3D, x: float, z: float, top: float = ROOF, brackets :=
 			if level + 1.12 < top:
 				bands.append(level + 1.12)
 	caps.append(top)
+	# Fluting stops below each capital and above the brass collar. Ground-floor
+	# lantern mounts remain proud of the relief at 2.9 m; upper banners
+	# stay on the centre of the face. These are shallow reliefs, entirely within the existing base
+	# footprint, and add neither collisions nor lights.
+	var start := 1.3
+	for cy in caps:
+		var end: float = cy - 0.85
+		if end > start + 0.4:
+			_pillar_flutes(a, at, start, end)
+		start = cy + 1.75
 	for y in bands:
 		_put(_box(0.76, 0.06, 0.76), _m("brass"), at + Vector3(0, y, 0), a)
 	for cy in caps:
 		_put(_box(0.76, 0.05, 0.76), _m("brass"), at + Vector3(0, cy - 0.42, 0), a)
-		_put(_box(0.86, 0.18, 0.86), _m("cream"), at + Vector3(0, cy - 0.27, 0), a)
-		_put(_box(1.0, 0.12, 1.0), _m("cream"), at + Vector3(0, cy - 0.06, 0), a)
+		_put(Props.rounded_block(0.86, 0.18, 0.86, 0.07, 0.035, 2), _m("cream"), at + Vector3(0, cy - 0.36, 0), a)
+		_put(Props.rounded_block(1.0, 0.12, 1.0, 0.08, 0.025, 2), _m("cream"), at + Vector3(0, cy - 0.12, 0), a)
 		for f in [Vector3(1, 0, 0), Vector3(-1, 0, 0), Vector3(0, 0, 1), Vector3(0, 0, -1)]:
 			var med := _put(_cyl(0.07, 0.07, 0.03, 16), _m("brass"), at + Vector3(0, cy - 0.62, 0) + f * 0.36, a)
 			med.rotation = Vector3(PI / 2.0, 0, 0) if absf(f.z) > 0.5 else Vector3(0, 0, PI / 2.0)
 		if brackets != 0.0 and cy < top and reach > 0.0:
 			_put(_box(reach, 0.32, 0.5), _m("cream"), at + Vector3(brackets * (0.35 + reach * 0.5), cy - 0.16, 0), a)
 			_put(_box(reach, 0.04, 0.52), _m("brass"), at + Vector3(brackets * (0.35 + reach * 0.5), cy - 0.3, 0), a)
+
+
+## Three stopped channels on each face, with rounded ends and narrow stone
+## arrises. The dark bed is a material recess, with real raised edges catching
+## the existing lamps. Small reliefs don't need their own shadow submissions.
+## Banners and lanterns remain proud of them; no fixtures are moved.
+static func _pillar_flutes(a: Node3D, at: Vector3, y0: float, y1: float) -> void:
+	for face in [Vector3.FORWARD, Vector3.BACK, Vector3.LEFT, Vector3.RIGHT]:
+		var along: Vector3 = face.cross(Vector3.UP)
+		for offset in [-0.19, 0.0, 0.19]:
+			var h := y1 - y0
+			var centre: Vector3 = at + along * offset + Vector3(0, (y0 + y1) * 0.5, 0)
+			var bed := _put(_box(0.085, h, 0.012), _m("flute_recess"), centre + face * 0.352, a, false)
+			bed.rotation.y = atan2(face.x, face.z)
+			for edge in [-1.0, 1.0]:
+				var lip := _put(_box(0.018, h, 0.025), _m("cream"), centre + along * (edge * 0.052) + face * 0.357, a, false)
+				lip.rotation.y = atan2(face.x, face.z)
+			for y in [y0, y1]:
+				var stop := _put(_cyl(0.043, 0.043, 0.012, 8), _m("flute_recess"), at + along * offset + Vector3(0, y, 0) + face * 0.352, a, false)
+				stop.basis = Basis.looking_at(face, Vector3.UP) * Basis(Vector3.RIGHT, PI / 2.0)
 
 
 ## The atrium's own columns: the rest of the gallery colonnade north of the court, and a row
@@ -1066,6 +1098,7 @@ static func _m(name: String) -> StandardMaterial3D:
 			m.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
 		"frame_dark": m = ST.plastic(Color("2b2420"), 0.45, 0.35)
 		"flute": m = ST.plastic(Color("d6ccb8"), 0.7, 0.0)
+		"flute_recess": m = ST.plastic(Color("a89a80"), 0.85, 0.0)
 		"walnut": m = ST.plastic(Color("5e3a22"), 0.5, 0.0)
 		"walnut_dark": m = ST.plastic(Color("3a2216"), 0.55, 0.0)
 		"nosing": m = ST.plastic(Color("c9a64a"), 0.5, 0.3)

@@ -7,7 +7,10 @@
 set -u
 cd "$(dirname "$0")/.."
 G="${GODOT:-godot}"
-RENDER=(env VK_ICD_FILENAMES="${VK_ICD_FILENAMES:-/usr/share/vulkan/icd.d/lvp_icd.json}" xvfb-run -a)
+RENDER=(env VK_ICD_FILENAMES="${VK_ICD_FILENAMES:-/usr/share/vulkan/icd.d/lvp_icd.json}")
+# Reuse an explicitly supplied display (including a TCP Xvfb in containers
+# that do not expose Unix sockets). Otherwise create a temporary display.
+if [[ -z "${DISPLAY:-}" ]]; then RENDER+=(xvfb-run -a); fi
 fail=0
 note() { printf '%-28s %s\n' "$1" "$2"; }
 
@@ -18,6 +21,10 @@ for t in room_test hats_test alterations_test sim_test paths_test chapter_test; 
 done
 
 if python3 tools/asset_paths.py; then note "asset paths" PASS; else note "asset paths" FAIL; fail=1; fi
+
+out=$("${RENDER[@]}" "$G" --rendering-driver vulkan --path . -s res://tests/geometry_test.gd 2>&1)
+if grep -q "RESULT: PASS" <<<"$out" && ! grep -q "SCRIPT ERROR" <<<"$out"; then note "geometry (rendered)" PASS
+else note "geometry (rendered)" FAIL; fail=1; grep -E "FAIL|SCRIPT ERROR" <<<"$out" | head -5; fi
 
 out=$("${RENDER[@]}" "$G" --rendering-driver vulkan --path . -s res://tools/scene_check.gd 2>&1)
 if grep -q "SCENE CHECK: all" <<<"$out" && ! grep -qE "SCRIPT ERROR|SCENE CHECK FAIL|Failed loading resource" <<<"$out"; then

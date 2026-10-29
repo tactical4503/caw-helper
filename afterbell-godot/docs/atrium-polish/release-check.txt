@@ -1,0 +1,11 @@
+room_test                    PASS
+hats_test                    PASS
+alterations_test             PASS
+sim_test                     PASS
+paths_test                   PASS
+chapter_test                 PASS
+asset paths: 55 checked, 0 missing, 0 optional absent
+asset paths                  PASS
+geometry (rendered)          PASS
+scenes (rendered)            PASS
+RELEASE CHECK: PASS

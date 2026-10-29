@@ -16,6 +16,10 @@ var wait := -1
 
 
 func _initialize() -> void:
+	if DisplayServer.get_name() == "headless":
+		printerr("CAPTURE FAIL: ref_shot needs a real renderer, not --headless")
+		quit(1)
+		return
 	for arg in OS.get_cmdline_user_args():
 		if arg.begins_with("--out="):
 			out = arg.substr(6)
@@ -42,6 +46,11 @@ func _initialize() -> void:
 
 
 func _process(_d: float) -> bool:
+	# _ready runs after SceneTree._initialize, so validate on the first frame.
+	if room == null or not room.has_method("start_game") or room.get("arena") == null or room.get("gauge") == null:
+		printerr("CAPTURE FAIL: court did not initialize; inspect preceding script errors")
+		quit(1)
+		return true
 	if wait == -1:
 		room.set_process(false)
 		if room.get("fade"):
@@ -78,7 +87,29 @@ func _process(_d: float) -> bool:
 				both.blit_rect(r, Rect2i(Vector2i.ZERO, r.get_size()), Vector2i.ZERO)
 				both.blit_rect(img, Rect2i(Vector2i.ZERO, img.get_size()), Vector2i(img.get_width(), 0))
 				img = both
-		img.save_png(out)
+		var saved := img.save_png(out)
+		if saved != OK:
+			printerr("CAPTURE FAIL: cannot write ", out, " (", saved, ")")
+			quit(1)
+			return true
+		# Keep renderer work beside the exact camera capture, rather than comparing
+		# counts from perf_probe's different (moving) opening camera.
+		var rs := RenderingServer
+		var metrics := {
+			"engine": Engine.get_version_info().string,
+			"adapter": rs.get_video_adapter_name(),
+			"viewport": [root.size.x, root.size.y],
+			"player": [pos.x, pos.y],
+			"boss_visible": show_boss,
+			"draw_calls": rs.get_rendering_info(rs.RENDERING_INFO_TOTAL_DRAW_CALLS_IN_FRAME),
+			"primitives": rs.get_rendering_info(rs.RENDERING_INFO_TOTAL_PRIMITIVES_IN_FRAME),
+			"objects": rs.get_rendering_info(rs.RENDERING_INFO_TOTAL_OBJECTS_IN_FRAME),
+			"lights": room.find_children("*", "Light3D", true, false).size(),
+		}
+		var report := FileAccess.open(out.get_basename() + ".json", FileAccess.WRITE)
+		if report:
+			report.store_string(JSON.stringify(metrics, "\t") + "\n")
+		print("CAPTURE METRICS: ", JSON.stringify(metrics))
 		print("saved ", out)
 		quit()
 	return false

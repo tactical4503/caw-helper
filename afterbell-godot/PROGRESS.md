@@ -1,5 +1,27 @@
 # AFTERBELL — chapter progress log
 
+## Atrium stonework pass — 29 October 2026
+
+Working branch: `afterbell-atrium-polish`, from baseline `66445bc`.
+
+- Replaced shared box-shaft columns with bevelled stone bases, shafts and
+  capitals, and stopped fluting. Preserved footprint, height, fixtures, combat
+  constants, camera and objectives. No additional lights or imported assets.
+- Reduced stone corner tessellation and fixed the rounded-block mesh cache
+  ignoring `seg`; new rendered regression checks protect that behaviour.
+- Added fixed-view renderer metrics beside captures and hardened capture failure
+  handling. Release checks include rendered geometry and reuse DISPLAY if set.
+- **Verified:** 108 existing + 6 new assertions; 55 asset paths; all six scenes
+  run with a real Forward+ renderer; release gate PASS. No new exported builds.
+- **Matched view:** 459 → 461 draws, 2,005,642 → 2,068,714 primitives (+3.14%),
+  64 → 64 light nodes. Software Vulkan only; no real-hardware FPS claim.
+
+[Before/after, audit, tool evaluation and next tasks](docs/atrium-polish/REVIEW.md).
+Evidence: `docs/atrium-polish/{before,after}.png`, matching JSON counts,
+`release-check.txt` and `validation.json`. Repeated displays and flat warm
+midtones remain; interactive camera/animation/audio QA is still outstanding.
+
+
 Source of truth: the Installment 002 bible (the user's first message in the build session,
 "Closing Time: Bellwether's Department Store", canon 0.2), plus this folder's README and code.
 Visual target: the user's department-store reference (4:3, golden bell on the MENSWEAR

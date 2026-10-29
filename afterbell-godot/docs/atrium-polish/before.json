@@ -1,0 +1,17 @@
+{
+	"adapter": "llvmpipe (LLVM 20.1.2, 256 bits)",
+	"boss_visible": false,
+	"draw_calls": 459,
+	"engine": "4.3-stable (official)",
+	"lights": 64,
+	"objects": 459,
+	"player": [
+		0,
+		-4.19999980926514
+	],
+	"primitives": 2005642,
+	"viewport": [
+		1280,
+		960
+	]
+}
